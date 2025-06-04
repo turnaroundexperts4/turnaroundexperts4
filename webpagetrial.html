@@ -1,0 +1,1563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Turnaround Experts - Transform Your Startup</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+            color: #ffffff;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #00ffff, #ff00ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: #ffffff;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: #00ffff;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(45deg, #00ffff, #ff00ff);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.6rem 1.5rem;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #00ffff, #0080ff);
+            color: #000;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid #00ffff;
+            color: #00ffff;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 255, 255, 0.3);
+        }
+
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 50%, rgba(0, 255, 255, 0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #00ffff, #ff00ff, #ffff00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { filter: brightness(1); }
+            to { filter: brightness(1.2); }
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        /* Sections */
+        .section {
+            padding: 5rem 0;
+            position: relative;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            background: linear-gradient(45deg, #00ffff, #ff00ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* About Section */
+        .about-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .about-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .about-card:hover {
+            transform: translateY(-10px);
+            border-color: #00ffff;
+            box-shadow: 0 20px 40px rgba(0, 255, 255, 0.2);
+        }
+
+        .about-card h3 {
+            color: #00ffff;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        /* Services Section */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .service-item {
+            text-align: center;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .service-item:hover {
+            transform: scale(1.05);
+            border-color: #ff00ff;
+        }
+
+        .service-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #00ffff;
+        }
+
+        /* Pricing Section */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .pricing-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(0, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 2.5rem;
+            text-align: center;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .pricing-card.featured {
+            border-color: #ff00ff;
+            transform: scale(1.05);
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            border-color: #00ffff;
+        }
+
+        .plan-name {
+            font-size: 1.5rem;
+            color: #00ffff;
+            margin-bottom: 1rem;
+        }
+
+        .plan-price {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #ff00ff;
+            margin-bottom: 1rem;
+        }
+
+        .plan-duration {
+            color: #ffffff;
+            opacity: 0.8;
+            margin-bottom: 2rem;
+        }
+
+        .plan-features {
+            list-style: none;
+            margin-bottom: 2rem;
+        }
+
+        .plan-features li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .plan-features li:before {
+            content: '✓';
+            color: #00ffff;
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+
+        /* Forms */
+        .form-container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #00ffff;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #00ffff;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+        }
+
+        /* Footer */
+        footer {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 3rem 0;
+            text-align: center;
+            border-top: 1px solid rgba(0, 255, 255, 0.2);
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h3 {
+            color: #00ffff;
+            margin-bottom: 1rem;
+        }
+
+        .footer-section p,
+        .footer-section a {
+            color: #ffffff;
+            opacity: 0.8;
+            text-decoration: none;
+        }
+
+        .footer-section a:hover {
+            color: #00ffff;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a2e 0%, #2a2a4e 100%);
+            border: 2px solid #00ffff;
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+            font-size: 2rem;
+            color: #00ffff;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #ff00ff;
+        }
+
+        /* Hidden sections */
+        .hidden {
+            display: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero p {
+                font-size: 1.1rem;
+            }
+            
+            .pricing-card.featured {
+                transform: none;
+            }
+        }
+
+        /* Admin Panel */
+        .admin-panel {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .admin-section {
+            margin-bottom: 3rem;
+        }
+
+        .admin-section h3 {
+            color: #00ffff;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .data-table th {
+            background: rgba(0, 255, 255, 0.1);
+            color: #00ffff;
+            font-weight: bold;
+        }
+
+        .data-table tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-export {
+            background: linear-gradient(45deg, #ff00ff, #ff4500);
+            color: #fff;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .btn-export:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 0, 255, 0.3);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #00ffff;
+        }
+
+        .stat-label {
+            opacity: 0.8;
+            margin-top: 0.5rem;
+        }
+        .case-study {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 3rem;
+            margin: 3rem 0;
+            text-align: center;
+        }
+
+        .case-study h3 {
+            color: #ff00ff;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .case-study-logo {
+            font-size: 1.5rem;
+            color: #00ffff;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .metric {
+            text-align: center;
+        }
+
+        .metric-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #00ffff;
+        }
+
+        .metric-label {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <nav class="container">
+            <div class="logo">TAE - TURNAROUND EXPERTS</div>
+            <ul class="nav-links">
+                <li><a href="#home" onclick="showSection('home')">Home</a></li>
+                <li><a href="#about" onclick="showSection('about')">About</a></li>
+                <li><a href="#services" onclick="showSection('services')">Services</a></li>
+                <li><a href="#pricing" onclick="showSection('pricing')">Pricing</a></li>
+                <li><a href="#contact" onclick="showSection('contact')">Contact</a></li>
+                <li id="adminNav" style="display: none;"><a href="#admin" onclick="showSection('admin')">Admin</a></li>
+            </ul>
+            <div class="auth-buttons">
+                <a href="#" class="btn btn-secondary" onclick="showModal('loginModal')">Login</a>
+                <a href="#" class="btn btn-primary" onclick="showModal('signupModal')">Sign Up</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Home Section -->
+    <section id="home" class="hero">
+        <div class="hero-bg"></div>
+        <div class="container">
+            <div class="hero-content">
+                <h1>TRANSFORM YOUR STARTUP</h1>
+                <p>Turn losses into profits with our expert strategies and innovative marketing campaigns</p>
+                <div style="margin-top: 2rem;">
+                    <a href="#" class="btn btn-primary" onclick="showSection('pricing')" style="margin-right: 1rem;">Get Started</a>
+                    <a href="#" class="btn btn-secondary" onclick="showSection('about')">Learn More</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Admin Section -->
+    <section id="admin" class="section hidden">
+        <div class="container">
+            <h2 class="section-title">Admin Dashboard</h2>
+            
+            <!-- Statistics -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalUsers">0</div>
+                    <div class="stat-label">Total Users</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalAppointments">0</div>
+                    <div class="stat-label">Total Appointments</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="pendingAppointments">0</div>
+                    <div class="stat-label">Pending Appointments</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="basicPlanCount">0</div>
+                    <div class="stat-label">Basic Plan Interest</div>
+                </div>
+            </div>
+
+            <!-- Export Buttons -->
+            <div class="export-buttons">
+                <button class="btn-export" onclick="exportUsersToExcel()">📊 Export Users to Excel</button>
+                <button class="btn-export" onclick="exportAppointmentsToExcel()">📅 Export Appointments to Excel</button>
+                <button class="btn-export" onclick="exportAllDataToExcel()">📋 Export All Data to Excel</button>
+            </div>
+
+            <!-- Users Section -->
+            <div class="admin-section">
+                <h3>Registered Users</h3>
+                <div style="overflow-x: auto;">
+                    <table class="data-table" id="usersTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Company</th>
+                                <th>Registration Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody">
+                            <!-- Users will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Appointments Section -->
+            <div class="admin-section">
+                <h3>Appointments</h3>
+                <div style="overflow-x: auto;">
+                    <table class="data-table" id="appointmentsTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Company</th>
+                                <th>Plan</th>
+                                <th>Message</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="appointmentsTableBody">
+                            <!-- Appointments will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="section hidden">
+        <div class="container">
+            <h2 class="section-title">Why Choose TAE?</h2>
+            
+            <!-- Success Case Study -->
+            <div class="case-study">
+                <h3>SUCCESS STORY</h3>
+                <div class="case-study-logo">LE CHALO</div>
+                <p>From struggling startup to profitable business - we transformed Le Chalo's entire operation</p>
+                <div class="metrics">
+                    <div class="metric">
+                        <div class="metric-number">30%</div>
+                        <div class="metric-label">Revenue Growth</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-number">5K+</div>
+                        <div class="metric-label">Social Followers</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-number">58%</div>
+                        <div class="metric-label">Cost Reduction</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-number">1M</div>
+                        <div class="metric-label">Months to Profit</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="about-grid">
+                <div class="about-card">
+                    <h3>Complete Business Transformation</h3>
+                    <p>We don't just manage your marketing - we transform your entire business model, operations, and strategy to ensure sustainable growth and profitability.</p>
+                </div>
+                <div class="about-card">
+                    <h3>Expert Team</h3>
+                    <p>Our specialists include social media marketers, SEO experts, web developers, financial advisors, and legal consultants - all working together for your success.</p>
+                </div>
+                <div class="about-card">
+                    <h3>Proven Results</h3>
+                    <p>We've helped startups like Le Chalo achieve remarkable transformations. Our track record speaks for itself with measurable improvements in revenue and growth.</p>
+                </div>
+                <div class="about-card">
+                    <h3>Full-Service Solutions</h3>
+                    <p>From social media management to website development, ground operations to legal compliance - we handle everything so you can focus on your core business.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="section hidden">
+        <div class="container">
+            <h2 class="section-title">Our Expertise</h2>
+            <div class="services-grid">
+                <div class="service-item">
+                    <div class="service-icon">📱</div>
+                    <h3>Social Media Management</h3>
+                    <p>Complete social media strategy, content creation, and community management across all platforms</p>
+                </div>
+                <div class="service-item">
+                    <div class="service-icon">🌐</div>
+                    <h3>Website Development</h3>
+                    <p>Custom website design, development, and ongoing management to establish your online presence</p>
+                </div>
+                <div class="service-item">
+                    <div class="service-icon">🔍</div>
+                    <h3>SEO Optimization</h3>
+                    <p>Search engine optimization to improve your visibility and drive organic traffic to your business</p>
+                </div>
+                <div class="service-item">
+                    <div class="service-icon">📊</div>
+                    <h3>Marketing Campaigns</h3>
+                    <p>Unique, data-driven marketing campaigns designed to maximize ROI and customer acquisition</p>
+                </div>
+                <div class="service-item">
+                    <div class="service-icon">🏢</div>
+                    <h3>Ground Operations</h3>
+                    <p>Physical marketing activities, hoardings, events, and on-ground promotional campaigns</p>
+                </div>
+                <div class="service-item">
+                    <div class="service-icon">⚖️</div>
+                    <h3>Legal & Financial</h3>
+                    <p>Legal compliance support and financial optimization strategies (Advanced plan only)</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="section hidden">
+        <div class="container">
+            <h2 class="section-title">Choose Your Transformation Plan</h2>
+            <div class="pricing-grid">
+                <div class="pricing-card">
+                    <div class="plan-name">BASIC PLAN</div>
+                    <div class="plan-price">₹11,999</div>
+                    <div class="plan-duration">2 Months</div>
+                    <ul class="plan-features">
+                        <li>Dedicated Social Media Manager</li>
+                        <li>Daily Content Creation & Posting</li>
+                        <li>Ground Marketing Tasks</li>
+                        <li>Hoardings & Physical Promotion</li>
+                        <li>Basic Analytics & Reporting</li>
+                        <li>Weekly Strategy Calls</li>
+                    </ul>
+                    <a href="#" class="btn btn-primary" onclick="bookAppointment('Basic Plan')">Get Started</a>
+                </div>
+                
+                <div class="pricing-card featured">
+                    <div class="plan-name">STANDARD PLAN</div>
+                    <div class="plan-price">₹24,999</div>
+                    <div class="plan-duration">4 Months</div>
+                    <ul class="plan-features">
+                        <li>Everything in Basic Plan</li>
+                        <li>Custom Website Development</li>
+                        <li>Website Management & Maintenance</li>
+                        <li>SEO Optimization</li>
+                        <li>Advanced Social Media Strategy</li>
+                        <li>Email Marketing Setup</li>
+                        <li>Bi-weekly Strategy Sessions</li>
+                    </ul>
+                    <a href="#" class="btn btn-primary" onclick="bookAppointment('Standard Plan')">Most Popular</a>
+                </div>
+                
+                <div class="pricing-card">
+                    <div class="plan-name">ADVANCE PLAN</div>
+                    <div class="plan-price">₹49,999</div>
+                    <div class="plan-duration">6 Months</div>
+                    <ul class="plan-features">
+                        <li>Everything in Standard Plan</li>
+                        <li>Legal Compliance Support</li>
+                        <li>Financial Strategy & Optimization</li>
+                        <li>Business Model Restructuring</li>
+                        <li>Advanced Analytics & Insights</li>
+                        <li>Priority Support & Consultation</li>
+                        <li>Weekly One-on-One Sessions</li>
+                    </ul>
+                    <a href="#" class="btn btn-primary" onclick="bookAppointment('Advance Plan')">Transform Now</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="section hidden">
+        <div class="container">
+            <h2 class="section-title">Book Your Consultation</h2>
+            <div class="form-container">
+                <form id="appointmentForm">
+                    <div class="form-group">
+                        <label for="name">Full Name</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" id="phone" name="phone" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="company">Company Name</label>
+                        <input type="text" id="company" name="company" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="plan">Interested Plan</label>
+                        <select id="plan" name="plan" required>
+                            <option value="">Select a Plan</option>
+                            <option value="Basic Plan">Basic Plan - ₹11,999</option>
+                            <option value="Standard Plan">Standard Plan - ₹24,999</option>
+                            <option value="Advance Plan">Advance Plan - ₹49,999</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Tell us about your business challenges</label>
+                        <textarea id="message" name="message" rows="4" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Book Appointment</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>TAE - Turnaround Experts</h3>
+                    <p>Transforming startups from losses to profits through innovative strategies and expert execution.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Services</h3>
+                    <p>Social Media Management<br>
+                    Website Development<br>
+                    SEO Optimization<br>
+                    Marketing Campaigns</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Contact</h3>
+                    <p>Email: turnaroundexperts4@gmail.com<br>
+                    Phone: +91 84016 35015<br>
+                    Address: Palanpur Banaskantha Gujarat</p>
+                </div>
+            </div>
+            <p>&copy; 2025 Turnaround Experts. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('loginModal')">&times;</span>
+            <h2 style="text-align: center; color: #00ffff; margin-bottom: 2rem;">Login</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginEmail">Email Address</label>
+                    <input type="email" id="loginEmail" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" name="password" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Signup Modal -->
+    <div id="signupModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('signupModal')">&times;</span>
+            <h2 style="text-align: center; color: #00ffff; margin-bottom: 2rem;">Sign Up</h2>
+            <form id="signupForm">
+                <div class="form-group">
+                    <label for="signupName">Full Name</label>
+                    <input type="text" id="signupName" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="signupEmail">Email Address</label>
+                    <input type="email" id="signupEmail" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="signupPassword">Password</label>
+                    <input type="password" id="signupPassword" name="password" required>
+                </div>
+                <div class="form-group">
+                    <label for="signupCompany">Company Name</label>
+                    <input type="text" id="signupCompany" name="company" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Create Account</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script>
+        // User data storage
+        let users = JSON.parse(localStorage.getItem('tae_users')) || [];
+        let appointments = JSON.parse(localStorage.getItem('tae_appointments')) || [];
+        let currentUser = JSON.parse(localStorage.getItem('tae_current_user')) || null;
+        
+        // Admin credentials
+        const ADMIN_EMAIL = 'luckyvarandani112@gmail.com';
+        const ADMIN_PASSWORD = 'lucky@123';
+
+        // Navigation
+        function showSection(sectionId) {
+            // Hide all sections
+            const sections = ['home', 'about', 'services', 'pricing', 'contact', 'admin'];
+            sections.forEach(id => {
+                const element = document.getElementById(id);
+                if (id === sectionId) {
+                    element.classList.remove('hidden');
+                } else {
+                    element.classList.add('hidden');
+                }
+            });
+
+            // Update admin data if showing admin section
+            if (sectionId === 'admin') {
+                updateAdminDashboard();
+            }
+        }
+
+        // Modal functions
+        function showModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Book appointment function
+        function bookAppointment(planName) {
+            const planSelect = document.getElementById('plan');
+            planSelect.value = planName;
+            showSection('contact');
+        }
+
+        // Form submissions
+        document.getElementById('signupForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const userData = {
+                id: Date.now(),
+                name: formData.get('name'),
+                email: formData.get('email'),
+                password: formData.get('password'),
+                company: formData.get('company'),
+                createdAt: new Date().toISOString()
+            };
+
+            // Check if user already exists
+            if (users.find(user => user.email === userData.email)) {
+                alert('User with this email already exists!');
+                return;
+            }
+
+            users.push(userData);
+            localStorage.setItem('tae_users', JSON.stringify(users));
+            
+            alert('Account created successfully! You can now login.');
+            closeModal('signupModal');
+            this.reset();
+        });
+
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const email = formData.get('email');
+            const password = formData.get('password');
+
+            // Check for admin login
+            if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+                currentUser = {
+                    id: 'admin',
+                    name: 'Admin',
+                    email: ADMIN_EMAIL,
+                    isAdmin: true
+                };
+                localStorage.setItem('tae_current_user', JSON.stringify(currentUser));
+                alert('Welcome Admin! You now have access to the admin dashboard.');
+                closeModal('loginModal');
+                updateAuthButtons();
+                this.reset();
+                return;
+            }
+
+            // Regular user login
+            const user = users.find(u => u.email === email && u.password === password);
+            
+            if (user) {
+                currentUser = user;
+                localStorage.setItem('tae_current_user', JSON.stringify(user));
+                alert(`Welcome back, ${user.name}!`);
+                closeModal('loginModal');
+                updateAuthButtons();
+                this.reset();
+            } else {
+                alert('Invalid email or password!');
+            }
+        });
+
+        document.getElementById('appointmentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const appointmentData = {
+                id: Date.now(),
+                name: formData.get('name'),
+                email: formData.get('email'),
+                phone: formData.get('phone'),
+                company: formData.get('company'),
+                plan: formData.get('plan'),
+                message: formData.get('message'),
+                status: 'pending',
+                createdAt: new Date().toISOString()
+            };
+
+            appointments.push(appointmentData);
+            localStorage.setItem('tae_appointments', JSON.stringify(appointments));
+            
+            alert('Appointment booked successfully! Our team will contact you within 24 hours.');
+            this.reset();
+        });
+
+        // Update auth buttons based on login status
+        function updateAuthButtons() {
+            const authButtons = document.querySelector('.auth-buttons');
+            const adminNav = document.getElementById('adminNav');
+            
+            if (currentUser) {
+                if (currentUser.isAdmin) {
+                    authButtons.innerHTML = `
+                        <span style="color: #ff00ff; margin-right: 1rem; font-weight: bold;">👑 Admin Panel</span>
+                        <a href="#" class="btn btn-secondary" onclick="logout()">Logout</a>
+                    `;
+                    adminNav.style.display = 'block';
+                } else {
+                    authButtons.innerHTML = `
+                        <span style="color: #00ffff; margin-right: 1rem;">Welcome, ${currentUser.name}</span>
+                        <a href="#" class="btn btn-secondary" onclick="logout()">Logout</a>
+                    `;
+                    adminNav.style.display = 'none';
+                }
+            } else {
+                authButtons.innerHTML = `
+                    <a href="#" class="btn btn-secondary" onclick="showModal('loginModal')">Login</a>
+                    <a href="#" class="btn btn-primary" onclick="showModal('signupModal')">Sign Up</a>
+                `;
+                adminNav.style.display = 'none';
+            }
+        }
+
+        // Excel Export Functions
+        function exportUsersToExcel() {
+            if (users.length === 0) {
+                alert('No users data to export!');
+                return;
+            }
+
+            const wb = XLSX.utils.book_new();
+            const wsData = [
+                ['ID', 'Name', 'Email', 'Company', 'Registration Date']
+            ];
+
+            users.forEach(user => {
+                wsData.push([
+                    user.id,
+                    user.name,
+                    user.email,
+                    user.company,
+                    new Date(user.createdAt).toLocaleDateString()
+                ]);
+            });
+
+            const ws = XLSX.utils.aoa_to_sheet(wsData);
+            XLSX.utils.book_append_sheet(wb, ws, 'Users');
+            XLSX.writeFile(wb, `TAE_Users_${new Date().toISOString().split('T')[0]}.xlsx`);
+        }
+
+        function exportAppointmentsToExcel() {
+            if (appointments.length === 0) {
+                alert('No appointments data to export!');
+                return;
+            }
+
+            const wb = XLSX.utils.book_new();
+            const wsData = [
+                ['ID', 'Name', 'Email', 'Phone', 'Company', 'Plan', 'Message', 'Status', 'Date']
+            ];
+
+            appointments.forEach(appointment => {
+                wsData.push([
+                    appointment.id,
+                    appointment.name,
+                    appointment.email,
+                    appointment.phone,
+                    appointment.company,
+                    appointment.plan,
+                    appointment.message,
+                    appointment.status,
+                    new Date(appointment.createdAt).toLocaleDateString()
+                ]);
+            });
+
+            const ws = XLSX.utils.aoa_to_sheet(wsData);
+            XLSX.utils.book_append_sheet(wb, ws, 'Appointments');
+            XLSX.writeFile(wb, `TAE_Appointments_${new Date().toISOString().split('T')[0]}.xlsx`);
+        }
+
+        function exportAllDataToExcel() {
+            const wb = XLSX.utils.book_new();
+
+            // Users Sheet
+            if (users.length > 0) {
+                const usersData = [
+                    ['ID', 'Name', 'Email', 'Company', 'Registration Date']
+                ];
+                users.forEach(user => {
+                    usersData.push([
+                        user.id,
+                        user.name,
+                        user.email,
+                        user.company,
+                        new Date(user.createdAt).toLocaleDateString()
+                    ]);
+                });
+                const usersSheet = XLSX.utils.aoa_to_sheet(usersData);
+                XLSX.utils.book_append_sheet(wb, usersSheet, 'Users');
+            }
+
+            // Appointments Sheet
+            if (appointments.length > 0) {
+                const appointmentsData = [
+                    ['ID', 'Name', 'Email', 'Phone', 'Company', 'Plan', 'Message', 'Status', 'Date']
+                ];
+                appointments.forEach(appointment => {
+                    appointmentsData.push([
+                        appointment.id,
+                        appointment.name,
+                        appointment.email,
+                        appointment.phone,
+                        appointment.company,
+                        appointment.plan,
+                        appointment.message,
+                        appointment.status,
+                        new Date(appointment.createdAt).toLocaleDateString()
+                    ]);
+                });
+                const appointmentsSheet = XLSX.utils.aoa_to_sheet(appointmentsData);
+                XLSX.utils.book_append_sheet(wb, appointmentsSheet, 'Appointments');
+            }
+
+            // Statistics Sheet
+            const statsData = [
+                ['Metric', 'Value'],
+                ['Total Users', users.length],
+                ['Total Appointments', appointments.length],
+                ['Pending Appointments', appointments.filter(a => a.status === 'pending').length],
+                ['Basic Plan Interest', appointments.filter(a => a.plan === 'Basic Plan').length],
+                ['Standard Plan Interest', appointments.filter(a => a.plan === 'Standard Plan').length],
+                ['Advance Plan Interest', appointments.filter(a => a.plan === 'Advance Plan').length],
+                ['Export Date', new Date().toLocaleDateString()]
+            ];
+            const statsSheet = XLSX.utils.aoa_to_sheet(statsData);
+            XLSX.utils.book_append_sheet(wb, statsSheet, 'Statistics');
+
+            XLSX.writeFile(wb, `TAE_Complete_Data_${new Date().toISOString().split('T')[0]}.xlsx`);
+        }
+
+        // Admin Dashboard Functions
+        function updateAdminDashboard() {
+            // Update statistics
+            document.getElementById('totalUsers').textContent = users.length;
+            document.getElementById('totalAppointments').textContent = appointments.length;
+            document.getElementById('pendingAppointments').textContent = 
+                appointments.filter(a => a.status === 'pending').length;
+            document.getElementById('basicPlanCount').textContent = 
+                appointments.filter(a => a.plan === 'Basic Plan').length;
+
+            // Update users table
+            const usersTableBody = document.getElementById('usersTableBody');
+            usersTableBody.innerHTML = '';
+            users.forEach(user => {
+                const row = usersTableBody.insertRow();
+                row.innerHTML = `
+                    <td>${user.id}</td>
+                    <td>${user.name}</td>
+                    <td>${user.email}</td>
+                    <td>${user.company}</td>
+                    <td>${new Date(user.createdAt).toLocaleDateString()}</td>
+                `;
+            });
+
+            // Update appointments table
+            const appointmentsTableBody = document.getElementById('appointmentsTableBody');
+            appointmentsTableBody.innerHTML = '';
+            appointments.forEach(appointment => {
+                const row = appointmentsTableBody.insertRow();
+                row.innerHTML = `
+                    <td>${appointment.id}</td>
+                    <td>${appointment.name}</td>
+                    <td>${appointment.email}</td>
+                    <td>${appointment.phone}</td>
+                    <td>${appointment.company}</td>
+                    <td><span style="color: #00ffff; font-weight: bold;">${appointment.plan}</span></td>
+                    <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;">${appointment.message}</td>
+                    <td><span style="color: ${appointment.status === 'pending' ? '#ff00ff' : '#00ffff'}; font-weight: bold;">${appointment.status}</span></td>
+                    <td>${new Date(appointment.createdAt).toLocaleDateString()}</td>
+                    <td>
+                        <button onclick="updateAppointmentStatus(${appointment.id}, 'completed')" 
+                                style="background: #00ffff; color: #000; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; margin-right: 5px;">
+                            Complete
+                        </button>
+                        <button onclick="deleteAppointment(${appointment.id})" 
+                                style="background: #ff0000; color: #fff; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">
+                            Delete
+                        </button>
+                    </td>
+                `;
+            });
+        }
+
+        function updateAppointmentStatus(appointmentId, newStatus) {
+            const appointment = appointments.find(a => a.id === appointmentId);
+            if (appointment) {
+                appointment.status = newStatus;
+                localStorage.setItem('tae_appointments', JSON.stringify(appointments));
+                updateAdminDashboard();
+                alert(`Appointment status updated to ${newStatus}!`);
+            }
+        }
+
+        function deleteAppointment(appointmentId) {
+            if (confirm('Are you sure you want to delete this appointment?')) {
+                appointments = appointments.filter(a => a.id !== appointmentId);
+                localStorage.setItem('tae_appointments', JSON.stringify(appointments));
+                updateAdminDashboard();
+                alert('Appointment deleted successfully!');
+            }
+        }
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('tae_current_user');
+            updateAuthButtons();
+            alert('Logged out successfully!');
+        }
+
+        // Close modals when clicking outside
+        window.addEventListener('click', function(e) {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        });
+
+        // Smooth scrolling animation
+        function smoothScroll() {
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => {
+                section.style.opacity = '0';
+                section.style.transform = 'translateY(50px)';
+                section.style.transition = 'all 0.6s ease';
+            });
+
+            setTimeout(() => {
+                sections.forEach(section => {
+                    if (!section.classList.contains('hidden')) {
+                        section.style.opacity = '1';
+                        section.style.transform = 'translateY(0)';
+                    }
+                });
+            }, 100);
+        }
+
+        // Add animation to cards
+        function animateCards() {
+            const cards = document.querySelectorAll('.about-card, .service-item, .pricing-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(30px)';
+                card.style.transition = `all 0.6s ease ${index * 0.1}s`;
+                
+                setTimeout(() => {
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, 200 + (index * 100));
+            });
+        }
+
+        // Floating particles animation
+        function createParticles() {
+            const particleContainer = document.createElement('div');
+            particleContainer.style.position = 'fixed';
+            particleContainer.style.top = '0';
+            particleContainer.style.left = '0';
+            particleContainer.style.width = '100%';
+            particleContainer.style.height = '100%';
+            particleContainer.style.pointerEvents = 'none';
+            particleContainer.style.zIndex = '1';
+            document.body.appendChild(particleContainer);
+
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.style.position = 'absolute';
+                particle.style.width = '2px';
+                particle.style.height = '2px';
+                particle.style.background = '#00ffff';
+                particle.style.borderRadius = '50%';
+                particle.style.opacity = Math.random();
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animation = `float ${5 + Math.random() * 10}s linear infinite`;
+                particleContainer.appendChild(particle);
+            }
+        }
+
+        // Add floating animation keyframes
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes float {
+                0% { transform: translateY(100vh) rotate(0deg); }
+                100% { transform: translateY(-100vh) rotate(360deg); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateAuthButtons();
+            createParticles();
+            
+            // Add event listeners for section changes
+            const originalShowSection = showSection;
+            showSection = function(sectionId) {
+                originalShowSection(sectionId);
+                smoothScroll();
+                setTimeout(animateCards, 300);
+            };
+        });
+
+        // Add typing effect to hero text
+        function typeWriter(element, text, speed = 100) {
+            let i = 0;
+            element.innerHTML = '';
+            
+            function type() {
+                if (i < text.length) {
+                    element.innerHTML += text.charAt(i);
+                    i++;
+                    setTimeout(type, speed);
+                }
+            }
+            type();
+        }
+
+        // Initialize typing effect
+        window.addEventListener('load', function() {
+            const heroTitle = document.querySelector('.hero h1');
+            const heroText = document.querySelector('.hero p');
+            
+            setTimeout(() => {
+                typeWriter(heroTitle, 'TRANSFORM YOUR STARTUP', 100);
+            }, 500);
+            
+            setTimeout(() => {
+                typeWriter(heroText, 'Turn losses into profits with our expert strategies and innovative marketing campaigns', 50);
+            }, 3000);
+        });
+
+        // Add hover effects to pricing cards
+        document.addEventListener('DOMContentLoaded', function() {
+            const pricingCards = document.querySelectorAll('.pricing-card');
+            
+            pricingCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.background = `linear-gradient(135deg, 
+                        rgba(0, 255, 255, 0.1) 0%, 
+                        rgba(255, 0, 255, 0.1) 100%)`;
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.background = 'rgba(255, 255, 255, 0.05)';
+                });
+            });
+        });
+
+        // Add loading animation
+        function showLoading() {
+            const loader = document.createElement('div');
+            loader.id = 'loader';
+            loader.innerHTML = `
+                <div style="
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    z-index: 9999;
+                ">
+                    <div style="
+                        text-align: center;
+                        color: #00ffff;
+                    ">
+                        <div style="
+                            width: 50px;
+                            height: 50px;
+                            border: 3px solid rgba(0, 255, 255, 0.3);
+                            border-radius: 50%;
+                            border-top: 3px solid #00ffff;
+                            animation: spin 1s linear infinite;
+                            margin: 0 auto 20px;
+                        "></div>
+                        <h2>TAE - TURNAROUND EXPERTS</h2>
+                        <p>Loading your transformation...</p>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(loader);
+
+            // Add spin animation
+            const spinStyle = document.createElement('style');
+            spinStyle.textContent = `
+                @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+            `;
+            document.head.appendChild(spinStyle);
+
+            setTimeout(() => {
+                loader.remove();
+            }, 2000);
+        }
+
+        // Show loading on page load
+        window.addEventListener('load', function() {
+            showLoading();
+        });
+
+        // Add success metrics counter animation
+        function animateCounters() {
+            const counters = document.querySelectorAll('.metric-number');
+            
+            counters.forEach(counter => {
+                const target = counter.textContent;
+                const isPercentage = target.includes('%');
+                const isPlus = target.includes('+');
+                const isMonth = target.includes('M');
+                
+                let numericValue;
+                if (isPercentage) {
+                    numericValue = parseInt(target.replace('%', ''));
+                } else if (isPlus) {
+                    numericValue = parseInt(target.replace('K+', ''));
+                } else if (isMonth) {
+                    numericValue = parseInt(target.replace('M', ''));
+                } else {
+                    numericValue = parseInt(target);
+                }
+                
+                let current = 0;
+                const increment = numericValue / 50;
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= numericValue) {
+                        current = numericValue;
+                        clearInterval(timer);
+                    }
+                    
+                    let displayValue = Math.floor(current);
+                    if (isPercentage) {
+                        counter.textContent = displayValue + '%';
+                    } else if (isPlus) {
+                        counter.textContent = displayValue + 'K+';
+                    } else if (isMonth) {
+                        counter.textContent = displayValue + 'M';
+                    } else {
+                        counter.textContent = displayValue;
+                    }
+                }, 50);
+            });
+        }
+
+        // Trigger counter animation when about section is shown
+        const originalShowSectionWithCounters = showSection;
+        showSection = function(sectionId) {
+            originalShowSectionWithCounters(sectionId);
+            if (sectionId === 'about') {
+                setTimeout(animateCounters, 1000);
+            }
+            smoothScroll();
+            setTimeout(animateCards, 300);
+        };
+    </script>
+</body>
+</html>
