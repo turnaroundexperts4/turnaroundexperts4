@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Turnaround Experts - Transform Your Startup</title>
     <style>
         * {
@@ -419,6 +419,64 @@
             display: none;
         }
 
+        /* Admin Dashboard Styles */
+        .admin-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 0.8rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+        }
+
+        .data-table th {
+            background: rgba(0, 255, 255, 0.1);
+            color: #00ffff;
+            font-weight: bold;
+        }
+
+        .data-table td {
+            color: #ffffff;
+            font-size: 0.9rem;
+        }
+
+        .data-table tr:hover {
+            background: rgba(0, 255, 255, 0.05);
+        }
+
+        .status-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .status-pending {
+            background: rgba(255, 165, 0, 0.2);
+            color: #ffa500;
+        }
+
+        .status-confirmed {
+            background: rgba(0, 255, 0, 0.2);
+            color: #00ff00;
+        }
+
+        .status-completed {
+            background: rgba(0, 255, 255, 0.2);
+            color: #00ffff;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .nav-links {
@@ -438,98 +496,7 @@
             }
         }
 
-        /* Admin Panel */
-        .admin-panel {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(0, 255, 255, 0.2);
-            border-radius: 20px;
-            padding: 2rem;
-            margin: 2rem 0;
-        }
-
-        .admin-section {
-            margin-bottom: 3rem;
-        }
-
-        .admin-section h3 {
-            color: #00ffff;
-            margin-bottom: 1rem;
-            font-size: 1.5rem;
-        }
-
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .data-table th,
-        .data-table td {
-            padding: 1rem;
-            text-align: left;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .data-table th {
-            background: rgba(0, 255, 255, 0.1);
-            color: #00ffff;
-            font-weight: bold;
-        }
-
-        .data-table tr:hover {
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .export-buttons {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
-        }
-
-        .btn-export {
-            background: linear-gradient(45deg, #ff00ff, #ff4500);
-            color: #fff;
-            padding: 0.8rem 1.5rem;
-            border: none;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
-
-        .btn-export:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(255, 0, 255, 0.3);
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .stat-card {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(0, 255, 255, 0.2);
-            border-radius: 15px;
-            padding: 1.5rem;
-            text-align: center;
-        }
-
-        .stat-number {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #00ffff;
-        }
-
-        .stat-label {
-            opacity: 0.8;
-            margin-top: 0.5rem;
-        }
+        /* Success Case Study */
         .case-study {
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(0, 255, 255, 0.2);
@@ -573,13 +540,9 @@
             opacity: 0.8;
         }
     </style>
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/10.5.2/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.5.2/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js"></script>
 </head>
-<body>    
-    <div class="bg-image"></div>
+<body>
+        <div class="bg-image"></div>
     <style>
     .bg-image {
       background: url('bg.png') no-repeat center center fixed;
@@ -596,7 +559,6 @@
       z-index: 1;
     }
     </style>
-    
     <!-- Header -->
     <header>
         <nav class="container">
@@ -607,11 +569,11 @@
                 <li><a href="#services" onclick="showSection('services')">Services</a></li>
                 <li><a href="#pricing" onclick="showSection('pricing')">Pricing</a></li>
                 <li><a href="#contact" onclick="showSection('contact')">Contact</a></li>
-                <li id="adminNav" style="display: none;"><a href="#admin" onclick="showSection('admin')">Admin</a></li>
             </ul>
             <div class="auth-buttons">
                 <a href="#" class="btn btn-secondary" onclick="showModal('loginModal')">Login</a>
                 <a href="#" class="btn btn-primary" onclick="showModal('signupModal')">Sign Up</a>
+                <a href="#" class="btn btn-secondary" onclick="showModal('adminModal')" style="margin-left: 10px;">Admin</a>
             </div>
         </nav>
     </header>
@@ -631,87 +593,6 @@
         </div>
     </section>
 
-    <!-- Admin Section -->
-    <section id="admin" class="section hidden">
-        <div class="container">
-            <h2 class="section-title">Admin Dashboard</h2>
-            
-            <!-- Statistics -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-number" id="totalUsers">0</div>
-                    <div class="stat-label">Total Users</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="totalAppointments">0</div>
-                    <div class="stat-label">Total Appointments</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="pendingAppointments">0</div>
-                    <div class="stat-label">Pending Appointments</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="basicPlanCount">0</div>
-                    <div class="stat-label">Basic Plan Interest</div>
-                </div>
-            </div>
-
-            <!-- Export Buttons -->
-            <div class="export-buttons">
-                <button class="btn-export" onclick="exportUsersToExcel()">Export Users to Excel</button>
-                <button class="btn-export" onclick="exportAppointmentsToExcel()">Export Appointments to Excel</button>
-                <button class="btn-export" onclick="exportAllDataToExcel()">Export All Data to Excel</button>
-            </div>
-
-            <!-- Users Section -->
-            <div class="admin-section">
-                <h3>Registered Users</h3>
-                <div style="overflow-x: auto;">
-                    <table class="data-table" id="usersTable">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Name</th>
-                                <th>Email</th>
-                                <th>Company</th>
-                                <th>Registration Date</th>
-                            </tr>
-                        </thead>
-                        <tbody id="usersTableBody">
-                            <!-- Users will be populated here -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Appointments Section -->
-            <div class="admin-section">
-                <h3>Appointments</h3>
-                <div style="overflow-x: auto;">
-                    <table class="data-table" id="appointmentsTable">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Name</th>
-                                <th>Email</th>
-                                <th>Phone</th>
-                                <th>Company</th>
-                                <th>Plan</th>
-                                <th>Message</th>
-                                <th>Status</th>
-                                <th>Date</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="appointmentsTableBody">
-                            <!-- Appointments will be populated here -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </section>
-
     <!-- About Section -->
     <section id="about" class="section hidden">
         <div class="container">
@@ -724,19 +605,19 @@
                 <p>From struggling startup to profitable business - we transformed Le Chalo's entire operation</p>
                 <div class="metrics">
                     <div class="metric">
-                        <div class="metric-number">30%</div>
+                        <div class="metric-number">300%</div>
                         <div class="metric-label">Revenue Growth</div>
                     </div>
                     <div class="metric">
-                        <div class="metric-number">5K+</div>
+                        <div class="metric-number">50K+</div>
                         <div class="metric-label">Social Followers</div>
                     </div>
                     <div class="metric">
-                        <div class="metric-number">58%</div>
+                        <div class="metric-number">85%</div>
                         <div class="metric-label">Cost Reduction</div>
                     </div>
                     <div class="metric">
-                        <div class="metric-number">1M</div>
+                        <div class="metric-number">6M</div>
                         <div class="metric-label">Months to Profit</div>
                     </div>
                 </div>
@@ -796,7 +677,7 @@
                 <div class="service-item">
                     <div class="service-icon">⚖️</div>
                     <h3>Legal & Financial</h3>
-                    <p>Legal compliance support and financial optimisation strategies (Advanced plan only)</p>
+                    <p>Legal compliance support and financial optimization strategies (Advanced plan only)</p>
                 </div>
             </div>
         </div>
@@ -865,19 +746,19 @@
                 <form id="appointmentForm">
                     <div class="form-group">
                         <label for="name">Full Name</label>
-                        <input type="text" id="name" name="name" required />
+                        <input type="text" id="name" name="name" required>
                     </div>
                     <div class="form-group">
                         <label for="email">Email Address</label>
-                        <input type="email" id="email" name="email" required />
+                        <input type="email" id="email" name="email" required>
                     </div>
                     <div class="form-group">
                         <label for="phone">Phone Number</label>
-                        <input type="tel" id="phone" name="phone" required />
+                        <input type="tel" id="phone" name="phone" required>
                     </div>
                     <div class="form-group">
                         <label for="company">Company Name</label>
-                        <input type="text" id="company" name="company" required />
+                        <input type="text" id="company" name="company" required>
                     </div>
                     <div class="form-group">
                         <label for="plan">Interested Plan</label>
@@ -908,23 +789,16 @@
                 </div>
                 <div class="footer-section">
                     <h3>Services</h3>
-                    <p>
-                        Social Media Management<br />
-                        Website Development<br />
-                        SEO Optimization<br />
-                        Marketing Campaigns
-                    </p>
+                    <p>Social Media Management<br>
+                    Website Development<br>
+                    SEO Optimization<br>
+                    Marketing Campaigns</p>
                 </div>
                 <div class="footer-section">
                     <h3>Contact</h3>
-                    <p>
-                        <a href="mailto:turnaroundexperts4@gmail.com">Email: turnaroundexperts4@gmail.com</a><br />
-                        <a href="tel:+918401635015">Phone: +91 84016 35015</a><br />
-                        <a href="tel:+919409283440">Phone: +91 94092 83440</a><br />
-                        Address: Palanpur Banaskantha, Gujarat<br />
-                        Founder: Mr.Lucky Varandani .N<br />
-                        Co-Founder: Mr.Rudra Padhya .D<br />
-                    </p>
+                    <p>Email: info@turnaroundexperts.com<br>
+                    Phone: +91 98765 43210<br>
+                    Address: Business District, Mumbai</p>
                 </div>
             </div>
             <p>&copy; 2025 Turnaround Experts. All rights reserved.</p>
@@ -939,11 +813,11 @@
             <form id="loginForm">
                 <div class="form-group">
                     <label for="loginEmail">Email Address</label>
-                    <input type="email" id="loginEmail" name="email" required />
+                    <input type="email" id="loginEmail" name="email" required>
                 </div>
                 <div class="form-group">
                     <label for="loginPassword">Password</label>
-                    <input type="password" id="loginPassword" name="password" required />
+                    <input type="password" id="loginPassword" name="password" required>
                 </div>
                 <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
             </form>
@@ -958,660 +832,576 @@
             <form id="signupForm">
                 <div class="form-group">
                     <label for="signupName">Full Name</label>
-                    <input type="text" id="signupName" name="name" required />
+                    <input type="text" id="signupName" name="name" required>
                 </div>
                 <div class="form-group">
                     <label for="signupEmail">Email Address</label>
-                    <input type="email" id="signupEmail" name="email" required />
+                    <input type="email" id="signupEmail" name="email" required>
                 </div>
                 <div class="form-group">
                     <label for="signupPassword">Password</label>
-                    <input type="password" id="signupPassword" name="password" required />
+                    <input type="password" id="signupPassword" name="password" required>
                 </div>
                 <div class="form-group">
                     <label for="signupCompany">Company Name</label>
-                    <input type="text" id="signupCompany" name="company" required />
+                    <input type="text" id="signupCompany" name="company" required>
                 </div>
                 <button type="submit" class="btn btn-primary" style="width: 100%;">Create Account</button>
             </form>
         </div>
     </div>
 
-<script>
-    // Firebase configuration (Replace the following config object with your Firebase project config)
-    const firebaseConfig = {
-        apiKey: "AIzaSyDdUEW0_Lmv8jj48jQBCS0CM5wbRJeNVn8",
-  authDomain: "turnaroundexperts-113b9.firebaseapp.com",
-  projectId: "turnaroundexperts-113b9",
-  storageBucket: "turnaroundexperts-113b9.firebasestorage.app",
-  messagingSenderId: "210110687712",
-  appId: "1:210110687712:web:f81df5bb06b70712ec6385"
-    };
+    <!-- Admin Modal -->
+    <div id="adminModal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <span class="close" onclick="closeModal('adminModal')">&times;</span>
+            <h2 style="text-align: center; color: #00ffff; margin-bottom: 2rem;">Admin Dashboard</h2>
+            
+            <div style="display: flex; gap: 1rem; margin-bottom: 2rem; justify-content: center;">
+                <button class="btn btn-primary" onclick="showAdminSection('users')">User Management</button>
+                <button class="btn btn-primary" onclick="showAdminSection('appointments')">Appointments</button>
+                <button class="btn btn-secondary" onclick="exportAllData()">Export All Data</button>
+            </div>
 
-    // Initialize Firebase
-    const app = firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+            <!-- Users Tab -->
+            <div id="adminUsers" class="admin-section">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h3 style="color: #00ffff;">Registered Users</h3>
+                    <button class="btn btn-secondary" onclick="exportUsers()">Export Users</button>
+                </div>
+                <div id="usersTable" style="max-height: 300px; overflow-y: auto;">
+                    <!-- Users will be populated here -->
+                </div>
+            </div>
 
-    // Admin email constant
-    const ADMIN_EMAIL = 'luckyvarandani112@gmail.com';
+            <!-- Appointments Tab -->
+            <div id="adminAppointments" class="admin-section hidden">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h3 style="color: #00ffff;">Appointment Bookings</h3>
+                    <button class="btn btn-secondary" onclick="exportAppointments()">Export Appointments</button>
+                </div>
+                <div id="appointmentsTable" style="max-height: 300px; overflow-y: auto;">
+                    <!-- Appointments will be populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
 
-    // Current logged-in user info
-    let currentUser = null;
-    let currentUserProfile = null;
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script>
+        // User data storage
+        let users = [];
+        let appointments = [];
+        let currentUser = null;
 
-    // Pages sections
-    const sections = ['home', 'about', 'services', 'pricing', 'contact', 'admin'];
+        // Load data from localStorage or initialize empty arrays
+        function loadData() {
+            const storedUsers = localStorage.getItem('tae_users');
+            const storedAppointments = localStorage.getItem('tae_appointments');
+            const storedCurrentUser = localStorage.getItem('tae_current_user');
 
-    // Navigation handling: show one section and hide others
-    function showSection(sectionId) {
-        sections.forEach(id => {
-            const el = document.getElementById(id);
-            if (el) {
-                if (id === sectionId) {
-                    el.classList.remove('hidden');
+            users = storedUsers ? JSON.parse(storedUsers) : [];
+            appointments = storedAppointments ? JSON.parse(storedAppointments) : [];
+            currentUser = storedCurrentUser ? JSON.parse(storedCurrentUser) : null;
+        }
+
+        // Save data to localStorage
+        function saveData() {
+            localStorage.setItem('tae_users', JSON.stringify(users));
+            localStorage.setItem('tae_appointments', JSON.stringify(appointments));
+            if (currentUser) {
+                localStorage.setItem('tae_current_user', JSON.stringify(currentUser));
+            }
+        }
+
+        // Excel Export Functions
+        function exportUsers() {
+            if (users.length === 0) {
+                alert('No user data to export!');
+                return;
+            }
+
+            const worksheet = XLSX.utils.json_to_sheet(users.map(user => ({
+                'ID': user.id,
+                'Full Name': user.name,
+                'Email': user.email,
+                'Company': user.company,
+                'Registration Date': new Date(user.createdAt).toLocaleDateString(),
+                'Registration Time': new Date(user.createdAt).toLocaleTimeString()
+            })));
+
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'Users');
+
+            const fileName = `TAE_Users_${new Date().toISOString().split('T')[0]}.xlsx`;
+            XLSX.writeFile(workbook, fileName);
+        }
+
+        function exportAppointments() {
+            if (appointments.length === 0) {
+                alert('No appointment data to export!');
+                return;
+            }
+
+            const worksheet = XLSX.utils.json_to_sheet(appointments.map(apt => ({
+                'ID': apt.id,
+                'Full Name': apt.name,
+                'Email': apt.email,
+                'Phone': apt.phone,
+                'Company': apt.company,
+                'Selected Plan': apt.plan,
+                'Message': apt.message,
+                'Status': apt.status,
+                'Booking Date': new Date(apt.createdAt).toLocaleDateString(),
+                'Booking Time': new Date(apt.createdAt).toLocaleTimeString()
+            })));
+
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'Appointments');
+
+            const fileName = `TAE_Appointments_${new Date().toISOString().split('T')[0]}.xlsx`;
+            XLSX.writeFile(workbook, fileName);
+        }
+
+        function exportAllData() {
+            const workbook = XLSX.utils.book_new();
+
+            // Users sheet
+            if (users.length > 0) {
+                const usersSheet = XLSX.utils.json_to_sheet(users.map(user => ({
+                    'ID': user.id,
+                    'Full Name': user.name,
+                    'Email': user.email,
+                    'Company': user.company,
+                    'Registration Date': new Date(user.createdAt).toLocaleDateString(),
+                    'Registration Time': new Date(user.createdAt).toLocaleTimeString()
+                })));
+                XLSX.utils.book_append_sheet(workbook, usersSheet, 'Users');
+            }
+
+            // Appointments sheet
+            if (appointments.length > 0) {
+                const appointmentsSheet = XLSX.utils.json_to_sheet(appointments.map(apt => ({
+                    'ID': apt.id,
+                    'Full Name': apt.name,
+                    'Email': apt.email,
+                    'Phone': apt.phone,
+                    'Company': apt.company,
+                    'Selected Plan': apt.plan,
+                    'Message': apt.message,
+                    'Status': apt.status,
+                    'Booking Date': new Date(apt.createdAt).toLocaleDateString(),
+                    'Booking Time': new Date(apt.createdAt).toLocaleTimeString()
+                })));
+                XLSX.utils.book_append_sheet(workbook, appointmentsSheet, 'Appointments');
+            }
+
+            // Summary sheet
+            const summaryData = [
+                { 'Metric': 'Total Users', 'Count': users.length },
+                { 'Metric': 'Total Appointments', 'Count': appointments.length },
+                { 'Metric': 'Pending Appointments', 'Count': appointments.filter(a => a.status === 'pending').length },
+                { 'Metric': 'Basic Plan Inquiries', 'Count': appointments.filter(a => a.plan === 'Basic Plan').length },
+                { 'Metric': 'Standard Plan Inquiries', 'Count': appointments.filter(a => a.plan === 'Standard Plan').length },
+                { 'Metric': 'Advance Plan Inquiries', 'Count': appointments.filter(a => a.plan === 'Advance Plan').length },
+                { 'Metric': 'Export Date', 'Count': new Date().toLocaleDateString() }
+            ];
+            const summarySheet = XLSX.utils.json_to_sheet(summaryData);
+            XLSX.utils.book_append_sheet(workbook, summarySheet, 'Summary');
+
+            const fileName = `TAE_Complete_Data_${new Date().toISOString().split('T')[0]}.xlsx`;
+            XLSX.writeFile(workbook, fileName);
+        }
+
+        // Admin Dashboard Functions
+        function showAdminSection(section) {
+            const sections = ['users', 'appointments'];
+            sections.forEach(s => {
+                const element = document.getElementById(`admin${s.charAt(0).toUpperCase() + s.slice(1)}`);
+                if (s === section) {
+                    element.classList.remove('hidden');
                 } else {
-                    el.classList.add('hidden');
+                    element.classList.add('hidden');
                 }
-            }
-        });
-
-        // Update admin dashboard when admin section shown
-        if (sectionId === 'admin') {
-            if (currentUser && currentUser.email === ADMIN_EMAIL) {
-                updateAdminDashboard();
-            } else {
-                alert('Access denied. Admins only.');
-                showSection('home');
-            }
-        }
-        smoothScroll();
-        setTimeout(animateCards, 300);
-
-        // Animate counters if about shown
-        if(sectionId==='about'){
-            setTimeout(animateCounters, 1000);
-        }
-    }
-
-    // Show modal dialog by id
-    function showModal(modalId) {
-        const modal = document.getElementById(modalId);
-        if (modal) {
-            modal.style.display = 'flex';
-        }
-    }
-
-    // Close modal dialog by id
-    function closeModal(modalId) {
-        const modal = document.getElementById(modalId);
-        if (modal) {
-            modal.style.display = 'none';
-        }
-    }
-
-    // Display auth buttons and admin nav link depending on login status
-    function updateAuthButtons() {
-        const authButtons = document.querySelector('.auth-buttons');
-        const adminNav = document.getElementById('adminNav');
-
-        if (currentUser) {
-            if (currentUser.email === ADMIN_EMAIL) {
-                authButtons.innerHTML = `
-                    <span style="color: #ff00ff; margin-right: 1rem; font-weight: bold;">Admin Panel</span>
-                    <a href="#" class="btn btn-secondary" onclick="logout()">Logout</a>
-                `;
-                adminNav.style.display = 'block';
-            } else {
-                authButtons.innerHTML = `
-                    <span style="color: #00ffff; margin-right: 1rem;">Welcome, ${currentUserProfile ? currentUserProfile.name : ''}</span>
-                    <a href="#" class="btn btn-secondary" onclick="logout()">Logout</a>
-                `;
-                adminNav.style.display = 'none';
-            }
-        } else {
-            authButtons.innerHTML = `
-                <a href="#" class="btn btn-secondary" onclick="showModal('loginModal')">Login</a>
-                <a href="#" class="btn btn-primary" onclick="showModal('signupModal')">Sign Up</a>
-            `;
-            adminNav.style.display = 'none';
-        }
-    }
-
-    // Logout function
-    function logout() {
-        auth.signOut().then(() => {
-            currentUser = null;
-            currentUserProfile = null;
-            updateAuthButtons();
-            alert('Logged out successfully!');
-            showSection('home');
-        }).catch(err => {
-            alert('Logout error: ' + err.message);
-        });
-    }
-
-    // Signup form handling using Firebase Authentication & Firestore for user profile
-    document.getElementById('signupForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        const name = e.target.name.value.trim();
-        const email = e.target.email.value.trim();
-        const password = e.target.password.value;
-        const company = e.target.company.value.trim();
-
-        try {
-            // Create user with email and password
-            const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-            const user = userCredential.user;
-
-            // Save additional profile data in Firestore
-            await db.collection('users').doc(user.uid).set({
-                name,
-                email,
-                company,
-                createdAt: new Date().toISOString()
             });
 
-            alert('Account created successfully! You can now login.');
-            closeModal('signupModal');
-            e.target.reset();
-        } catch (error) {
-            alert('Signup error: ' + error.message);
+            if (section === 'users') {
+                displayUsers();
+            } else if (section === 'appointments') {
+                displayAppointments();
+            }
         }
-    });
 
-    // Login form handling using Firebase Authentication
-    document.getElementById('loginForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        const email = e.target.email.value.trim();
-        const password = e.target.password.value;
-
-        try {
-            const userCredential = await auth.signInWithEmailAndPassword(email, password);
-            currentUser = userCredential.user;
-
-            if (currentUser.email === ADMIN_EMAIL) {
-                currentUserProfile = { name: 'Admin' };
-            } else {
-                // Load user profile info from Firestore
-                const doc = await db.collection('users').doc(currentUser.uid).get();
-                currentUserProfile = doc.exists ? doc.data() : null;
+        function displayUsers() {
+            const usersTable = document.getElementById('usersTable');
+            
+            if (users.length === 0) {
+                usersTable.innerHTML = '<p style="text-align: center; color: #ffffff; opacity: 0.7;">No users registered yet.</p>';
+                return;
             }
 
-            alert(`Welcome back, ${currentUserProfile ? currentUserProfile.name : ''}!`);
-            closeModal('loginModal');
-            updateAuthButtons();
-            showSection('home');
-            e.target.reset();
-        } catch (error) {
-            alert('Login error: ' + error.message);
-        }
-    });
+            let tableHTML = `
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Company</th>
+                            <th>Registration Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
 
-    // Listen to auth state changes so UI remains updated on page reload or user state
-    auth.onAuthStateChanged(async (user) => {
-        if (user) {
-            currentUser = user;
-            if (user.email === ADMIN_EMAIL) {
-                currentUserProfile = { name: 'Admin' };
-            } else {
-                const doc = await db.collection('users').doc(user.uid).get();
-                currentUserProfile = doc.exists ? doc.data() : null;
+            users.forEach(user => {
+                tableHTML += `
+                    <tr>
+                        <td>${user.id}</td>
+                        <td>${user.name}</td>
+                        <td>${user.email}</td>
+                        <td>${user.company}</td>
+                        <td>${new Date(user.createdAt).toLocaleDateString()}</td>
+                    </tr>
+                `;
+            });
+
+            tableHTML += '</tbody></table>';
+            usersTable.innerHTML = tableHTML;
+        }
+
+        function displayAppointments() {
+            const appointmentsTable = document.getElementById('appointmentsTable');
+            
+            if (appointments.length === 0) {
+                appointmentsTable.innerHTML = '<p style="text-align: center; color: #ffffff; opacity: 0.7;">No appointments booked yet.</p>';
+                return;
             }
-        } else {
-            currentUser = null;
-            currentUserProfile = null;
+
+            let tableHTML = `
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Company</th>
+                            <th>Plan</th>
+                            <th>Phone</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            appointments.forEach(apt => {
+                tableHTML += `
+                    <tr>
+                        <td>${apt.id}</td>
+                        <td>${apt.name}</td>
+                        <td>${apt.company}</td>
+                        <td>${apt.plan}</td>
+                        <td>${apt.phone}</td>
+                        <td><span class="status-badge status-${apt.status}">${apt.status.toUpperCase()}</span></td>
+                        <td>${new Date(apt.createdAt).toLocaleDateString()}</td>
+                        <td>
+                            <select onchange="updateAppointmentStatus(${apt.id}, this.value)" style="background: rgba(0,0,0,0.5); color: #fff; border: 1px solid #00ffff; padding: 0.3rem;">
+                                <option value="pending" ${apt.status === 'pending' ? 'selected' : ''}>Pending</option>
+                                <option value="confirmed" ${apt.status === 'confirmed' ? 'selected' : ''}>Confirmed</option>
+                                <option value="completed" ${apt.status === 'completed' ? 'selected' : ''}>Completed</option>
+                            </select>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tableHTML += '</tbody></table>';
+            appointmentsTable.innerHTML = tableHTML;
         }
-        updateAuthButtons();
-    });
 
-    // Book appointment handling - store appointment in Firestore
-    document.getElementById('appointmentForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        const formData = new FormData(e.target);
-        const appointmentData = {
-            name: formData.get('name').trim(),
-            email: formData.get('email').trim(),
-            phone: formData.get('phone').trim(),
-            company: formData.get('company').trim(),
-            plan: formData.get('plan'),
-            message: formData.get('message').trim(),
-            status: 'pending',
-            createdAt: new Date().toISOString()
-        };
-
-        try {
-            await db.collection('appointments').add(appointmentData);
-            alert('Appointment booked successfully! Our team will contact you within 24 hours.');
-            e.target.reset();
-            showSection('home');
-        } catch (error) {
-            alert('Error booking appointment: ' + error.message);
+        function updateAppointmentStatus(appointmentId, newStatus) {
+            const appointment = appointments.find(apt => apt.id === appointmentId);
+            if (appointment) {
+                appointment.status = newStatus;
+                saveData();
+                displayAppointments();
+                alert(`Appointment status updated to ${newStatus.toUpperCase()}`);
+            }
         }
-    });
 
-    // Book appointment helper when clicked from pricing cards
-    function bookAppointment(planName) {
-        const planSelect = document.getElementById('plan');
-        if (planSelect) {
+        // Navigation
+        function showSection(sectionId) {
+            // Hide all sections
+            const sections = ['home', 'about', 'services', 'pricing', 'contact'];
+            sections.forEach(id => {
+                const element = document.getElementById(id);
+                if (id === sectionId) {
+                    element.classList.remove('hidden');
+                } else {
+                    element.classList.add('hidden');
+                }
+            });
+        }
+
+        // Modal functions
+        function showModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Book appointment function
+        function bookAppointment(planName) {
+            const planSelect = document.getElementById('plan');
             planSelect.value = planName;
             showSection('contact');
         }
-    }
 
-    // Admin Dashboard Update - fetch users and appointments from Firestore
-    async function updateAdminDashboard() {
-        if (!currentUser || currentUser.email !== ADMIN_EMAIL) {
-            alert('Access denied. Admins only.');
-            showSection('home');
-            return;
-        }
+        // Form submissions
+        document.getElementById('signupForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const userData = {
+                id: Date.now(),
+                name: formData.get('name'),
+                email: formData.get('email'),
+                password: formData.get('password'),
+                company: formData.get('company'),
+                createdAt: new Date().toISOString()
+            };
 
-        try {
-            const usersSnapshot = await db.collection('users').get();
-            const appointmentsSnapshot = await db.collection('appointments').get();
-
-            const usersData = [];
-            usersSnapshot.forEach(doc => {
-                const data = doc.data();
-                usersData.push({
-                    id: doc.id,
-                    name: data.name,
-                    email: data.email,
-                    company: data.company,
-                    createdAt: data.createdAt
-                });
-            });
-
-            const appointmentsData = [];
-            appointmentsSnapshot.forEach(doc => {
-                const data = doc.data();
-                appointmentsData.push({
-                    id: doc.id,
-                    name: data.name,
-                    email: data.email,
-                    phone: data.phone,
-                    company: data.company,
-                    plan: data.plan,
-                    message: data.message,
-                    status: data.status,
-                    createdAt: data.createdAt
-                });
-            });
-
-            // Update statistics counts
-            document.getElementById('totalUsers').textContent = usersData.length;
-            document.getElementById('totalAppointments').textContent = appointmentsData.length;
-            document.getElementById('pendingAppointments').textContent = 
-                appointmentsData.filter(a => a.status === 'pending').length;
-            document.getElementById('basicPlanCount').textContent = 
-                appointmentsData.filter(a => a.plan === 'Basic Plan').length;
-
-            // Populate users table
-            const usersTableBody = document.getElementById('usersTableBody');
-            usersTableBody.innerHTML = '';
-            usersData.forEach(user => {
-                const row = usersTableBody.insertRow();
-                row.innerHTML = `
-                    <td>${user.id}</td>
-                    <td>${user.name}</td>
-                    <td>${user.email}</td>
-                    <td>${user.company}</td>
-                    <td>${new Date(user.createdAt).toLocaleDateString()}</td>
-                `;
-            });
-
-            // Populate appointments table
-            const appointmentsTableBody = document.getElementById('appointmentsTableBody');
-            appointmentsTableBody.innerHTML = '';
-            appointmentsData.forEach(appointment => {
-                const row = appointmentsTableBody.insertRow();
-                row.innerHTML = `
-                    <td>${appointment.id}</td>
-                    <td>${appointment.name}</td>
-                    <td>${appointment.email}</td>
-                    <td>${appointment.phone}</td>
-                    <td>${appointment.company}</td>
-                    <td><span style="color: #00ffff; font-weight: bold;">${appointment.plan}</span></td>
-                    <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;">${appointment.message}</td>
-                    <td><span style="color: ${appointment.status === 'pending' ? '#ff00ff' : '#00ffff'}; font-weight: bold;">${appointment.status}</span></td>
-                    <td>${appointment.createdAt ? new Date(appointment.createdAt).toLocaleDateString() : ''}</td>
-                    <td>
-                        <button onclick="updateAppointmentStatus('${appointment.id}', 'completed')" 
-                                style="background: #00ffff; color: #000; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; margin-right: 5px;">
-                            Complete
-                        </button>
-                        <button onclick="deleteAppointment('${appointment.id}')" 
-                                style="background: #ff0000; color: #fff; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">
-                            Delete
-                        </button>
-                    </td>
-                `;
-            });
-        } catch (error) {
-            alert('Error loading admin dashboard: ' + error.message);
-        }
-    }
-
-    // Update appointment status in Firestore
-    async function updateAppointmentStatus(appointmentId, newStatus) {
-        try {
-            await db.collection('appointments').doc(appointmentId).update({ status: newStatus });
-            updateAdminDashboard();
-            alert(`Appointment status updated to ${newStatus}!`);
-        } catch (error) {
-            alert('Error updating appointment status: ' + error.message);
-        }
-    }
-
-    // Delete appointment from Firestore
-    async function deleteAppointment(appointmentId) {
-        if (confirm('Are you sure you want to delete this appointment?')) {
-            try {
-                await db.collection('appointments').doc(appointmentId).delete();
-                updateAdminDashboard();
-                alert('Appointment deleted successfully!');
-            } catch (error) {
-                alert('Error deleting appointment: ' + error.message);
-            }
-        }
-    }
-
-    // Excel Export Functions using Firestore snapshot data
-    // You may want to cache data for exports or fetch fresh again
-    async function exportUsersToExcel() {
-        try {
-            const usersSnapshot = await db.collection('users').get();
-            if (usersSnapshot.empty) {
-                alert('No users data to export!');
+            // Check if user already exists
+            if (users.find(user => user.email === userData.email)) {
+                alert('User with this email already exists!');
                 return;
             }
-            const wsData = [
-                ['ID', 'Name', 'Email', 'Company', 'Registration Date']
-            ];
-            usersSnapshot.forEach(doc => {
-                const data = doc.data();
-                wsData.push([
-                    doc.id,
-                    data.name,
-                    data.email,
-                    data.company,
-                    data.createdAt ? new Date(data.createdAt).toLocaleDateString() : ''
-                ]);
-            });
-            const wb = XLSX.utils.book_new();
-            const ws = XLSX.utils.aoa_to_sheet(wsData);
-            XLSX.utils.book_append_sheet(wb, ws, 'Users');
-            XLSX.writeFile(wb, `TAE_Users_${new Date().toISOString().split('T')[0]}.xlsx`);
-        } catch (error) {
-            alert('Error exporting users: ' + error.message);
-        }
-    }
 
-    async function exportAppointmentsToExcel() {
-        try {
-            const appointmentsSnapshot = await db.collection('appointments').get();
-            if (appointmentsSnapshot.empty) {
-                alert('No appointments data to export!');
-                return;
-            }
-            const wsData = [
-                ['ID', 'Name', 'Email', 'Phone', 'Company', 'Plan', 'Message', 'Status', 'Date']
-            ];
-            appointmentsSnapshot.forEach(doc => {
-                const data = doc.data();
-                wsData.push([
-                    doc.id,
-                    data.name,
-                    data.email,
-                    data.phone,
-                    data.company,
-                    data.plan,
-                    data.message,
-                    data.status,
-                    data.createdAt ? new Date(data.createdAt).toLocaleDateString() : ''
-                ]);
-            });
-            const wb = XLSX.utils.book_new();
-            const ws = XLSX.utils.aoa_to_sheet(wsData);
-            XLSX.utils.book_append_sheet(wb, ws, 'Appointments');
-            XLSX.writeFile(wb, `TAE_Appointments_${new Date().toISOString().split('T')[0]}.xlsx`);
-        } catch (error) {
-            alert('Error exporting appointments: ' + error.message);
-        }
-    }
-
-    async function exportAllDataToExcel() {
-        try {
-            const usersSnapshot = await db.collection('users').get();
-            const appointmentsSnapshot = await db.collection('appointments').get();
-
-            const wb = XLSX.utils.book_new();
-
-            if (!usersSnapshot.empty) {
-                const usersData = [
-                    ['ID', 'Name', 'Email', 'Company', 'Registration Date']
-                ];
-                usersSnapshot.forEach(doc => {
-                    const data = doc.data();
-                    usersData.push([
-                        doc.id,
-                        data.name,
-                        data.email,
-                        data.company,
-                        data.createdAt ? new Date(data.createdAt).toLocaleDateString() : ''
-                    ]);
-                });
-                const usersSheet = XLSX.utils.aoa_to_sheet(usersData);
-                XLSX.utils.book_append_sheet(wb, usersSheet, 'Users');
-            }
-
-            if (!appointmentsSnapshot.empty) {
-                const appointmentsData = [
-                    ['ID', 'Name', 'Email', 'Phone', 'Company', 'Plan', 'Message', 'Status', 'Date']
-                ];
-                appointmentsSnapshot.forEach(doc => {
-                    const data = doc.data();
-                    appointmentsData.push([
-                        doc.id,
-                        data.name,
-                        data.email,
-                        data.phone,
-                        data.company,
-                        data.plan,
-                        data.message,
-                        data.status,
-                        data.createdAt ? new Date(data.createdAt).toLocaleDateString() : ''
-                    ]);
-                });
-                const appointmentsSheet = XLSX.utils.aoa_to_sheet(appointmentsData);
-                XLSX.utils.book_append_sheet(wb, appointmentsSheet, 'Appointments');
-            }
-
-            // Statistics Sheet
-            const usersCount = usersSnapshot.size;
-            const appointmentsCount = appointmentsSnapshot.size;
-            let pendingCount = 0;
-            let basicPlanCount = 0;
-            let standardPlanCount = 0;
-            let advancePlanCount = 0;
-
-            appointmentsSnapshot.forEach(doc => {
-                const a = doc.data();
-                if (a.status === 'pending') pendingCount++;
-                if (a.plan === 'Basic Plan') basicPlanCount++;
-                if (a.plan === 'Standard Plan') standardPlanCount++;
-                if (a.plan === 'Advance Plan') advancePlanCount++;
-            });
-
-            const statsData = [
-                ['Metric', 'Value'],
-                ['Total Users', usersCount],
-                ['Total Appointments', appointmentsCount],
-                ['Pending Appointments', pendingCount],
-                ['Basic Plan Interest', basicPlanCount],
-                ['Standard Plan Interest', standardPlanCount],
-                ['Advance Plan Interest', advancePlanCount],
-                ['Export Date', new Date().toLocaleDateString()]
-            ];
-
-            const statsSheet = XLSX.utils.aoa_to_sheet(statsData);
-            XLSX.utils.book_append_sheet(wb, statsSheet, 'Statistics');
-
-            XLSX.writeFile(wb, `TAE_Complete_Data_${new Date().toISOString().split('T')[0]}.xlsx`);
-
-        } catch (error) {
-            alert('Error exporting all data: ' + error.message);
-        }
-    }
-
-    // Close modals when clicking outside
-    window.addEventListener('click', function (e) {
-        const modals = document.querySelectorAll('.modal');
-        modals.forEach(modal => {
-            if (e.target === modal) {
-                modal.style.display = 'none';
-            }
-        });
-    });
-
-    // Smooth scrolling animation
-    function smoothScroll() {
-        const sections = document.querySelectorAll('.section');
-        sections.forEach(section => {
-            section.style.opacity = '0';
-            section.style.transform = 'translateY(50px)';
-            section.style.transition = 'all 0.6s ease';
+            users.push(userData);
+            saveData();
+            
+            alert('Account created successfully! You can now login.');
+            closeModal('signupModal');
+            this.reset();
         });
 
-        setTimeout(() => {
-            sections.forEach(section => {
-                if (!section.classList.contains('hidden')) {
-                    section.style.opacity = '1';
-                    section.style.transform = 'translateY(0)';
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const email = formData.get('email');
+            const password = formData.get('password');
+
+            const user = users.find(u => u.email === email && u.password === password);
+            
+            if (user) {
+                currentUser = user;
+                saveData();
+                alert(`Welcome back, ${user.name}!`);
+                closeModal('loginModal');
+                updateAuthButtons();
+                this.reset();
+            } else {
+                alert('Invalid email or password!');
+            }
+        });
+
+        document.getElementById('appointmentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const appointmentData = {
+                id: Date.now(),
+                name: formData.get('name'),
+                email: formData.get('email'),
+                phone: formData.get('phone'),
+                company: formData.get('company'),
+                plan: formData.get('plan'),
+                message: formData.get('message'),
+                status: 'pending',
+                createdAt: new Date().toISOString()
+            };
+
+            appointments.push(appointmentData);
+            saveData();
+            
+            alert('Appointment booked successfully! Our team will contact you within 24 hours.');
+            this.reset();
+        });
+
+        // Update auth buttons based on login status
+        function updateAuthButtons() {
+            const authButtons = document.querySelector('.auth-buttons');
+            if (currentUser) {
+                authButtons.innerHTML = `
+                    <span style="color: #00ffff; margin-right: 1rem;">Welcome, ${currentUser.name}</span>
+                    <a href="#" class="btn btn-secondary" onclick="logout()">Logout</a>
+                `;
+            } else {
+                authButtons.innerHTML = `
+                    <a href="#" class="btn btn-secondary" onclick="showModal('loginModal')">Login</a>
+                    <a href="#" class="btn btn-primary" onclick="showModal('signupModal')">Sign Up</a>
+                `;
+            }
+        }
+
+        // Logout function
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('tae_current_user');
+            updateAuthButtons();
+            alert('Logged out successfully!');
+        }
+
+        // Close modals when clicking outside
+        window.addEventListener('click', function(e) {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                if (e.target === modal) {
+                    modal.style.display = 'none';
                 }
             });
-        }, 100);
-    }
+        });
 
-    // Add animation to cards
-    function animateCards() {
-        const cards = document.querySelectorAll('.about-card, .service-item, .pricing-card');
-        cards.forEach((card, index) => {
-            card.style.opacity = '0';
-            card.style.transform = 'translateY(30px)';
-            card.style.transition = `all 0.6s ease ${index * 0.1}s`;
+        // Smooth scrolling animation
+        function smoothScroll() {
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => {
+                section.style.opacity = '0';
+                section.style.transform = 'translateY(50px)';
+                section.style.transition = 'all 0.6s ease';
+            });
 
             setTimeout(() => {
-                card.style.opacity = '1';
-                card.style.transform = 'translateY(0)';
-            }, 200 + (index * 100));
-        });
-    }
-
-    // Floating particles animation
-    function createParticles() {
-        const particleContainer = document.createElement('div');
-        particleContainer.style.position = 'fixed';
-        particleContainer.style.top = '0';
-        particleContainer.style.left = '0';
-        particleContainer.style.width = '100%';
-        particleContainer.style.height = '100%';
-        particleContainer.style.pointerEvents = 'none';
-        particleContainer.style.zIndex = '1';
-        document.body.appendChild(particleContainer);
-
-        for (let i = 0; i < 50; i++) {
-            const particle = document.createElement('div');
-            particle.style.position = 'absolute';
-            particle.style.width = '2px';
-            particle.style.height = '2px';
-            particle.style.background = '#00ffff';
-            particle.style.borderRadius = '50%';
-            particle.style.opacity = Math.random();
-            particle.style.left = Math.random() * 100 + '%';
-            particle.style.top = Math.random() * 100 + '%';
-            particle.style.animation = `float ${5 + Math.random() * 10}s linear infinite`;
-            particleContainer.appendChild(particle);
+                sections.forEach(section => {
+                    if (!section.classList.contains('hidden')) {
+                        section.style.opacity = '1';
+                        section.style.transform = 'translateY(0)';
+                    }
+                });
+            }, 100);
         }
-    }
 
-    // Add floating animation keyframes
-    const style = document.createElement('style');
-    style.textContent = `
+        // Add animation to cards
+        function animateCards() {
+            const cards = document.querySelectorAll('.about-card, .service-item, .pricing-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(30px)';
+                card.style.transition = `all 0.6s ease ${index * 0.1}s`;
+                
+                setTimeout(() => {
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, 200 + (index * 100));
+            });
+        }
+
+        // Floating particles animation
+        function createParticles() {
+            const particleContainer = document.createElement('div');
+            particleContainer.style.position = 'fixed';
+            particleContainer.style.top = '0';
+            particleContainer.style.left = '0';
+            particleContainer.style.width = '100%';
+            particleContainer.style.height = '100%';
+            particleContainer.style.pointerEvents = 'none';
+            particleContainer.style.zIndex = '1';
+            document.body.appendChild(particleContainer);
+
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.style.position = 'absolute';
+                particle.style.width = '2px';
+                particle.style.height = '2px';
+                particle.style.background = '#00ffff';
+                particle.style.borderRadius = '50%';
+                particle.style.opacity = Math.random();
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animation = `float ${5 + Math.random() * 10}s linear infinite`;
+                particleContainer.appendChild(particle);
+            }
+        }
+
+        // Add floating animation keyframes
+        const style = document.createElement('style');
+        style.textContent = `
             @keyframes float {
                 0% { transform: translateY(100vh) rotate(0deg); }
                 100% { transform: translateY(-100vh) rotate(360deg); }
             }
         `;
-    document.head.appendChild(style);
+        document.head.appendChild(style);
 
-    // Initialize
-    document.addEventListener('DOMContentLoaded', function () {
-        updateAuthButtons();
-        createParticles();
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateAuthButtons();
+            createParticles();
+            
+            // Add event listeners for section changes
+            const originalShowSection = showSection;
+            showSection = function(sectionId) {
+                originalShowSection(sectionId);
+                smoothScroll();
+                setTimeout(animateCards, 300);
+            };
+        });
 
-        // Override showSection to add animations
-        const originalShowSection = showSection;
-        showSection = function (sectionId) {
-            originalShowSection(sectionId);
-            smoothScroll();
-            setTimeout(animateCards, 300);
-        };
-    });
-
-    // Typing effect on hero text
-    function typeWriter(element, text, speed = 100) {
-        let i = 0;
-        element.innerHTML = '';
-
-        function type() {
-            if (i < text.length) {
-                element.innerHTML += text.charAt(i);
-                i++;
-                setTimeout(type, speed);
+        // Add typing effect to hero text
+        function typeWriter(element, text, speed = 100) {
+            let i = 0;
+            element.innerHTML = '';
+            
+            function type() {
+                if (i < text.length) {
+                    element.innerHTML += text.charAt(i);
+                    i++;
+                    setTimeout(type, speed);
+                }
             }
+            type();
         }
-        type();
-    }
-    window.addEventListener('load', function () {
-        const heroTitle = document.querySelector('.hero h1');
-        const heroText = document.querySelector('.hero p');
 
-        setTimeout(() => {
-            typeWriter(heroTitle, 'TRANSFORM YOUR STARTUP', 100);
-        }, 500);
+        // Initialize typing effect
+        window.addEventListener('load', function() {
+            const heroTitle = document.querySelector('.hero h1');
+            const heroText = document.querySelector('.hero p');
+            
+            setTimeout(() => {
+                typeWriter(heroTitle, 'TRANSFORM YOUR STARTUP', 100);
+            }, 500);
+            
+            setTimeout(() => {
+                typeWriter(heroText, 'Turn losses into profits with our expert strategies and innovative marketing campaigns', 50);
+            }, 3000);
+        });
 
-        setTimeout(() => {
-            typeWriter(heroText, 'Turn losses into profits with our expert strategies and innovative marketing campaigns', 50);
-        }, 3000);
-    });
-
-    // Add hover effects to pricing cards
-    document.addEventListener('DOMContentLoaded', function () {
-        const pricingCards = document.querySelectorAll('.pricing-card');
-
-        pricingCards.forEach(card => {
-            card.addEventListener('mouseenter', function () {
-                this.style.background = `linear-gradient(135deg, 
+        // Add hover effects to pricing cards
+        document.addEventListener('DOMContentLoaded', function() {
+            const pricingCards = document.querySelectorAll('.pricing-card');
+            
+            pricingCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.background = `linear-gradient(135deg, 
                         rgba(0, 255, 255, 0.1) 0%, 
                         rgba(255, 0, 255, 0.1) 100%)`;
-            });
-
-            card.addEventListener('mouseleave', function () {
-                this.style.background = 'rgba(255, 255, 255, 0.05)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.background = 'rgba(255, 255, 255, 0.05)';
+                });
             });
         });
-    });
 
-    // Loading animation on page load
-    function showLoading() {
-        const loader = document.createElement('div');
-        loader.id = 'loader';
-        loader.innerHTML = \`
+        // Add loading animation
+        function showLoading() {
+            const loader = document.createElement('div');
+            loader.id = 'loader';
+            loader.innerHTML = `
                 <div style="
                     position: fixed;
                     top: 0;
@@ -1641,75 +1431,83 @@
                         <p>Loading your transformation...</p>
                     </div>
                 </div>
-            \`;
-        document.body.appendChild(loader);
+            `;
+            document.body.appendChild(loader);
 
-        // Add spin animation
-        const spinStyle = document.createElement('style');
-        spinStyle.textContent = \`
+            // Add spin animation
+            const spinStyle = document.createElement('style');
+            spinStyle.textContent = `
                 @keyframes spin {
                     0% { transform: rotate(0deg); }
                     100% { transform: rotate(360deg); }
                 }
-            \`;
-        document.head.appendChild(spinStyle);
+            `;
+            document.head.appendChild(spinStyle);
 
-        setTimeout(() => {
-            loader.remove();
-        }, 2000);
-    }
-    window.addEventListener('load', function () {
-        showLoading();
-    });
+            setTimeout(() => {
+                loader.remove();
+            }, 2000);
+        }
 
-    // Animate success metrics counters
-    function animateCounters() {
-        const counters = document.querySelectorAll('.metric-number');
-
-        counters.forEach(counter => {
-            const target = counter.textContent;
-            const isPercentage = target.includes('%');
-            const isPlus = target.includes('+');
-            const isMonth = target.includes('M');
-
-            let numericValue;
-            if (isPercentage) {
-                numericValue = parseInt(target.replace('%', ''));
-            } else if (isPlus) {
-                numericValue = parseInt(target.replace('K+', ''));
-            } else if (isMonth) {
-                numericValue = parseInt(target.replace('M', ''));
-            } else {
-                numericValue = parseInt(target);
-            }
-
-            let current = 0;
-            const increment = numericValue / 50;
-            const timer = setInterval(() => {
-                current += increment;
-                if (current >= numericValue) {
-                    current = numericValue;
-                    clearInterval(timer);
-                }
-
-                let displayValue = Math.floor(current);
-                if (isPercentage) {
-                    counter.textContent = displayValue + '%';
-                } else if (isPlus) {
-                    counter.textContent = displayValue + 'K+';
-                } else if (isMonth) {
-                    counter.textContent = displayValue + 'M';
-                } else {
-                    counter.textContent = displayValue;
-                }
-            }, 50);
+        // Show loading on page load
+        window.addEventListener('load', function() {
+            showLoading();
         });
-    }
-</script>
 
-<!-- XLSX library for Excel export -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+        // Add success metrics counter animation
+        function animateCounters() {
+            const counters = document.querySelectorAll('.metric-number');
+            
+            counters.forEach(counter => {
+                const target = counter.textContent;
+                const isPercentage = target.includes('%');
+                const isPlus = target.includes('+');
+                const isMonth = target.includes('M');
+                
+                let numericValue;
+                if (isPercentage) {
+                    numericValue = parseInt(target.replace('%', ''));
+                } else if (isPlus) {
+                    numericValue = parseInt(target.replace('K+', ''));
+                } else if (isMonth) {
+                    numericValue = parseInt(target.replace('M', ''));
+                } else {
+                    numericValue = parseInt(target);
+                }
+                
+                let current = 0;
+                const increment = numericValue / 50;
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= numericValue) {
+                        current = numericValue;
+                        clearInterval(timer);
+                    }
+                    
+                    let displayValue = Math.floor(current);
+                    if (isPercentage) {
+                        counter.textContent = displayValue + '%';
+                    } else if (isPlus) {
+                        counter.textContent = displayValue + 'K+';
+                    } else if (isMonth) {
+                        counter.textContent = displayValue + 'M';
+                    } else {
+                        counter.textContent = displayValue;
+                    }
+                }, 50);
+            });
+        }
 
+        // Trigger counter animation when about section is shown
+        const originalShowSectionWithCounters = showSection;
+        showSection = function(sectionId) {
+            originalShowSectionWithCounters(sectionId);
+            if (sectionId === 'about') {
+                setTimeout(animateCounters, 1000);
+            }
+            smoothScroll();
+            setTimeout(animateCards, 300);
+        };
+    </script>
 </body>
 </html>
-
