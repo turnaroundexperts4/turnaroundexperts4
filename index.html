@@ -137,13 +137,8 @@
         }
 
         @keyframes pulse {
-            0%,
-            100% {
-                opacity: 0.5;
-            }
-            50% {
-                opacity: 1;
-            }
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
         }
 
         .hero-content {
@@ -163,12 +158,8 @@
         }
 
         @keyframes glow {
-            from {
-                filter: brightness(1);
-            }
-            to {
-                filter: brightness(1.2);
-            }
+            from { filter: brightness(1); }
+            to { filter: brightness(1.2); }
         }
 
         .hero p {
@@ -433,15 +424,15 @@
             .nav-links {
                 display: none;
             }
-
+            
             .hero h1 {
                 font-size: 2.5rem;
             }
-
+            
             .hero p {
                 font-size: 1.1rem;
             }
-
+            
             .pricing-card.featured {
                 transform: none;
             }
@@ -581,34 +572,31 @@
         .metric-label {
             opacity: 0.8;
         }
-        .case-study p {
-            color: #ccc;
-            max-width: 600px;
-            margin: 0 auto;
-        }
     </style>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.5.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.5.2/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js"></script>
 </head>
-<body>
+<body>    
     <div class="bg-image"></div>
     <style>
-        .bg-image {
-            background: url('bg.png') no-repeat center center fixed;
-            background-size: cover;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            opacity: 0.1;
-            z-index: -1;
-        }
-
-        .content {
-            position: relative;
-            z-index: 1;
-        }
+    .bg-image {
+      background: url('bg.png') no-repeat center center fixed;
+      background-size: cover;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      opacity: 0.1;
+      z-index: -1;
+    }
+    .content {
+      position: relative;
+      z-index: 1;
+    }
     </style>
-
+    
     <!-- Header -->
     <header>
         <nav class="container">
@@ -833,7 +821,7 @@
                     </ul>
                     <a href="#" class="btn btn-primary" onclick="bookAppointment('Basic Plan')">Get Started</a>
                 </div>
-
+                
                 <div class="pricing-card featured">
                     <div class="plan-name">STANDARD PLAN</div>
                     <div class="plan-price">₹24,999</div>
@@ -849,7 +837,7 @@
                     </ul>
                     <a href="#" class="btn btn-primary" onclick="bookAppointment('Standard Plan')">Most Popular</a>
                 </div>
-
+                
                 <div class="pricing-card">
                     <div class="plan-name">ADVANCE PLAN</div>
                     <div class="plan-price">₹49,999</div>
@@ -904,7 +892,7 @@
                         <label for="message">Tell us about your business challenges</label>
                         <textarea id="message" name="message" rows="4" required></textarea>
                     </div>
-                    <button type="submit" class="btn btn-primary" style="width: 100%">Book Appointment</button>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Book Appointment</button>
                 </form>
             </div>
         </div>
@@ -916,9 +904,7 @@
             <div class="footer-content">
                 <div class="footer-section">
                     <h3>TAE - Turnaround Experts</h3>
-                    <p>
-                        Transforming startups from losses to profits through innovative strategies and expert execution.
-                    </p>
+                    <p>Transforming startups from losses to profits through innovative strategies and expert execution.</p>
                 </div>
                 <div class="footer-section">
                     <h3>Services</h3>
@@ -932,11 +918,8 @@
                 <div class="footer-section">
                     <h3>Contact</h3>
                     <p>
-                        <a href="mailto:turnaroundexperts4@gmail.com">
-                            Email: turnaroundexperts4@gmail.com</a
-                        ><br />
-                        <a href="tel:+918401635015">Phone: +91 84016 35015</a
-                        ><br />
+                        <a href="mailto:turnaroundexperts4@gmail.com">Email: turnaroundexperts4@gmail.com</a><br />
+                        <a href="tel:+918401635015">Phone: +91 84016 35015</a><br />
                         <a href="tel:+919409283440">Phone: +91 94092 83440</a><br />
                         Address: Palanpur Banaskantha, Gujarat<br />
                         Founder: Mr.Lucky Varandani .N<br />
@@ -952,7 +935,7 @@
     <div id="loginModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeModal('loginModal')">&times;</span>
-            <h2 style="text-align: center; color: #00ffff; margin-bottom: 2rem">Login</h2>
+            <h2 style="text-align: center; color: #00ffff; margin-bottom: 2rem;">Login</h2>
             <form id="loginForm">
                 <div class="form-group">
                     <label for="loginEmail">Email Address</label>
@@ -962,7 +945,7 @@
                     <label for="loginPassword">Password</label>
                     <input type="password" id="loginPassword" name="password" required />
                 </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%">Login</button>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
             </form>
         </div>
     </div>
@@ -971,7 +954,7 @@
     <div id="signupModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeModal('signupModal')">&times;</span>
-            <h2 style="text-align: center; color: #00ffff; margin-bottom: 2rem">Sign Up</h2>
+            <h2 style="text-align: center; color: #00ffff; margin-bottom: 2rem;">Sign Up</h2>
             <form id="signupForm">
                 <div class="form-group">
                     <label for="signupName">Full Name</label>
@@ -989,439 +972,646 @@
                     <label for="signupCompany">Company Name</label>
                     <input type="text" id="signupCompany" name="company" required />
                 </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%">Create Account</button>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Create Account</button>
             </form>
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script>
-        // Backend base URL - replace with your actual backend URL
-        const BACKEND_BASE_URL = 'https://turnaroundexperts-113b9.firebaseapp.com';
+<script>
+    // Firebase configuration (Replace the following config object with your Firebase project config)
+    const firebaseConfig = {
+        apiKey: "AIzaSyDdUEW0_Lmv8jj48jQBCS0CM5wbRJeNVn8",
+  authDomain: "turnaroundexperts-113b9.firebaseapp.com",
+  projectId: "turnaroundexperts-113b9",
+  storageBucket: "turnaroundexperts-113b9.firebasestorage.app",
+  messagingSenderId: "210110687712",
+  appId: "1:210110687712:web:f81df5bb06b70712ec6385"
+    };
 
+    // Initialize Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
 
-        // User and appointment data will now be loaded through backend APIs (no localStorage)
-        let currentUser = JSON.parse(sessionStorage.getItem('tae_current_user')) || null;
+    // Admin email constant
+    const ADMIN_EMAIL = 'luckyvarandani112@gmail.com';
 
-        // Navigation
-        function showSection(sectionId) {
-            // Hide all sections
-            const sections = ['home', 'about', 'services', 'pricing', 'contact', 'admin'];
-            sections.forEach(id => {
-                const element = document.getElementById(id);
+    // Current logged-in user info
+    let currentUser = null;
+    let currentUserProfile = null;
+
+    // Pages sections
+    const sections = ['home', 'about', 'services', 'pricing', 'contact', 'admin'];
+
+    // Navigation handling: show one section and hide others
+    function showSection(sectionId) {
+        sections.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
                 if (id === sectionId) {
-                    element.classList.remove('hidden');
+                    el.classList.remove('hidden');
                 } else {
-                    element.classList.add('hidden');
+                    el.classList.add('hidden');
                 }
-            });
+            }
+        });
 
-            // Update admin data if showing admin section
-            if (sectionId === 'admin') {
+        // Update admin dashboard when admin section shown
+        if (sectionId === 'admin') {
+            if (currentUser && currentUser.email === ADMIN_EMAIL) {
                 updateAdminDashboard();
+            } else {
+                alert('Access denied. Admins only.');
+                showSection('home');
             }
         }
+        smoothScroll();
+        setTimeout(animateCards, 300);
 
-        // Modal functions
-        function showModal(modalId) {
-            document.getElementById(modalId).style.display = 'flex';
+        // Animate counters if about shown
+        if(sectionId==='about'){
+            setTimeout(animateCounters, 1000);
         }
+    }
 
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
+    // Show modal dialog by id
+    function showModal(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.style.display = 'flex';
         }
+    }
 
-        // Book appointment function remains unchanged
-        function bookAppointment(planName) {
-            const planSelect = document.getElementById('plan');
-            planSelect.value = planName;
-            showSection('contact');
+    // Close modal dialog by id
+    function closeModal(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.style.display = 'none';
         }
+    }
 
-        // Signup form submission with backend integration
-        document.getElementById('signupForm').addEventListener('submit', async function (e) {
-            e.preventDefault();
+    // Display auth buttons and admin nav link depending on login status
+    function updateAuthButtons() {
+        const authButtons = document.querySelector('.auth-buttons');
+        const adminNav = document.getElementById('adminNav');
 
-            const formData = new FormData(this);
-            const userData = {
-                name: formData.get('name'),
-                email: formData.get('email'),
-                password: formData.get('password'),
-                company: formData.get('company'),
-            };
-
-            try {
-                const response = await fetch(`${BACKEND_BASE_URL}/signup`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(userData),
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    alert(`Signup failed: ${errorData.message || response.statusText}`);
-                    return;
-                }
-
-                alert('Account created successfully! You can now login.');
-                closeModal('signupModal');
-                this.reset();
-            } catch (error) {
-                alert('Error connecting to server. Please try again later.');
-                console.error(error);
-            }
-        });
-
-        // Login form submission with backend integration
-        document.getElementById('loginForm').addEventListener('submit', async function (e) {
-            e.preventDefault();
-
-            const formData = new FormData(this);
-            const credentials = {
-                email: formData.get('email'),
-                password: formData.get('password'),
-            };
-
-            try {
-                const response = await fetch(`${BACKEND_BASE_URL}/login`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(credentials),
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    alert(`Login failed: ${errorData.message || response.statusText}`);
-                    return;
-                }
-
-                const user = await response.json();
-                currentUser = user;
-                sessionStorage.setItem('tae_current_user', JSON.stringify(user));
-                
-                alert(`Welcome back, ${user.name}!`);
-                closeModal('loginModal');
-                updateAuthButtons();
-                this.reset();
-            } catch (error) {
-                alert('Error connecting to server. Please try again later.');
-                console.error(error);
-            }
-        });
-
-        // Logout function
-        function logout() {
-            currentUser = null;
-            sessionStorage.removeItem('tae_current_user');
-            updateAuthButtons();
-            alert('Logged out successfully!');
-            showSection('home');
-        }
-
-        // Update auth buttons based on login status
-        function updateAuthButtons() {
-            const authButtons = document.querySelector('.auth-buttons');
-            const adminNav = document.getElementById('adminNav');
-
-            if (currentUser) {
-                if (currentUser.isAdmin) {
-                    authButtons.innerHTML = `
-                        <span style="color: #ff00ff; margin-right: 1rem; font-weight: bold;">Admin Panel</span>
-                        <a href="#" class="btn btn-secondary" onclick="logout()">Logout</a>
-                    `;
-                    adminNav.style.display = 'block';
-                } else {
-                    authButtons.innerHTML = `
-                        <span style="color: #00ffff; margin-right: 1rem;">Welcome, ${currentUser.name}</span>
-                        <a href="#" class="btn btn-secondary" onclick="logout()">Logout</a>
-                    `;
-                    adminNav.style.display = 'none';
-                }
+        if (currentUser) {
+            if (currentUser.email === ADMIN_EMAIL) {
+                authButtons.innerHTML = `
+                    <span style="color: #ff00ff; margin-right: 1rem; font-weight: bold;">Admin Panel</span>
+                    <a href="#" class="btn btn-secondary" onclick="logout()">Logout</a>
+                `;
+                adminNav.style.display = 'block';
             } else {
                 authButtons.innerHTML = `
-                    <a href="#" class="btn btn-secondary" onclick="showModal('loginModal')">Login</a>
-                    <a href="#" class="btn btn-primary" onclick="showModal('signupModal')">Sign Up</a>
+                    <span style="color: #00ffff; margin-right: 1rem;">Welcome, ${currentUserProfile ? currentUserProfile.name : ''}</span>
+                    <a href="#" class="btn btn-secondary" onclick="logout()">Logout</a>
                 `;
                 adminNav.style.display = 'none';
             }
+        } else {
+            authButtons.innerHTML = `
+                <a href="#" class="btn btn-secondary" onclick="showModal('loginModal')">Login</a>
+                <a href="#" class="btn btn-primary" onclick="showModal('signupModal')">Sign Up</a>
+            `;
+            adminNav.style.display = 'none';
+        }
+    }
+
+    // Logout function
+    function logout() {
+        auth.signOut().then(() => {
+            currentUser = null;
+            currentUserProfile = null;
+            updateAuthButtons();
+            alert('Logged out successfully!');
+            showSection('home');
+        }).catch(err => {
+            alert('Logout error: ' + err.message);
+        });
+    }
+
+    // Signup form handling using Firebase Authentication & Firestore for user profile
+    document.getElementById('signupForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const name = e.target.name.value.trim();
+        const email = e.target.email.value.trim();
+        const password = e.target.password.value;
+        const company = e.target.company.value.trim();
+
+        try {
+            // Create user with email and password
+            const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+            const user = userCredential.user;
+
+            // Save additional profile data in Firestore
+            await db.collection('users').doc(user.uid).set({
+                name,
+                email,
+                company,
+                createdAt: new Date().toISOString()
+            });
+
+            alert('Account created successfully! You can now login.');
+            closeModal('signupModal');
+            e.target.reset();
+        } catch (error) {
+            alert('Signup error: ' + error.message);
+        }
+    });
+
+    // Login form handling using Firebase Authentication
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const email = e.target.email.value.trim();
+        const password = e.target.password.value;
+
+        try {
+            const userCredential = await auth.signInWithEmailAndPassword(email, password);
+            currentUser = userCredential.user;
+
+            if (currentUser.email === ADMIN_EMAIL) {
+                currentUserProfile = { name: 'Admin' };
+            } else {
+                // Load user profile info from Firestore
+                const doc = await db.collection('users').doc(currentUser.uid).get();
+                currentUserProfile = doc.exists ? doc.data() : null;
+            }
+
+            alert(`Welcome back, ${currentUserProfile ? currentUserProfile.name : ''}!`);
+            closeModal('loginModal');
+            updateAuthButtons();
+            showSection('home');
+            e.target.reset();
+        } catch (error) {
+            alert('Login error: ' + error.message);
+        }
+    });
+
+    // Listen to auth state changes so UI remains updated on page reload or user state
+    auth.onAuthStateChanged(async (user) => {
+        if (user) {
+            currentUser = user;
+            if (user.email === ADMIN_EMAIL) {
+                currentUserProfile = { name: 'Admin' };
+            } else {
+                const doc = await db.collection('users').doc(user.uid).get();
+                currentUserProfile = doc.exists ? doc.data() : null;
+            }
+        } else {
+            currentUser = null;
+            currentUserProfile = null;
+        }
+        updateAuthButtons();
+    });
+
+    // Book appointment handling - store appointment in Firestore
+    document.getElementById('appointmentForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData(e.target);
+        const appointmentData = {
+            name: formData.get('name').trim(),
+            email: formData.get('email').trim(),
+            phone: formData.get('phone').trim(),
+            company: formData.get('company').trim(),
+            plan: formData.get('plan'),
+            message: formData.get('message').trim(),
+            status: 'pending',
+            createdAt: new Date().toISOString()
+        };
+
+        try {
+            await db.collection('appointments').add(appointmentData);
+            alert('Appointment booked successfully! Our team will contact you within 24 hours.');
+            e.target.reset();
+            showSection('home');
+        } catch (error) {
+            alert('Error booking appointment: ' + error.message);
+        }
+    });
+
+    // Book appointment helper when clicked from pricing cards
+    function bookAppointment(planName) {
+        const planSelect = document.getElementById('plan');
+        if (planSelect) {
+            planSelect.value = planName;
+            showSection('contact');
+        }
+    }
+
+    // Admin Dashboard Update - fetch users and appointments from Firestore
+    async function updateAdminDashboard() {
+        if (!currentUser || currentUser.email !== ADMIN_EMAIL) {
+            alert('Access denied. Admins only.');
+            showSection('home');
+            return;
         }
 
-        // Admin Dashboard Functions (Fetch users & appointments from backend)
-        async function updateAdminDashboard() {
-            if (!currentUser || !currentUser.isAdmin) {
-                alert('Access denied. Admin only.');
+        try {
+            const usersSnapshot = await db.collection('users').get();
+            const appointmentsSnapshot = await db.collection('appointments').get();
+
+            const usersData = [];
+            usersSnapshot.forEach(doc => {
+                const data = doc.data();
+                usersData.push({
+                    id: doc.id,
+                    name: data.name,
+                    email: data.email,
+                    company: data.company,
+                    createdAt: data.createdAt
+                });
+            });
+
+            const appointmentsData = [];
+            appointmentsSnapshot.forEach(doc => {
+                const data = doc.data();
+                appointmentsData.push({
+                    id: doc.id,
+                    name: data.name,
+                    email: data.email,
+                    phone: data.phone,
+                    company: data.company,
+                    plan: data.plan,
+                    message: data.message,
+                    status: data.status,
+                    createdAt: data.createdAt
+                });
+            });
+
+            // Update statistics counts
+            document.getElementById('totalUsers').textContent = usersData.length;
+            document.getElementById('totalAppointments').textContent = appointmentsData.length;
+            document.getElementById('pendingAppointments').textContent = 
+                appointmentsData.filter(a => a.status === 'pending').length;
+            document.getElementById('basicPlanCount').textContent = 
+                appointmentsData.filter(a => a.plan === 'Basic Plan').length;
+
+            // Populate users table
+            const usersTableBody = document.getElementById('usersTableBody');
+            usersTableBody.innerHTML = '';
+            usersData.forEach(user => {
+                const row = usersTableBody.insertRow();
+                row.innerHTML = `
+                    <td>${user.id}</td>
+                    <td>${user.name}</td>
+                    <td>${user.email}</td>
+                    <td>${user.company}</td>
+                    <td>${new Date(user.createdAt).toLocaleDateString()}</td>
+                `;
+            });
+
+            // Populate appointments table
+            const appointmentsTableBody = document.getElementById('appointmentsTableBody');
+            appointmentsTableBody.innerHTML = '';
+            appointmentsData.forEach(appointment => {
+                const row = appointmentsTableBody.insertRow();
+                row.innerHTML = `
+                    <td>${appointment.id}</td>
+                    <td>${appointment.name}</td>
+                    <td>${appointment.email}</td>
+                    <td>${appointment.phone}</td>
+                    <td>${appointment.company}</td>
+                    <td><span style="color: #00ffff; font-weight: bold;">${appointment.plan}</span></td>
+                    <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;">${appointment.message}</td>
+                    <td><span style="color: ${appointment.status === 'pending' ? '#ff00ff' : '#00ffff'}; font-weight: bold;">${appointment.status}</span></td>
+                    <td>${appointment.createdAt ? new Date(appointment.createdAt).toLocaleDateString() : ''}</td>
+                    <td>
+                        <button onclick="updateAppointmentStatus('${appointment.id}', 'completed')" 
+                                style="background: #00ffff; color: #000; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; margin-right: 5px;">
+                            Complete
+                        </button>
+                        <button onclick="deleteAppointment('${appointment.id}')" 
+                                style="background: #ff0000; color: #fff; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">
+                            Delete
+                        </button>
+                    </td>
+                `;
+            });
+        } catch (error) {
+            alert('Error loading admin dashboard: ' + error.message);
+        }
+    }
+
+    // Update appointment status in Firestore
+    async function updateAppointmentStatus(appointmentId, newStatus) {
+        try {
+            await db.collection('appointments').doc(appointmentId).update({ status: newStatus });
+            updateAdminDashboard();
+            alert(`Appointment status updated to ${newStatus}!`);
+        } catch (error) {
+            alert('Error updating appointment status: ' + error.message);
+        }
+    }
+
+    // Delete appointment from Firestore
+    async function deleteAppointment(appointmentId) {
+        if (confirm('Are you sure you want to delete this appointment?')) {
+            try {
+                await db.collection('appointments').doc(appointmentId).delete();
+                updateAdminDashboard();
+                alert('Appointment deleted successfully!');
+            } catch (error) {
+                alert('Error deleting appointment: ' + error.message);
+            }
+        }
+    }
+
+    // Excel Export Functions using Firestore snapshot data
+    // You may want to cache data for exports or fetch fresh again
+    async function exportUsersToExcel() {
+        try {
+            const usersSnapshot = await db.collection('users').get();
+            if (usersSnapshot.empty) {
+                alert('No users data to export!');
                 return;
             }
-
-            try {
-                const [usersResponse, appointmentsResponse] = await Promise.all([
-                    fetch(`${BACKEND_BASE_URL}/users`),
-                    fetch(`${BACKEND_BASE_URL}/appointments`),
+            const wsData = [
+                ['ID', 'Name', 'Email', 'Company', 'Registration Date']
+            ];
+            usersSnapshot.forEach(doc => {
+                const data = doc.data();
+                wsData.push([
+                    doc.id,
+                    data.name,
+                    data.email,
+                    data.company,
+                    data.createdAt ? new Date(data.createdAt).toLocaleDateString() : ''
                 ]);
-
-                if (!usersResponse.ok || !appointmentsResponse.ok) {
-                    alert('Failed to fetch admin data.');
-                    return;
-                }
-
-                const users = await usersResponse.json();
-                const appointments = await appointmentsResponse.json();
-
-                // Update statistics
-                document.getElementById('totalUsers').textContent = users.length;
-                document.getElementById('totalAppointments').textContent = appointments.length;
-                document.getElementById('pendingAppointments').textContent =
-                    appointments.filter(a => a.status === 'pending').length;
-                document.getElementById('basicPlanCount').textContent =
-                    appointments.filter(a => a.plan === 'Basic Plan').length;
-
-                // Update users table
-                const usersTableBody = document.getElementById('usersTableBody');
-                usersTableBody.innerHTML = '';
-                users.forEach(user => {
-                    const row = usersTableBody.insertRow();
-                    row.innerHTML = `
-                        <td>${user.id}</td>
-                        <td>${user.name}</td>
-                        <td>${user.email}</td>
-                        <td>${user.company}</td>
-                        <td>${new Date(user.createdAt).toLocaleDateString()}</td>
-                    `;
-                });
-
-                // Update appointments table
-                const appointmentsTableBody = document.getElementById('appointmentsTableBody');
-                appointmentsTableBody.innerHTML = '';
-                appointments.forEach(appointment => {
-                    const row = appointmentsTableBody.insertRow();
-                    row.innerHTML = `
-                        <td>${appointment.id}</td>
-                        <td>${appointment.name}</td>
-                        <td>${appointment.email}</td>
-                        <td>${appointment.phone}</td>
-                        <td>${appointment.company}</td>
-                        <td><span style="color: #00ffff; font-weight: bold;">${appointment.plan}</span></td>
-                        <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;">${appointment.message}</td>
-                        <td><span style="color: ${appointment.status === 'pending' ? '#ff00ff' : '#00ffff'}; font-weight: bold;">${appointment.status}</span></td>
-                        <td>${new Date(appointment.createdAt).toLocaleDateString()}</td>
-                        <td>
-                            <button onclick="updateAppointmentStatus(${appointment.id}, 'completed')"
-                                    style="background: #00ffff; color: #000; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; margin-right: 5px;">
-                                Complete
-                            </button>
-                            <button onclick="deleteAppointment(${appointment.id})"
-                                    style="background: #ff0000; color: #fff; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">
-                                Delete
-                            </button>
-                        </td>
-                    `;
-                });
-            } catch (error) {
-                alert('Error loading admin dashboard data.');
-                console.error(error);
-            }
-        }
-
-        // Update appointment status via backend
-        async function updateAppointmentStatus(appointmentId, newStatus) {
-            try {
-                const response = await fetch(`${BACKEND_BASE_URL}/appointments/${appointmentId}/status`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ status: newStatus }),
-                });
-
-                if (!response.ok) {
-                    alert('Failed to update appointment status.');
-                    return;
-                }
-
-                alert(`Appointment status updated to ${newStatus}!`);
-                updateAdminDashboard();
-            } catch (error) {
-                alert('Error updating appointment status.');
-                console.error(error);
-            }
-        }
-
-        // Delete appointment via backend
-        async function deleteAppointment(appointmentId) {
-            if (!confirm('Are you sure you want to delete this appointment?')) return;
-
-            try {
-                const response = await fetch(`${BACKEND_BASE_URL}/appointments/${appointmentId}`, {
-                    method: 'DELETE',
-                });
-
-                if (!response.ok) {
-                    alert('Failed to delete appointment.');
-                    return;
-                }
-
-                alert('Appointment deleted successfully!');
-                updateAdminDashboard();
-            } catch (error) {
-                alert('Error deleting appointment.');
-                console.error(error);
-            }
-        }
-
-        // Export functions are not feasible without backend data download
-        // You could implement client-side export if you fetch all data beforehand
-        // Simplified alerts for now
-        function exportUsersToExcel() {
-            alert('Export function requires backend implementation.');
-        }
-
-        function exportAppointmentsToExcel() {
-            alert('Export function requires backend implementation.');
-        }
-
-        function exportAllDataToExcel() {
-            alert('Export function requires backend implementation.');
-        }
-
-        // Smooth scrolling animation
-        function smoothScroll() {
-            const sections = document.querySelectorAll('.section');
-            sections.forEach(section => {
-                section.style.opacity = '0';
-                section.style.transform = 'translateY(50px)';
-                section.style.transition = 'all 0.6s ease';
             });
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(wsData);
+            XLSX.utils.book_append_sheet(wb, ws, 'Users');
+            XLSX.writeFile(wb, `TAE_Users_${new Date().toISOString().split('T')[0]}.xlsx`);
+        } catch (error) {
+            alert('Error exporting users: ' + error.message);
+        }
+    }
+
+    async function exportAppointmentsToExcel() {
+        try {
+            const appointmentsSnapshot = await db.collection('appointments').get();
+            if (appointmentsSnapshot.empty) {
+                alert('No appointments data to export!');
+                return;
+            }
+            const wsData = [
+                ['ID', 'Name', 'Email', 'Phone', 'Company', 'Plan', 'Message', 'Status', 'Date']
+            ];
+            appointmentsSnapshot.forEach(doc => {
+                const data = doc.data();
+                wsData.push([
+                    doc.id,
+                    data.name,
+                    data.email,
+                    data.phone,
+                    data.company,
+                    data.plan,
+                    data.message,
+                    data.status,
+                    data.createdAt ? new Date(data.createdAt).toLocaleDateString() : ''
+                ]);
+            });
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(wsData);
+            XLSX.utils.book_append_sheet(wb, ws, 'Appointments');
+            XLSX.writeFile(wb, `TAE_Appointments_${new Date().toISOString().split('T')[0]}.xlsx`);
+        } catch (error) {
+            alert('Error exporting appointments: ' + error.message);
+        }
+    }
+
+    async function exportAllDataToExcel() {
+        try {
+            const usersSnapshot = await db.collection('users').get();
+            const appointmentsSnapshot = await db.collection('appointments').get();
+
+            const wb = XLSX.utils.book_new();
+
+            if (!usersSnapshot.empty) {
+                const usersData = [
+                    ['ID', 'Name', 'Email', 'Company', 'Registration Date']
+                ];
+                usersSnapshot.forEach(doc => {
+                    const data = doc.data();
+                    usersData.push([
+                        doc.id,
+                        data.name,
+                        data.email,
+                        data.company,
+                        data.createdAt ? new Date(data.createdAt).toLocaleDateString() : ''
+                    ]);
+                });
+                const usersSheet = XLSX.utils.aoa_to_sheet(usersData);
+                XLSX.utils.book_append_sheet(wb, usersSheet, 'Users');
+            }
+
+            if (!appointmentsSnapshot.empty) {
+                const appointmentsData = [
+                    ['ID', 'Name', 'Email', 'Phone', 'Company', 'Plan', 'Message', 'Status', 'Date']
+                ];
+                appointmentsSnapshot.forEach(doc => {
+                    const data = doc.data();
+                    appointmentsData.push([
+                        doc.id,
+                        data.name,
+                        data.email,
+                        data.phone,
+                        data.company,
+                        data.plan,
+                        data.message,
+                        data.status,
+                        data.createdAt ? new Date(data.createdAt).toLocaleDateString() : ''
+                    ]);
+                });
+                const appointmentsSheet = XLSX.utils.aoa_to_sheet(appointmentsData);
+                XLSX.utils.book_append_sheet(wb, appointmentsSheet, 'Appointments');
+            }
+
+            // Statistics Sheet
+            const usersCount = usersSnapshot.size;
+            const appointmentsCount = appointmentsSnapshot.size;
+            let pendingCount = 0;
+            let basicPlanCount = 0;
+            let standardPlanCount = 0;
+            let advancePlanCount = 0;
+
+            appointmentsSnapshot.forEach(doc => {
+                const a = doc.data();
+                if (a.status === 'pending') pendingCount++;
+                if (a.plan === 'Basic Plan') basicPlanCount++;
+                if (a.plan === 'Standard Plan') standardPlanCount++;
+                if (a.plan === 'Advance Plan') advancePlanCount++;
+            });
+
+            const statsData = [
+                ['Metric', 'Value'],
+                ['Total Users', usersCount],
+                ['Total Appointments', appointmentsCount],
+                ['Pending Appointments', pendingCount],
+                ['Basic Plan Interest', basicPlanCount],
+                ['Standard Plan Interest', standardPlanCount],
+                ['Advance Plan Interest', advancePlanCount],
+                ['Export Date', new Date().toLocaleDateString()]
+            ];
+
+            const statsSheet = XLSX.utils.aoa_to_sheet(statsData);
+            XLSX.utils.book_append_sheet(wb, statsSheet, 'Statistics');
+
+            XLSX.writeFile(wb, `TAE_Complete_Data_${new Date().toISOString().split('T')[0]}.xlsx`);
+
+        } catch (error) {
+            alert('Error exporting all data: ' + error.message);
+        }
+    }
+
+    // Close modals when clicking outside
+    window.addEventListener('click', function (e) {
+        const modals = document.querySelectorAll('.modal');
+        modals.forEach(modal => {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+    });
+
+    // Smooth scrolling animation
+    function smoothScroll() {
+        const sections = document.querySelectorAll('.section');
+        sections.forEach(section => {
+            section.style.opacity = '0';
+            section.style.transform = 'translateY(50px)';
+            section.style.transition = 'all 0.6s ease';
+        });
+
+        setTimeout(() => {
+            sections.forEach(section => {
+                if (!section.classList.contains('hidden')) {
+                    section.style.opacity = '1';
+                    section.style.transform = 'translateY(0)';
+                }
+            });
+        }, 100);
+    }
+
+    // Add animation to cards
+    function animateCards() {
+        const cards = document.querySelectorAll('.about-card, .service-item, .pricing-card');
+        cards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(30px)';
+            card.style.transition = `all 0.6s ease ${index * 0.1}s`;
 
             setTimeout(() => {
-                sections.forEach(section => {
-                    if (!section.classList.contains('hidden')) {
-                        section.style.opacity = '1';
-                        section.style.transform = 'translateY(0)';
-                    }
-                });
-            }, 100);
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, 200 + (index * 100));
+        });
+    }
+
+    // Floating particles animation
+    function createParticles() {
+        const particleContainer = document.createElement('div');
+        particleContainer.style.position = 'fixed';
+        particleContainer.style.top = '0';
+        particleContainer.style.left = '0';
+        particleContainer.style.width = '100%';
+        particleContainer.style.height = '100%';
+        particleContainer.style.pointerEvents = 'none';
+        particleContainer.style.zIndex = '1';
+        document.body.appendChild(particleContainer);
+
+        for (let i = 0; i < 50; i++) {
+            const particle = document.createElement('div');
+            particle.style.position = 'absolute';
+            particle.style.width = '2px';
+            particle.style.height = '2px';
+            particle.style.background = '#00ffff';
+            particle.style.borderRadius = '50%';
+            particle.style.opacity = Math.random();
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.top = Math.random() * 100 + '%';
+            particle.style.animation = `float ${5 + Math.random() * 10}s linear infinite`;
+            particleContainer.appendChild(particle);
         }
+    }
 
-        // Add animation to cards
-        function animateCards() {
-            const cards = document.querySelectorAll('.about-card, .service-item, .pricing-card');
-            cards.forEach((card, index) => {
-                card.style.opacity = '0';
-                card.style.transform = 'translateY(30px)';
-                card.style.transition = `all 0.6s ease ${index * 0.1}s`;
-
-                setTimeout(() => {
-                    card.style.opacity = '1';
-                    card.style.transform = 'translateY(0)';
-                }, 200 + index * 100);
-            });
-        }
-
-        // Floating particles animation unchanged
-        function createParticles() {
-            const particleContainer = document.createElement('div');
-            particleContainer.style.position = 'fixed';
-            particleContainer.style.top = '0';
-            particleContainer.style.left = '0';
-            particleContainer.style.width = '100%';
-            particleContainer.style.height = '100%';
-            particleContainer.style.pointerEvents = 'none';
-            particleContainer.style.zIndex = '1';
-            document.body.appendChild(particleContainer);
-
-            for (let i = 0; i < 50; i++) {
-                const particle = document.createElement('div');
-                particle.style.position = 'absolute';
-                particle.style.width = '2px';
-                particle.style.height = '2px';
-                particle.style.background = '#00ffff';
-                particle.style.borderRadius = '50%';
-                particle.style.opacity = Math.random();
-                particle.style.left = Math.random() * 100 + '%';
-                particle.style.top = Math.random() * 100 + '%';
-                particle.style.animation = `float ${5 + Math.random() * 10}s linear infinite`;
-                particleContainer.appendChild(particle);
-            }
-        }
-
-        const style = document.createElement('style');
-        style.textContent = `
+    // Add floating animation keyframes
+    const style = document.createElement('style');
+    style.textContent = `
             @keyframes float {
                 0% { transform: translateY(100vh) rotate(0deg); }
                 100% { transform: translateY(-100vh) rotate(360deg); }
             }
         `;
-        document.head.appendChild(style);
+    document.head.appendChild(style);
 
-        // Initialize on DOMContentLoaded
-        document.addEventListener('DOMContentLoaded', function () {
-            updateAuthButtons();
-            createParticles();
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function () {
+        updateAuthButtons();
+        createParticles();
 
-            const originalShowSection = showSection;
-            showSection = function (sectionId) {
-                originalShowSection(sectionId);
-                smoothScroll();
-                setTimeout(animateCards, 300);
-            };
-        });
+        // Override showSection to add animations
+        const originalShowSection = showSection;
+        showSection = function (sectionId) {
+            originalShowSection(sectionId);
+            smoothScroll();
+            setTimeout(animateCards, 300);
+        };
+    });
 
-        // Typing effect unchanged
-        function typeWriter(element, text, speed = 100) {
-            let i = 0;
-            element.innerHTML = '';
+    // Typing effect on hero text
+    function typeWriter(element, text, speed = 100) {
+        let i = 0;
+        element.innerHTML = '';
 
-            function type() {
-                if (i < text.length) {
-                    element.innerHTML += text.charAt(i);
-                    i++;
-                    setTimeout(type, speed);
-                }
+        function type() {
+            if (i < text.length) {
+                element.innerHTML += text.charAt(i);
+                i++;
+                setTimeout(type, speed);
             }
-            type();
         }
+        type();
+    }
+    window.addEventListener('load', function () {
+        const heroTitle = document.querySelector('.hero h1');
+        const heroText = document.querySelector('.hero p');
 
-        window.addEventListener('load', function () {
-            const heroTitle = document.querySelector('.hero h1');
-            const heroText = document.querySelector('.hero p');
+        setTimeout(() => {
+            typeWriter(heroTitle, 'TRANSFORM YOUR STARTUP', 100);
+        }, 500);
 
-            setTimeout(() => {
-                typeWriter(heroTitle, 'TRANSFORM YOUR STARTUP', 100);
-            }, 500);
+        setTimeout(() => {
+            typeWriter(heroText, 'Turn losses into profits with our expert strategies and innovative marketing campaigns', 50);
+        }, 3000);
+    });
 
-            setTimeout(() => {
-                typeWriter(
-                    heroText,
-                    'Turn losses into profits with our expert strategies and innovative marketing campaigns',
-                    50
-                );
-            }, 3000);
-        });
+    // Add hover effects to pricing cards
+    document.addEventListener('DOMContentLoaded', function () {
+        const pricingCards = document.querySelectorAll('.pricing-card');
 
-        // Hover effects unchanged
-        document.addEventListener('DOMContentLoaded', function () {
-            const pricingCards = document.querySelectorAll('.pricing-card');
-
-            pricingCards.forEach(card => {
-                card.addEventListener('mouseenter', function () {
-                    this.style.background = `linear-gradient(135deg,
-                        rgba(0, 255, 255, 0.1) 0%,
+        pricingCards.forEach(card => {
+            card.addEventListener('mouseenter', function () {
+                this.style.background = `linear-gradient(135deg, 
+                        rgba(0, 255, 255, 0.1) 0%, 
                         rgba(255, 0, 255, 0.1) 100%)`;
-                });
+            });
 
-                card.addEventListener('mouseleave', function () {
-                    this.style.background = 'rgba(255, 255, 255, 0.05)';
-                });
+            card.addEventListener('mouseleave', function () {
+                this.style.background = 'rgba(255, 255, 255, 0.05)';
             });
         });
+    });
 
-        // Loading animation unchanged
-        function showLoading() {
-            const loader = document.createElement('div');
-            loader.id = 'loader';
-            loader.innerHTML = `
+    // Loading animation on page load
+    function showLoading() {
+        const loader = document.createElement('div');
+        loader.id = 'loader';
+        loader.innerHTML = \`
                 <div style="
                     position: fixed;
                     top: 0;
@@ -1451,82 +1641,75 @@
                         <p>Loading your transformation...</p>
                     </div>
                 </div>
-            `;
-            document.body.appendChild(loader);
+            \`;
+        document.body.appendChild(loader);
 
-            const spinStyle = document.createElement('style');
-            spinStyle.textContent = `
+        // Add spin animation
+        const spinStyle = document.createElement('style');
+        spinStyle.textContent = \`
                 @keyframes spin {
                     0% { transform: rotate(0deg); }
                     100% { transform: rotate(360deg); }
                 }
-            `;
-            document.head.appendChild(spinStyle);
+            \`;
+        document.head.appendChild(spinStyle);
 
-            setTimeout(() => {
-                loader.remove();
-            }, 2000);
-        }
+        setTimeout(() => {
+            loader.remove();
+        }, 2000);
+    }
+    window.addEventListener('load', function () {
+        showLoading();
+    });
 
-        window.addEventListener('load', function () {
-            showLoading();
-        });
+    // Animate success metrics counters
+    function animateCounters() {
+        const counters = document.querySelectorAll('.metric-number');
 
-        // Success metrics animation unchanged
-        function animateCounters() {
-            const counters = document.querySelectorAll('.metric-number');
+        counters.forEach(counter => {
+            const target = counter.textContent;
+            const isPercentage = target.includes('%');
+            const isPlus = target.includes('+');
+            const isMonth = target.includes('M');
 
-            counters.forEach(counter => {
-                const target = counter.textContent;
-                const isPercentage = target.includes('%');
-                const isPlus = target.includes('+');
-                const isMonth = target.includes('M');
+            let numericValue;
+            if (isPercentage) {
+                numericValue = parseInt(target.replace('%', ''));
+            } else if (isPlus) {
+                numericValue = parseInt(target.replace('K+', ''));
+            } else if (isMonth) {
+                numericValue = parseInt(target.replace('M', ''));
+            } else {
+                numericValue = parseInt(target);
+            }
 
-                let numericValue;
-                if (isPercentage) {
-                    numericValue = parseInt(target.replace('%', ''));
-                } else if (isPlus) {
-                    numericValue = parseInt(target.replace('K+', ''));
-                } else if (isMonth) {
-                    numericValue = parseInt(target.replace('M', ''));
-                } else {
-                    numericValue = parseInt(target);
+            let current = 0;
+            const increment = numericValue / 50;
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= numericValue) {
+                    current = numericValue;
+                    clearInterval(timer);
                 }
 
-                let current = 0;
-                const increment = numericValue / 50;
-                const timer = setInterval(() => {
-                    current += increment;
-                    if (current >= numericValue) {
-                        current = numericValue;
-                        clearInterval(timer);
-                    }
+                let displayValue = Math.floor(current);
+                if (isPercentage) {
+                    counter.textContent = displayValue + '%';
+                } else if (isPlus) {
+                    counter.textContent = displayValue + 'K+';
+                } else if (isMonth) {
+                    counter.textContent = displayValue + 'M';
+                } else {
+                    counter.textContent = displayValue;
+                }
+            }, 50);
+        });
+    }
+</script>
 
-                    let displayValue = Math.floor(current);
-                    if (isPercentage) {
-                        counter.textContent = displayValue + '%';
-                    } else if (isPlus) {
-                        counter.textContent = displayValue + 'K+';
-                    } else if (isMonth) {
-                        counter.textContent = displayValue + 'M';
-                    } else {
-                        counter.textContent = displayValue;
-                    }
-                }, 50);
-            });
-        }
+<!-- XLSX library for Excel export -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
-        // Trigger counter animation when about section shown
-        const originalShowSectionWithCounters = showSection;
-        showSection = function (sectionId) {
-            originalShowSectionWithCounters(sectionId);
-            if (sectionId === 'about') {
-                setTimeout(animateCounters, 1000);
-            }
-            smoothScroll();
-            setTimeout(animateCards, 300);
-        };
-    </script>
 </body>
 </html>
 
