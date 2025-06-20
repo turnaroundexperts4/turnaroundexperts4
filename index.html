@@ -910,13 +910,13 @@
                 </div>
                 <div class="footer-section">
                     <h3>Contact</h3>
-                    <p>
+                   <p>
                         <a href="mailto:turnaroundexperts4@gmail.com">Email: turnaroundexperts4@gmail.com</a><br />
                         <a href="tel:+918401635015">Phone: +91 84016 35015</a><br />
                         <a href="tel:+919409283440">Phone: +91 94092 83440</a><br />
                         Address: Palanpur Banaskantha, Gujarat<br />
-                        Founder: Mr.Lucky N. Varandani <br />
-                        Co-Founder: Mr.Rudra D. Padhya <br />
+                        Founder: Mr.Lucky Varandani .N<br />
+                        Co-Founder: Mr.Rudra Padhya .D<br />
                     </p>
                 </div>
             </div>
@@ -1581,5 +1581,144 @@
             setTimeout(animateCards, 300);
         };
     </script>
+
+<!-- Chatbot Widget -->
+<style>
+#chatbot-icon {
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 20px;
+    width: 70px;
+    height: 70px;
+    font-size: 32px;
+
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: linear-gradient(45deg, #00ffff, #ff00ff);
+    color: #000;
+    border: none;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    font-size: 30px;
+    cursor: pointer;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+#chatbot-box {
+    position: fixed;
+    bottom: 90px;
+    right: 20px;
+    width: 350px;
+    height: 500px;
+    background: #1a1a2e;
+    border-radius: 15px;
+    box-shadow: 0 0 15px rgba(0,255,255,0.3);
+    display: none;
+    flex-direction: column;
+    z-index: 9999;
+    overflow: hidden;
+}
+#chatbot-header {
+    background: linear-gradient(45deg, #00ffff, #ff00ff);
+    padding: 10px;
+    color: black;
+    font-weight: bold;
+    text-align: center;
+}
+#chatbot-messages {
+    flex: 1;
+    padding: 10px;
+    overflow-y: auto;
+    color: #fff;
+    font-size: 14px;
+}
+#chatbot-input-area {
+    display: flex;
+    padding: 10px;
+    background: #0a0a0a;
+}
+#chatbot-input {
+    flex: 1;
+    padding: 8px;
+    border: none;
+    border-radius: 10px;
+    background: #333;
+    color: #fff;
+}
+#chatbot-send {
+    margin-left: 10px;
+    background: #00ffff;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+</style>
+<div id="chatbot-icon" onclick="toggleChatbot()">💬</div>
+<div id="chatbot-box">
+    <div id="chatbot-header">Ask TAE</div>
+    <div id="chatbot-messages"></div>
+    <div id="chatbot-input-area">
+        <input type="text" id="chatbot-input" placeholder="Ask something...">
+        <button id="chatbot-send" onclick="sendMessage()">Send</button>
+    </div>
+</div>
+<script>
+function toggleChatbot() {
+    const box = document.getElementById('chatbot-box');
+    box.style.display = box.style.display === 'flex' ? 'none' : 'flex';
+}
+function sendMessage() {
+    const input = document.getElementById('chatbot-input');
+    const msg = input.value.trim();
+    if (!msg) return;
+    const messages = document.getElementById('chatbot-messages');
+    messages.innerHTML += '<div><b>You:</b> ' + msg + '</div>';
+    input.value = '';
+    setTimeout(() => {
+        messages.innerHTML += '<div><b>TAE:</b> ' + getBotReply(msg) + '</div>';
+        messages.scrollTop = messages.scrollHeight;
+    }, 500);
+}
+function getBotReply(msg) {
+    msg = msg.toLowerCase();
+    if (msg.includes('basic')) {
+        return '🟢 Basic Plan (₹11,999 for 2 months):\n- Social Media Manager\n- Daily Content Posting\n- Ground Marketing\n- Weekly Strategy Calls';
+    }
+    if (msg.includes('standard')) {
+        return '🔵 Standard Plan (₹24,999 for 4 months):\n- Includes Basic Plan\n- Website Development\n- SEO Optimization\n- Bi-weekly Strategy Sessions';
+    }
+    if (msg.includes('advance') || msg.includes('advanced')) {
+        return '🔴 Advance Plan (₹49,999 for 6 months):\n- Everything in Standard\n- Legal Compliance\n- Financial Strategy\n- Weekly One-on-One Sessions';
+    }
+    if (msg.includes('plans')) {
+        return 'We offer 3 plans:\n1. Basic - ₹11,999 (2 months)\n2. Standard - ₹24,999 (4 months)\n3. Advance - ₹49,999 (6 months)\nType a plan name for more info.';
+    }
+    if (msg.includes('contact') || msg.includes('email') || msg.includes('phone')) {
+        return '📞 Contact us at:\nEmail: turnaroundexperts4@gmail.com\nPhone: +91 84016 35015 / +91 94092 83440';
+    }
+    if (msg.includes('services') || msg.includes('do')) {
+        return 'We offer:\n- Social Media Management\n- Website Development\n- SEO\n- Ground Marketing\n- Legal & Financial Strategy';
+    }
+    if (msg.includes('location') || msg.includes('where')) {
+        return '📍 We are based in Palanpur, Banaskantha, Gujarat, India.';
+    }
+    if (msg.includes('address') || msg.includes('where')) {
+        return '📍 We are based in Palanpur, Banaskantha, Gujarat, India.';
+    }
+    if (msg.includes('founder') || msg.includes('team')) {
+        return 'TAE was founded by Mr. Lucky Varandani N and co-founded by Mr. Rudra Padhya D.';
+    }
+    if (msg.includes('success') || msg.includes('case')) {
+        return '💡 Our Le Chalo case study shows 300% revenue growth, 85% cost reduction, and profitability within 6 months.';
+    }
+    return 'Thank you for your message! Please connect with any Team member, Lucky Varandani- +91 8401635015 OR Rudradutt Padhya- +91 9409283440';
+}
+</script>
+
 </body>
 </html>
