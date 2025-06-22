@@ -653,11 +653,12 @@
             </div>
 
             <!-- Export Buttons -->
-            <div class="export-buttons">
-                <button class="btn-export" onclick="exportUsersToExcel()">📊 Export Users to Excel</button>
-                <button class="btn-export" onclick="exportAppointmentsToExcel()">📅 Export Appointments to Excel</button>
-                <button class="btn-export" onclick="exportAllDataToExcel()">📋 Export All Data to Excel</button>
-            </div>
+            <div class="export-buttons" style="justify-content: center;">
+    <a href="https://docs.google.com/spreadsheets/d/1D0irhTSg0aE2JuG_8ESp-86geJ2cQboNSu92ID5WSxk/edit?gid=1671340409#gid=1671340409" 
+       class="btn-export" target="_blank">
+        📋 Export All Data to Excel
+    </a>
+</div>
 
             <!-- Users Section -->
             <div class="admin-section">
@@ -981,7 +982,7 @@
         
         // Admin credentials
         const ADMIN_EMAIL = 'luckyvarandani112@gmail.com';
-        const ADMIN_PASSWORD = 'lucky@123';
+        const ADMIN_PASSWORD = 'lucky@123';     
 
         // Navigation
         function showSection(sectionId) {
