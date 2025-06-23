@@ -602,7 +602,6 @@
                 <li><a href="#about" onclick="showSection('about')">About</a></li>
                 <li><a href="#services" onclick="showSection('services')">Services</a></li>
                 <li><a href="#pricing" onclick="showSection('pricing')">Pricing</a></li>
-                <li><a href="#contact" onclick="showSection('contact')">Contact</a></li>
                 <li id="adminNav" style="display: none;"><a href="#admin" onclick="showSection('admin')">Admin</a></li>
             </ul>
             <div class="auth-buttons">
@@ -854,47 +853,6 @@
         </div>
     </section>
 
-    <!-- Contact Section -->
-    <section id="contact" class="section hidden">
-        <div class="container">
-            <h2 class="section-title">Book Your Consultation</h2>
-            <div class="form-container">
-                <form id="appointmentForm">
-                    <div class="form-group">
-                        <label for="name">Full Name</label>
-                        <input type="text" id="name" name="name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="email">Email Address</label>
-                        <input type="email" id="email" name="email" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="phone">Phone Number</label>
-                        <input type="tel" id="phone" name="phone" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="company">Company Name</label>
-                        <input type="text" id="company" name="company" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="plan">Interested Plan</label>
-                        <select id="plan" name="plan" required>
-                            <option value="">Select a Plan</option>
-                            <option value="Basic Plan">Basic Plan - ₹11,999</option>
-                            <option value="Standard Plan">Standard Plan - ₹24,999</option>
-                            <option value="Advance Plan">Advance Plan - ₹49,999</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="message">Tell us about your business challenges</label>
-                        <textarea id="message" name="message" rows="4" required></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-primary" style="width: 100%;">Book Appointment</button>
-                </form>
-            </div>
-        </div>
-    </section>
-
     <!-- Footer -->
     <footer>
         <div class="container">
@@ -987,7 +945,7 @@
         // Navigation
         function showSection(sectionId) {
             // Hide all sections
-            const sections = ['home', 'about', 'services', 'pricing', 'contact', 'admin'];
+            const sections = ['home', 'about', 'services', 'pricing', 'admin'];
             sections.forEach(id => {
                 const element = document.getElementById(id);
                 if (id === sectionId) {
@@ -1012,12 +970,7 @@
             document.getElementById(modalId).style.display = 'none';
         }
 
-        // Book appointment function
-        function bookAppointment(planName) {
-            const planSelect = document.getElementById('plan');
-            planSelect.value = planName;
-            showSection('contact');
-        }
+        
 
         // Form submissions
         document.getElementById('signupForm').addEventListener('submit', function(e) {
