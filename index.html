@@ -1666,6 +1666,9 @@ function getBotReply(msg) {
     if (msg.includes('address') || msg.includes('where')) {
         return '📍 We are based in Palanpur, Banaskantha, Gujarat, India.';
     }
+    if (msg.includes('hi') || msg.includes('hello')){
+        return 'Hi there! How can I help you today?';
+    }
     if (msg.includes('founder') || msg.includes('team')) {
         return 'TAE was founded by Mr. Lucky N. Varandani and co-founded by Mr. Rudradutt D. Padhya';
     }
