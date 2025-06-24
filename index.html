@@ -1,11 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8934005777109571"
-     crossorigin="anonymous"></script>
-    <script async custom-element="amp-auto-ads"
-        src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js">
-</script>
     <link rel="website icon" type="png/jpg" href="bg.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -581,9 +576,6 @@
     </style>
 </head>
 <body>
-    <amp-auto-ads type="adsense"
-        data-ad-client="ca-pub-8934005777109571">
-</amp-auto-ads>
          <div class="bg-image"></div>
     <style>
     .bg-image {
@@ -1650,6 +1642,44 @@ function sendMessage() {
 }
 function getBotReply(msg) {
     msg = msg.toLowerCase();
+
+
+    if (msg.includes('what is tae') || msg.includes('tae') || msg.includes('turnaround experts') || msg.includes('who are you')) {
+        return '🔁 TAE (TurnAround Experts) is a business transformation agency that helps startups become profitable through expert digital marketing, legal guidance, and financial restructuring—all under one roof.';
+    }
+
+    if (msg.includes('basic') || msg.includes('starter') || msg.includes('initial')) {
+        return '🟢 Basic Plan (₹11,999 for 2 months):<br>- Social Media Manager<br>- Daily Content<br>- Ground Marketing<br>- Weekly Strategy Calls';
+    }
+
+    if (msg.includes('standard') || msg.includes('middle') || msg.includes('recommended')) {
+        return '🔵 Standard Plan (₹24,999 for 4 months):<br>- Everything in Basic<br>- Website Development<br>- SEO Optimization<br>- Bi-weekly Strategy Sessions';
+    }
+
+    if (msg.includes('advance') || msg.includes('advanced') || msg.includes('premium') || msg.includes('top')) {
+        return '🔴 Advance Plan (₹49,999 for 6 months):<br>- Includes Standard Plan<br>- Legal & Financial Planning<br>- Business Restructure<br>- Weekly One-on-One Support';
+    }
+
+    if (msg.includes('plans') || msg.includes('pricing') || msg.includes('package') || msg.includes('cost') || msg.includes('subscription')) {
+        return '💼 We offer 3 transformation plans:<br>1. Basic – ₹11,999<br>2. Standard – ₹24,999<br>3. Advance – ₹49,999<br>Type a plan name for more info.';
+    }
+
+    if (msg.includes('services') || msg.includes('what do you do') || msg.includes('offerings') || msg.includes('features') || msg.includes('capabilities')) {
+        return '📋 Our services include:<br>- Social Media Management<br>- Website Development<br>- SEO<br>- Ground Marketing<br>- Legal & Financial Strategy';
+    }
+
+    if (msg.includes('founder') || msg.includes('team') || msg.includes('management') || msg.includes('owners') || msg.includes('leaders')) {
+        return '👥 TAE was founded by Mr. Lucky N. Varandani and co-founded by Mr. Rudradutt D. Padhya — startup growth experts.';
+    }
+
+    if (msg.includes('location') || msg.includes('where') || msg.includes('address') || msg.includes('city') || msg.includes('place')) {
+        return '📍 Based in Palanpur, Banaskantha, Gujarat, India. We serve clients nation wide.';
+    }
+
+    if (msg.includes('contact') || msg.includes('connect') || msg.includes('call') || msg.includes('message') || msg.includes('whatsapp') || msg.includes('reach') || msg.includes('talk') || msg.includes('help') || msg.includes('support')) {
+        return '📞 Reach us on WhatsApp:<br><a href="https://wa.me/918401635015" target="_blank">Mr. Lucky N. Varandani</a><br><a href="https://wa.me/919409283440" target="_blank">Mr. Rudradutt D. Padhya</a>';
+    }
+
     if (msg.includes('basic')) {
         return '🟢 Basic Plan (₹11,999 for 2 months):\n- Social Media Manager\n- Daily Content Posting\n- Ground Marketing\n- Weekly Strategy Calls';
     }
