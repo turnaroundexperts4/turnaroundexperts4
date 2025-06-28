@@ -1713,7 +1713,7 @@ function getBotReply(msg) {
     msg = msg.toLowerCase();
 
 
-  if (msg.includes('what is this') || if (msg.includes('what is tae') || msg.includes('tae') || msg.includes('turnaround experts') || msg.includes('who are you')) {
+  if (msg.includes('what is this') || (msg.includes('what is tae') || msg.includes('tae') || msg.includes('turnaround experts') || msg.includes('who are you')) {
         return '🔁 TAE (TurnAround Experts) is a business transformation agency that helps startups become profitable through expert digital marketing, legal guidance, and financial restructuring—all under one roof.';
     }
 
@@ -1770,10 +1770,13 @@ function getBotReply(msg) {
     if (msg.includes('location') || msg.includes('where')) {
         return '📍 We are based in Palanpur, Banaskantha, Gujarat, India.';
     }
-    if (msg.includes('address') || msg.includes('where')) {
-        return '📍 We are based in Palanpur, Banaskantha, Gujarat, India.';
+if (msg.includes('Good morning') || msg.includes('good morning')) {
+        return 'Good Morning 🌞🌄, How can I help you ? ';
     }
-    if (msg.includes('hi') || msg.includes('hello')){
+    if (msg.includes('Good night ') || msg.includes('good night')) {
+        return 'Good night, hope so you get favourable response from our side...😊';
+    }
+    if (msg.includes('hi') || msg.includes('hello'))|| msg.includes('hey')){
         return 'Hi there! How can I help you today?';
     }
     if (msg.includes('founder') || msg.includes('team')) {
