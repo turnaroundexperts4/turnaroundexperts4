@@ -631,6 +631,7 @@
                 <li><a href="#about" onclick="showSection('about')">About</a></li>
                 <li><a href="#services" onclick="showSection('services')">Services</a></li>
                 <li><a href="#pricing" onclick="showSection('pricing')">Pricing</a></li>
+                <li><a href="#blogs" onclick="showSection('blogs')">Blog</a></li>
                 <li id="adminNav" style="display: none;"><a href="#admin" onclick="showSection('admin')">Admin</a></li>
             </ul>
             <div class="auth-buttons">
@@ -907,7 +908,54 @@
 </amp-ad>
     </section>
 
-    <!-- Footer -->
+    
+
+<!-- Blog Section -->
+<section id="blogs" class="section">
+  <div class="container">
+    <h2 class="section-title">Insights & Resources</h2>
+    <div class="about-grid">
+      <div class="about-card">
+        <h3>Why Digital Marketing Is a Must for Startups</h3>
+        <p>Explore how digital strategies help startups reach wider audiences, build credibility, and compete with larger players cost-effectively.</p>
+        <a href="blog1.html" class="btn btn-secondary" style="margin-top: 10px; display: inline-block;">Read More</a>
+      </div>
+      <div class="about-card">
+        <h3>How SEO Can Drive Growth in 2025</h3>
+        <p>Learn the latest SEO trends and how optimization helps you rank higher, gain trust, and convert traffic into clients.</p>
+        <a href="blog2.html" class="btn btn-secondary" style="margin-top: 10px; display: inline-block;">Read More</a>
+      </div>
+      <div class="about-card">
+        <h3>Website Vs Social Media Presence</h3>
+        <p>Understand the role of your website as a business asset and how it complements your social presence for maximum impact.</p>
+        <a href="blog3.html" class="btn btn-secondary" style="margin-top: 10px; display: inline-block;">Read More</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="blogs" class="section">
+  <div class="container">
+    <h2 class="section-title">Insights & Resources</h2>
+    <div class="about-grid">
+      <div class="about-card">
+        <h3>Why Digital Marketing Is a Must for Startups</h3>
+        <p>Explore how digital strategies help startups reach wider audiences, build credibility, and compete with larger players cost-effectively.</p>
+      </div>
+      <div class="about-card">
+        <h3>How SEO Can Drive Growth in 2025</h3>
+        <p>Learn the latest SEO trends and how optimization helps you rank higher, gain trust, and convert traffic into clients.</p>
+      </div>
+      <div class="about-card">
+        <h3>Website Vs Social Media Presence</h3>
+        <p>Understand the role of your website as a business asset and how it complements your social presence for maximum impact.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- Footer -->
     <footer>
         <div class="container">
             <div class="footer-content">
@@ -1713,7 +1761,7 @@ function getBotReply(msg) {
     msg = msg.toLowerCase();
 
 
-  if (msg.includes('what is this') || (msg.includes('what is tae') || msg.includes('tae') || msg.includes('turnaround experts') || msg.includes('who are you')) {
+    if (msg.includes('what is tae') || msg.includes('tae') || msg.includes('turnaround experts') || msg.includes('who are you')) {
         return '🔁 TAE (TurnAround Experts) is a business transformation agency that helps startups become profitable through expert digital marketing, legal guidance, and financial restructuring—all under one roof.';
     }
 
@@ -1767,16 +1815,13 @@ function getBotReply(msg) {
     if (msg.includes('services') || msg.includes('do')) {
         return 'We offer:\n- Social Media Management\n- Website Development\n- SEO\n- Ground Marketing\n- Legal & Financial Strategy';
     }
-    if (msg.includes('location')|| msg.includes('where')) {
+    if (msg.includes('location') || msg.includes('where')) {
         return '📍 We are based in Palanpur, Banaskantha, Gujarat, India.';
     }
-if (msg.includes('Good morning')|| msg.includes('good morning')) {
-        return 'Good Morning 🌞🌄, How can I help you ? ';
+    if (msg.includes('address') || msg.includes('where')) {
+        return '📍 We are based in Palanpur, Banaskantha, Gujarat, India.';
     }
-    if (msg.includes('Good night')|| msg.includes('good night')){
-        return 'Good night, hope so you get favourable response from our side...😊';
-    }
-    if (msg.includes('hi') || msg.includes('hello'))|| msg.includes('hey')){
+    if (msg.includes('hi') || msg.includes('hello')){
         return 'Hi there! How can I help you today?';
     }
     if (msg.includes('founder') || msg.includes('team')) {
