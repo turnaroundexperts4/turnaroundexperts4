@@ -1,0 +1,2438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TurnAround Experts - GST, MCA & Business Services</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://unpkg.com/jspdf@latest/dist/jspdf.umd.min.js"></script>
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        
+        :root {
+            --primary: #6366f1;
+            --secondary: #8b5cf6;
+            --accent: #06b6d4;
+            --glow: rgba(99, 102, 241, 0.4);
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a3e 50%, #0f0f23 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .service-dropdown-menu {
+    background: rgba(30, 41, 59, 0.95);
+    backdrop-filter: blur(20px);
+}
+
+.service-dropdown-header {
+    background: rgba(30, 41, 59, 0.98);
+}
+        
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .glass-light {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        
+        .neon-glow {
+            box-shadow: 0 0 30px var(--glow), 0 0 60px rgba(139, 92, 246, 0.2);
+        }
+        
+        .neon-text {
+            text-shadow: 0 0 20px var(--glow), 0 0 40px rgba(139, 92, 246, 0.3);
+        }
+        
+        .card-3d {
+            transform-style: preserve-3d;
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        
+        .card-3d:hover {
+            transform: translateY(-15px) rotateX(5deg) rotateY(-5deg);
+            box-shadow: 0 30px 60px rgba(99, 102, 241, 0.3), 0 0 40px rgba(139, 92, 246, 0.2);
+        }
+        
+        .float-animation {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotateY(0deg); }
+            50% { transform: translateY(-20px) rotateY(10deg); }
+        }
+        
+        .rotate-3d {
+            animation: rotate3d 20s linear infinite;
+            transform-style: preserve-3d;
+        }
+        
+        @keyframes rotate3d {
+            from { transform: rotateY(0deg); }
+            to { transform: rotateY(360deg); }
+        }
+        
+        .icon-float {
+            animation: iconFloat 3s ease-in-out infinite;
+        }
+        
+        @keyframes iconFloat {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(5deg); }
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .btn-3d {
+            position: relative;
+            transform-style: preserve-3d;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-3d::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: inherit;
+            border-radius: inherit;
+            transform: translateZ(-10px);
+            filter: blur(15px);
+            opacity: 0.5;
+        }
+        
+        .btn-3d:hover {
+            transform: translateY(-5px) scale(1.02);
+        }
+        
+        .page { display: none; }
+        .page.active { display: block; }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal.active { display: flex; }
+        
+        .input-3d {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .input-3d:focus {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+            outline: none;
+        }
+        
+        .pricing-card {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .pricing-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.05), transparent);
+            transform: rotate(45deg);
+            animation: shine 3s infinite;
+        }
+        
+        @keyframes shine {
+            0% { transform: translateX(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) rotate(45deg); }
+        }
+        
+        .status-pending { background: #f59e0b; }
+        .status-review { background: #3b82f6; }
+        .status-completed { background: #10b981; }
+        
+        .nav-link {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #6366f1, #8b5cf6);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover::after { width: 100%; }
+        
+        .icon-container {
+            perspective: 1000px;
+        }
+        
+        .icon-3d {
+            transform-style: preserve-3d;
+            transition: transform 0.5s ease;
+        }
+        
+        .icon-3d:hover {
+            transform: rotateY(180deg);
+        }
+        
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
+        ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #6366f1, #8b5cf6); border-radius: 10px; }
+        
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(99, 102, 241, 0.5);
+            border-radius: 50%;
+            animation: particleFloat 10s infinite;
+        }
+        
+        @keyframes particleFloat {
+            0%, 100% { transform: translateY(0) translateX(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100vh) translateX(50px); opacity: 0; }
+        }
+
+        .whatsapp-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 99;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+    </style>
+</head>
+<body class="text-white">
+    <!-- Particles Background -->
+    <div id="particles" class="fixed inset-0 pointer-events-none overflow-hidden z-0"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 glass">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-3 cursor-pointer" onclick="showPage('home')">
+                   <div class="w-7 h-7 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center neon-glow">
+    <img src="logo.jpg" class="w-8 h-8 object-contain" alt="Logo" />
+</div>
+    <span class="font-bold text-xl gradient-text">TurnAround Experts</span>
+                </div>
+                
+                <div class="hidden md:flex items-center gap-8">
+                    <a href="#" class="nav-link text-gray-300 hover:text-white" onclick="showPage('home')">Home</a>
+                    <a href="#" class="nav-link text-gray-300 hover:text-white" onclick="showPage('services')">Services</a>
+                    <a href="#" class="nav-link text-gray-300 hover:text-white" onclick="showPage('blogs')">Blogs</a>
+                    <a href="#" class="nav-link text-gray-300 hover:text-white" onclick="showPage('pricing')">Pricing</a>
+                    <a href="#" class="nav-link text-gray-300 hover:text-white" onclick="showPage('booking')">Book Appointment</a>
+                </div>
+                
+                <div class="flex items-center gap-4" id="authButtons">
+                    <button onclick="openModal('loginModal')" class="px-4 py-2 text-gray-300 hover:text-white transition">Login</button>
+                    <button onclick="openModal('signupModal')" class="btn-3d px-6 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl font-medium">Sign Up</button>
+                </div>
+                
+                <div class="hidden items-center gap-4" id="userMenu">
+                    <button onclick="showPage('dashboard')" class="flex items-center gap-2 text-gray-300 hover:text-white">
+                        <i class="fas fa-user-circle text-xl"></i>
+                        <span id="userName">Dashboard</span>
+                    </button>
+                    <button onclick="logout()" class="px-4 py-2 bg-red-500/20 text-red-400 rounded-xl hover:bg-red-500/30 transition">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </div>
+                
+                <button class="md:hidden text-white" onclick="toggleMobileMenu()">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div id="mobileMenu" class="hidden md:hidden glass-light">
+            <div class="px-4 py-4 space-y-3">
+                <a href="#" class="block py-2 text-gray-300" onclick="showPage('home'); toggleMobileMenu()">Home</a>
+                <a href="#" class="block py-2 text-gray-300" onclick="showPage('services'); toggleMobileMenu()">Services</a>
+                <a href="#" class="block py-2 text-gray-300" onclick="showPage('blogs'); toggleMobileMenu()">Blogs</a>
+                <a href="#" class="block py-2 text-gray-300" onclick="showPage('pricing'); toggleMobileMenu()">Pricing</a>
+                <a href="#" class="block py-2 text-gray-300" onclick="showPage('booking'); toggleMobileMenu()">Book Appointment</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Home Page -->
+    <div id="home" class="page active">
+        <!-- Hero Section -->
+        <section class="min-h-screen flex items-center pt-20 relative overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-b from-indigo-900/20 to-transparent"></div>
+            
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                <div class="grid lg:grid-cols-2 gap-12 items-center">
+                    <div class="float-animation">
+                        <div class="inline-block px-4 py-2 glass rounded-full mb-6">
+                            <span class="text-indigo-400">🚀 Your Trusted Business Partner</span>
+                        </div>
+                        <h1 class="text-4xl md:text-6xl font-bold leading-tight mb-6">
+                            <span class="gradient-text neon-text">TurnAround Experts</span>
+                            <br>
+                            <span class="text-white">Fast, Reliable, and Expert</span>
+                            <br>
+                            <span class="text-gray-400">GST, MCA & Business Services</span>
+                        </h1>
+                        <p class="text-gray-400 text-lg mb-8 max-w-xl">
+                            Simplify your business compliance with our expert team. From GST registration to company formation, we handle it all with precision and speed.
+                        </p>
+                        <div class="flex flex-wrap gap-4">
+                            <button onclick="showPage('booking')" class="btn-3d px-8 py-4 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl font-semibold text-lg neon-glow">
+                                <i class="fas fa-calendar-check mr-2"></i> Book Appointment
+                            </button>
+                            <button onclick="showPage('services')" class="btn-3d px-8 py-4 glass rounded-2xl font-semibold text-lg border border-indigo-500/50">
+                                <i class="fas fa-th-large mr-2"></i> View Services
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Hero Right: Process & Trust Panel -->
+                    <div class="relative h-full flex items-center justify-center">
+                        <div class="glass-light rounded-3xl p-6 md:p-8 card-3d w-full max-w-md neon-glow">
+                            <p class="text-xs uppercase tracking-[0.25em] text-indigo-300 mb-4">How It Works</p>
+                            <div class="space-y-4 mb-6">
+                                <div class="flex items-start gap-4">
+                                    <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shadow-lg shadow-emerald-500/40">
+                                        <i class="fas fa-comments text-lg"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-semibold">1. Share your requirement</p>
+                                        <p class="text-xs text-gray-400">Tell us about your GST, Income Tax, MCA or licensing needs in a simple form.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-4">
+                                    <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center shadow-lg shadow-indigo-500/40">
+                                        <i class="fas fa-user-tie text-lg"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-semibold">2. Get matched with an expert</p>
+                                        <p class="text-xs text-gray-400">Our team reviews your case and assigns a dedicated compliance specialist.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-4">
+                                    <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-sky-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-sky-500/40">
+                                        <i class="fas fa-bolt text-lg"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-semibold">3. Fast, on-time execution</p>
+                                        <p class="text-xs text-gray-400">We handle filings, registrations and follow‑ups while you focus on business.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-3 gap-3 text-center text-xs">
+                                <div class="glass rounded-2xl py-3">
+                                    <p class="font-semibold text-sm">500+</p>
+                                    <p class="text-gray-400 text-[11px]">Cases Closed</p>
+                                </div>
+                                <div class="glass rounded-2xl py-3">
+                                    <p class="font-semibold text-sm"><span class="text-emerald-400">99%</span></p>
+                                    <p class="text-gray-400 text-[11px]">On‑time filings</p>
+                                </div>
+                                <div class="glass rounded-2xl py-3">
+                                    <p class="font-semibold text-sm">4.9★</p>
+                                    <p class="text-gray-400 text-[11px]">Client rating</p>
+                                </div>
+                            </div>
+
+                            <div class="mt-6 flex items-center justify-between gap-4 text-[11px] text-gray-400">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-6 h-6 rounded-full bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center">
+                                        <i class="fas fa-shield-alt text-[11px] text-emerald-300"></i>
+                                    </span>
+                                    <span>Govt‑compliant documentation</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="w-6 h-6 rounded-full bg-sky-500/20 border border-sky-400/40 flex items-center justify-center">
+                                        <i class="fas fa-headset text-[11px] text-sky-300"></i>
+                                    </span>
+                                    <span>Dedicated support</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Stats -->
+        <section class="py-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                    <div class="glass-light rounded-2xl p-6 text-center card-3d">
+                        <div class="text-4xl font-bold gradient-text mb-2">30+</div>
+                        <div class="text-gray-400">Happy Clients</div>
+                    </div>
+                    <div class="glass-light rounded-2xl p-6 text-center card-3d">
+                        <div class="text-4xl font-bold gradient-text mb-2">15+</div>
+                        <div class="text-gray-400">Services</div>
+                    </div>
+                    <div class="glass-light rounded-2xl p-6 text-center card-3d">
+                        <div class="text-4xl font-bold gradient-text mb-2">99%</div>
+                        <div class="text-gray-400">Success Rate</div>
+                    </div>
+                    <div class="glass-light rounded-2xl p-6 text-center card-3d">
+                        <div class="text-4xl font-bold gradient-text mb-2">24/7</div>
+                        <div class="text-gray-400">Support</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Featured Services Preview -->
+        <section class="py-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl font-bold mb-4">Our <span class="gradient-text">Expert Services</span></h2>
+                    <p class="text-gray-400 max-w-2xl mx-auto">Comprehensive business solutions tailored to your needs</p>
+                </div>
+                
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="glass-light rounded-3xl p-8 card-3d">
+                        <div class="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center mb-6 neon-glow">
+                            <i class="fas fa-file-invoice-dollar text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3">Marketing Services</h3>
+                        <p class="text-gray-400 mb-4">On-Ground Marketing , Digital Marketing , Content Marketing , and Brand Strategy.</p>
+                        <a href="#" onclick="showPage('services')" class="text-indigo-400 hover:text-indigo-300">Learn more →</a>
+                    </div>
+                    
+                    <div class="glass-light rounded-3xl p-8 card-3d">
+                        <div class="w-16 h-16 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl flex items-center justify-center mb-6">
+                            <i class="fas fa-building text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3">Company Registration</h3>
+                        <p class="text-gray-400 mb-4">Pvt Ltd, LLP, Partnership, OPC, and Section 8 company registration.</p>
+                        <a href="#" onclick="showPage('services')" class="text-indigo-400 hover:text-indigo-300">Learn more →</a>
+                    </div>
+                    
+                    <div class="glass-light rounded-3xl p-8 card-3d">
+                        <div class="w-16 h-16 bg-gradient-to-br from-pink-500 to-rose-600 rounded-2xl flex items-center justify-center mb-6">
+                            <i class="fas fa-chart-line text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3">Development Services</h3>
+                        <p class="text-gray-400 mb-4">App Development, Web Development, E-Commerce Development, UI/UX Design, and Maintenance & Support.</p>
+                        <a href="#" onclick="showPage('services')" class="text-indigo-400 hover:text-indigo-300">Learn more →</a>
+                    </div>
+                     <div class="glass-light rounded-3xl p-8 card-3d">
+                        <div class="w-16 h-16 bg-gradient-to-br from-pink-500 to-rose-600 rounded-2xl flex items-center justify-center mb-6">
+                            <i class="fas fa-chart-line text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3">Designing services</h3>
+                        <p class="text-gray-400 mb-4">Logo Design ,Visiting Card Design, Poster & Banner Design, Social Media Creative Design, Brochure & Pamphlet Design, and Complete Brand Kit.</p>
+                        <a href="#" onclick="showPage('services')" class="text-indigo-400 hover:text-indigo-300">Learn more →</a>
+                    </div>
+
+                   
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Services Page -->
+    <div id="services" class="page">
+        <section class="pt-24 pb-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h1 class="text-5xl font-bold mb-4">Our <span class="gradient-text">Services</span></h1>
+                    <p class="text-gray-400 max-w-2xl mx-auto">Complete range of business registration, taxation, and compliance services</p>
+                </div>
+
+                 <div class="mb-16">
+                    <h2 class="text-3xl font-bold mb-8 flex items-center gap-3">
+                        <div class="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center">
+                            <i class="fas fa-file-invoice"></i>
+                        </div>
+                        Marketing Services
+                    </h2>
+                  <div class="grid md:grid-cols-4 gap-6">
+                        <div class="glass-light rounded-2xl p-6 card-3d">
+                            <i class="fas fa-plus-circle text-3xl text-indigo-400 mb-4"></i>
+                            <h3 class="font-bold mb-2">On-Ground Marketing</h3>
+                            <p class="text-gray-400 text-sm">Street promotions, rickshaw ads, pamphlet distribution, targeted area compaigns.</p>
+                        </div>
+                        <div class="glass-light rounded-2xl p-6 card-3d">
+                            <i class="fas fa-file-upload text-3xl text-purple-400 mb-4"></i>
+                            <h3 class="font-bold mb-2">Digital Marketing</h3>
+                            <p class="text-gray-400 text-sm">Social media management, Instagram/Facebook ads, Google ads, influencer marketing.</p>
+                        </div>
+                        <div class="glass-light rounded-2xl p-6 card-3d">
+                            <i class="fas fa-times-circle text-3xl text-pink-400 mb-4"></i>
+                            <h3 class="font-bold mb-2">Content Marketing</h3>
+                            <p class="text-gray-400 text-sm">Creative posts, reels, blogs, and branded storytelling for audience engagement.</p>
+                        </div>
+                        <div class="glass-light rounded-2xl p-6 card-3d">
+                            <i class="fas fa-edit text-3xl text-cyan-400 mb-4"></i>
+                            <h3 class="font-bold mb-2">SEO & SEM</h3>
+                            <p class="text-gray-400 text-sm">Improve ranking on google with optimized keywords and targeted campaigns.</p>
+                        </div>
+                    </div>
+                </div>
+
+               <!-- Designing Services -->
+                <div class="mb-16">
+                    <h2 class="text-3xl font-bold mb-8 flex items-center gap-3">
+                        <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center">
+                            <i class="fas fa-landmark"></i>
+                        </div>
+                        Designing Services
+                    </h2>
+                    <div class="grid md:grid-cols-4 gap-6">
+                        <div class="glass-light rounded-2xl p-6 card-3d">
+                            <i class="fas fa-logo-alt text-3xl text-green-400 mb-4"></i>
+                            <h3 class="font-bold mb-2">Logo Design</h3>
+                            <p class="text-gray-400 text-sm">Unique, modern, and memorable logo concepts for your business.</p>
+                        </div>
+                        <div class="glass-light rounded-2xl p-6 card-3d">
+                            <i class="fas fa-card text-3xl text-emerald-400 mb-4"></i>
+                            <h3 class="font-bold mb-2">Visitng Card Design</h3>
+                            <p class="text-gray-400 text-sm">Clean, premium, and professional business card layout.</p>
+                        </div>
+                        <div class="glass-light rounded-2xl p-6 card-3d">
+                            <i class="fas fa-page text-3xl text-teal-400 mb-4"></i>
+                            <h3 class="font-bold mb-2">Poster & Banner Design</h3>
+                            <p class="text-gray-400 text-sm">Eye-catching creatives for events, offers, and promotions.</p>
+                        </div>
+                        <div class="glass-light rounded-2xl p-6 card-3d">
+                            <i class="fas fa-check-double text-3xl text-lime-400 mb-4"></i>
+                            <h3 class="font-bold mb-2">Social Media Creative Design</h3>
+                            <p class="text-gray-400 text-sm">Posts, stories, highlights, reels thumbnails for all platforms.</p>
+                        </div>
+                        <div class="glass-light rounded-2xl p-6 card-3d">
+                            <i class="fas fa-check-double text-3xl text-lime-400 mb-4"></i>
+                            <h3 class="font-bold mb-2">Complete Brand kit</h3>
+                            <p class="text-gray-400 text-sm">Color theme, typography, branding elements, templates.</p>
+                        </div>
+                    </div>
+                </div>
+
+                    <!-- Business Registration -->
+                    <div class="mb-16">
+                        <h2 class="text-3xl font-bold mb-8 flex items-center gap-3">
+                            <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-building"></i>
+                            </div>
+                            Business Registration
+                        </h2>
+                        <div class="grid md:grid-cols-3 lg:grid-cols-6 gap-6">
+                            <div class="glass-light rounded-2xl p-6 card-3d text-center">
+                                <i class="fas fa-industry text-3xl text-blue-400 mb-4"></i>
+                                <h3 class="font-bold text-sm">MSME</h3>
+                            </div>
+                            <div class="glass-light rounded-2xl p-6 card-3d text-center">
+                                <i class="fas fa-rocket text-3xl text-purple-400 mb-4"></i>
+                                <h3 class="font-bold text-sm">Startup India</h3>
+                            </div>
+                            <div class="glass-light rounded-2xl p-6 card-3d text-center">
+                                <i class="fas fa-handshake text-3xl text-pink-400 mb-4"></i>
+                                <h3 class="font-bold text-sm">Partnership</h3>
+                            </div>
+                            <div class="glass-light rounded-2xl p-6 card-3d text-center">
+                                <i class="fas fa-building text-3xl text-indigo-400 mb-4"></i>
+                                <h3 class="font-bold text-sm">Pvt Ltd</h3>
+                            </div>
+                            <div class="glass-light rounded-2xl p-6 card-3d text-center">
+                                <i class="fas fa-balance-scale text-3xl text-cyan-400 mb-4"></i>
+                                <h3 class="font-bold text-sm">LLP</h3>
+                            </div>
+                            <div class="glass-light rounded-2xl p-6 card-3d text-center">
+                                <i class="fas fa-heart text-3xl text-red-400 mb-4"></i>
+                                <h3 class="font-bold text-sm">Section 8</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                <!-- Food License -->
+                <div class="mb-16">
+                    <h2 class="text-3xl font-bold mb-8 flex items-center gap-3">
+                        <div class="w-12 h-12 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-xl flex items-center justify-center">
+                            <i class="fas fa-utensils"></i>
+                        </div>
+                        Food License (FSSAI)
+                    </h2>
+                    <div class="grid md:grid-cols-4 gap-6">
+                        <div class="glass-light rounded-2xl p-6 card-3d">
+                            <i class="fas fa-certificate text-3xl text-yellow-400 mb-4"></i>
+                            <h3 class="font-bold mb-2">FSSAI Basic</h3>
+                            <p class="text-gray-400 text-sm">For small food businesses</p>
+                        </div>
+                        <div class="glass-light rounded-2xl p-6 card-3d">
+                            <i class="fas fa-award text-3xl text-orange-400 mb-4"></i>
+                            <h3 class="font-bold mb-2">FSSAI State</h3>
+                            <p class="text-gray-400 text-sm">For medium-sized businesses</p>
+                        </div>
+                        <div class="glass-light rounded-2xl p-6 card-3d">
+                            <i class="fas fa-star text-3xl text-amber-400 mb-4"></i>
+                            <h3 class="font-bold mb-2">FSSAI Central</h3>
+                            <p class="text-gray-400 text-sm">For large-scale operations</p>
+                        </div>
+                        <div class="glass-light rounded-2xl p-6 card-3d">
+                            <i class="fas fa-sync text-3xl text-red-400 mb-4"></i>
+                            <h3 class="font-bold mb-2">Renewals</h3>
+                            <p class="text-gray-400 text-sm">License renewal services</p>
+                        </div>
+                    </div>
+                </div>
+
+                 <!-- Development Services -->
+                <div class="mb-16">
+                    <h2 class="text-3xl font-bold mb-8 flex items-center gap-3">
+                        <div class="w-12 h-12 bg-gradient-to-br from-rose-500 to-pink-600 rounded-xl flex items-center justify-center">
+                            <i class="fas fa-id-card"></i>
+                        </div>
+                        Development Services
+                    </h2>
+                    <div class="grid md:grid-cols-3 gap-6">
+                        <div class="glass-light rounded-2xl p-6 card-3d">
+                            <i class="fas fa-plus text-3xl text-rose-400 mb-4"></i>
+                            <h3 class="font-bold mb-2">App Development</h3>
+                            <p class="text-gray-400 text-sm">Android & iOS apps with smooth UI and strong performance.</p>
+                        </div>
+                        <div class="glass-light rounded-2xl p-6 card-3d">
+                            <i class="fas fa-weblink text-3xl text-pink-400 mb-4"></i>
+                            <h3 class="font-bold mb-2">Web Development</h3>
+                            <p class="text-gray-400 text-sm">Modern, Fast, mobile-responsive websites for any business.</p>
+                        </div>
+                        <div class="glass-light rounded-2xl p-6 card-3d">
+                            <i class="fas fa-e-commerce text-3xl text-pink-400 mb-4"></i>
+                            <h3 class="font-bold mb-2">E-Commerce Development</h3>
+                            <p class="text-gray-400 text-sm">Online store setup, payment gateway, and full backend.</p>
+                        </div>
+                        <div class="glass-light rounded-2xl p-6 card-3d">
+                            <i class="fas fa-screw text-3xl text-pink-400 mb-4"></i>
+                            <h3 class="font-bold mb-2">Custom Software Development/h3>
+                            <p class="text-gray-400 text-sm">Tailor-made tools for automation, management, and business operation.</p>
+                        </div>
+                        <div class="glass-light rounded-2xl p-6 card-3d">
+                            <i class="fas fa-pen text-3xl text-pink-400 mb-4"></i>
+                            <h3 class="font-bold mb-2">UI/UX Design</h3>
+                            <p class="text-gray-400 text-sm">Clean, user-friendly interfaces crafted for maximum engagement.</p>
+                        </div>
+                        <div class="glass-light rounded-2xl p-6 card-3d">
+                            <i class="fas fa-print text-3xl text-fuchsia-400 mb-4"></i>
+                            <h3 class="font-bold mb-2">Maintenance & Support</h3>
+                            <p class="text-gray-400 text-sm">Regular updates, bug fixes, and feature improvements.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Accounting -->
+                <div class="mb-16">
+                    <h2 class="text-3xl font-bold mb-8 flex items-center gap-3">
+                        <div class="w-12 h-12 bg-gradient-to-br from-violet-500 to-purple-600 rounded-xl flex items-center justify-center">
+                            <i class="fas fa-calculator"></i>
+                        </div>
+                        Accounting Services
+                    </h2>
+                    <div class="grid md:grid-cols-3 gap-6">
+                        <div class="glass-light rounded-2xl p-6 card-3d">
+                            <i class="fas fa-book text-3xl text-violet-400 mb-4"></i>
+                            <h3 class="font-bold mb-2">Bookkeeping</h3>
+                            <p class="text-gray-400 text-sm">Maintain accurate financial records</p>
+                        </div>
+                        <div class="glass-light rounded-2xl p-6 card-3d">
+                            <i class="fas fa-list-alt text-3xl text-purple-400 mb-4"></i>
+                            <h3 class="font-bold mb-2">Ledger Maintenance</h3>
+                            <p class="text-gray-400 text-sm">Complete ledger and account management</p>
+                        </div>
+                        <div class="glass-light rounded-2xl p-6 card-3d">
+                            <i class="fas fa-chart-pie text-3xl text-indigo-400 mb-4"></i>
+                            <h3 class="font-bold mb-2">Budget Planning</h3>
+                            <p class="text-gray-400 text-sm">Strategic financial planning</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <button onclick="showPage('booking')" class="btn-3d px-10 py-4 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl font-semibold text-lg neon-glow">
+                        <i class="fas fa-calendar-check mr-2"></i> Book a Consultation
+                    </button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Pricing Page -->
+    <div id="pricing" class="page">
+        <section class="pt-24 pb-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h1 class="text-5xl font-bold mb-4">Transparent <span class="gradient-text">Pricing</span></h1>
+                    <p class="text-gray-400 max-w-2xl mx-auto">Choose the plan that fits your business needs</p>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                  <!-- Basic Plan -->
+    <div class="pricing-card glass-light rounded-3xl p-8 card-3d relative">
+        <div class="text-center mb-8">
+            <div class="w-16 h-16 bg-gradient-to-br from-gray-500 to-gray-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-briefcase text-2xl"></i>
+            </div>
+            <h3 class="text-2xl font-bold mb-2">Basic Plan</h3>
+            <div class="text-4xl font-bold gradient-text">₹24,999</div>
+            <p class="text-gray-400 text-sm">/ month</p>
+        </div>
+        <ul class="space-y-4 mb-8">
+            <li class="flex items-center gap-3"><i class="fas fa-check text-green-400"></i><span class="text-gray-300">Basic compliance & registrations</span></li>
+            <li class="flex items-center gap-3"><i class="fas fa-check text-green-400"></i><span class="text-gray-300">Monthly filings</span></li>
+            <li class="flex items-center gap-3"><i class="fas fa-check text-green-400"></i><span class="text-gray-300">1 dedicated executive</span></li>
+            <li class="flex items-center gap-3 opacity-50"><i class="fas fa-times text-red-400"></i><span class="text-gray-400">Priority support</span></li>
+        </ul>
+        <button onclick="showPage('booking')" class="w-full py-3 glass rounded-xl font-semibold hover:bg-white/10 transition">Get Started</button>
+    </div>
+
+    <!-- Custom Plan -->
+    <div class="pricing-card glass-light rounded-3xl p-8 card-3d relative border-2 border-indigo-500 transform scale-105">
+        <div class="absolute -top-1 left-1/2 -translate-x-1/2 px-4 py-1 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full text-sm font-semibold">Most Popular</div>
+        <div class="text-center mb-8">
+            <div class="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4 neon-glow">
+                <i class="fas fa-cogs text-2xl"></i>
+            </div>
+            <h3 class="text-2xl font-bold mb-2">Custom Plan</h3>
+            <div class="text-4xl font-bold gradient-text">Starting ₹6,999</div>
+            <p class="text-gray-400 text-sm">/ month  (charges as per requirements)</p>
+         </div>
+        <ul class="space-y-4 mb-8">
+            <li class="flex items-center gap-3"><i class="fas fa-check text-green-400"></i><span class="text-gray-300">Tailored services per client needs</span></li>
+            <li class="flex items-center gap-3"><i class="fas fa-check text-green-400"></i><span class="text-gray-300">Pay only for selected services</span></li>
+            <li class="flex items-center gap-3"><i class="fas fa-check text-green-400"></i><span class="text-gray-300">Scalable support & onboarding</span></li>
+            <li class="flex items-center gap-3 opacity-80"><i class="fas fa-info-circle text-yellow-400"></i><span class="text-gray-300">Final pricing after requirement analysis</span></li>
+        </ul>
+        <button onclick="showPage('booking')" class="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl font-semibold neon-glow">Get Started</button>
+    </div>
+
+    <!-- Advanced Plan -->
+    <div class="pricing-card glass-light rounded-3xl p-8 card-3d relative">
+        <div class="text-center mb-8">
+             <div class="w-16 h-16 bg-gradient-to-br from-gray-500 to-gray-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+               <i class="fas fa-tools text-2xl"></i>
+            </div>
+            <h3 class="text-2xl font-bold mb-2">Advanced Plan</h3>
+            <div class="text-4xl font-bold gradient-text">₹59,999</div>
+            <p class="text-gray-400 text-sm">/ month</p>
+       </div>
+        <ul class="space-y-4 mb-8">
+            <li class="flex items-center gap-3"><i class="fas fa-check text-green-400"></i><span class="text-gray-300">Website development</span></li>
+            <li class="flex items-center gap-3"><i class="fas fa-check text-green-400"></i><span class="text-gray-300">App development</span></li>
+            <li class="flex items-center gap-3"><i class="fas fa-check text-green-400"></i><span class="text-gray-300">All registration services (GST, MCA, PAN, FSSAI)</span></li>
+            <li class="flex items-center gap-3"><i class="fas fa-check text-green-400"></i><span class="text-gray-300">Priority processing & support</span></li>
+        </ul>
+        <button onclick="showPage('booking')" class="w-full py-3 glass rounded-xl font-semibold hover:bg-white/10 transition">Get Started</button>
+    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Booking Page -->
+    <div id="booking" class="page">
+        <section class="pt-24 pb-20">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h1 class="text-5xl font-bold mb-4">Book an <span class="gradient-text">Appointment</span></h1>
+                    <p class="text-gray-400">Fill out the form below and our experts will get back to you</p>
+                </div>
+
+                <div class="glass-light rounded-3xl p-8 card-3d">
+                    <form id="bookingForm" onsubmit="submitBooking(event)">
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Full Name *</label>
+                                <input type="text" name="fullName" required class="w-full px-4 py-3 rounded-xl input-3d text-white" placeholder="Enter your full name">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Phone Number *</label>
+                                <input type="tel" name="phone" required class="w-full px-4 py-3 rounded-xl input-3d text-white" placeholder="Enter phone number">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Email *</label>
+                                <input type="email" name="email" required class="w-full px-4 py-3 rounded-xl input-3d text-white" placeholder="Enter email address">
+                            </div>
+                           <div>
+    <label class="block text-sm font-medium mb-2">Preferred Services * <span class="text-indigo-300 text-xs">(Select multiple)</span></label>
+    
+    <!-- Selected Services Display -->
+    <div id="selectedServicesDisplay" class="hidden flex-wrap gap-2 mb-3 p-3 glass rounded-xl"></div>
+    
+    <!-- Dropdown -->
+    <div class="relative">
+        <div id="serviceDropdownToggle" class="w-full px-4 py-3 rounded-xl input-3d text-white cursor-pointer hover:bg-white/10 transition flex items-center justify-between">
+            <span id="serviceDropdownText" class="text-gray-400">Select services...</span>
+            <i class="fas fa-chevron-down transition-transform" id="serviceDropdownIcon"></i>
+        </div>
+        
+        <div id="serviceDropdownMenu" class="hidden absolute z-50 w-full mt-2 service-dropdown-menu border border-white/20 rounded-xl shadow-2xl max-h-96 overflow-hidden">
+    <!-- Search Input -->
+    <div class="p-3 border-b border-white/10 sticky top-0 service-dropdown-header">
+        <input type="text" id="serviceSearch" placeholder="Search services..." class="w-full px-4 py-2 rounded-lg input-3d text-white placeholder-gray-400">
+    </div>
+    
+    <!-- Services List -->
+    <div id="servicesList" class="overflow-y-auto max-h-80 p-2"></div>
+</div>
+    </div>
+    
+    <!-- Hidden input to store selected services -->
+    <input type="hidden" name="services" id="selectedServicesInput" required>
+    
+    <p class="text-xs text-gray-400 mt-2">Select all services you're interested in</p>
+            </div>
+                             <div>
+                                <label class="block text-sm font-medium mb-2">Your City *</label>
+                                <input type="text" name="city" required class="w-full px-4 py-3 rounded-xl input-3d text-white" placeholder="Enter your city">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Business / Firm Name</label>
+                                <input type="text" name="businessName" class="w-full px-4 py-3 rounded-xl input-3d text-white" placeholder="Enter business name">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Do you have GST? *</label>
+                                <select name="hasGST" required class="w-full px-4 py-3 rounded-xl input-3d text-white bg-transparent">
+                                    <option value="" class="bg-gray-800">Select</option>
+                                    <option value="Yes" class="bg-gray-800">Yes</option>
+                                    <option value="No" class="bg-gray-800">No</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Business Type *</label>
+                                <select name="businessType" required class="w-full px-4 py-3 rounded-xl input-3d text-white bg-transparent">
+                                    <option value="" class="bg-gray-800">Select type</option>
+                                    <option value="Proprietorship" class="bg-gray-800">Proprietorship</option>
+                                    <option value="Partnership" class="bg-gray-800">Partnership</option>
+                                    <option value="Pvt Ltd" class="bg-gray-800">Pvt Ltd</option>
+                                    <option value="LLP" class="bg-gray-800">LLP</option>
+                                    <option value="Other" class="bg-gray-800">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mt-6">
+                            <label class="block text-sm font-medium mb-2">Description of Issue / Requirement *</label>
+                            <textarea name="description" required rows="4" class="w-full px-4 py-3 rounded-xl input-3d text-white" placeholder="Describe your requirement in detail"></textarea>
+                        </div>
+                        <div class="mt-8 text-center">
+                            <button type="submit" class="btn-3d px-12 py-4 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl font-semibold text-lg neon-glow">
+                                <i class="fas fa-paper-plane mr-2"></i> Submit Appointment
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- User Dashboard -->
+    <div id="dashboard" class="page">
+        <section class="pt-24 pb-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex flex-col md:flex-row gap-8">
+                    <!-- Sidebar -->
+                    <div class="w-full md:w-64 glass-light rounded-3xl p-6">
+                        <div class="text-center mb-6">
+                            <div class="w-20 h-20 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 neon-glow">
+                                <i class="fas fa-user text-3xl"></i>
+                            </div>
+                            <h3 id="dashboardUserName" class="font-bold text-lg">User Name</h3>
+                            <p class="text-gray-400 text-sm" id="dashboardUserEmail">user@email.com</p>
+                        </div>
+                        <nav class="space-y-2">
+                            <button onclick="showDashboardTab('overview')" class="w-full text-left px-4 py-3 rounded-xl hover:bg-white/10 transition flex items-center gap-3 dashboard-tab active" data-tab="overview">
+                                <i class="fas fa-home"></i> Overview
+                            </button>
+                            <button onclick="showDashboardTab('appointments')" class="w-full text-left px-4 py-3 rounded-xl hover:bg-white/10 transition flex items-center gap-3 dashboard-tab" data-tab="appointments">
+                                <i class="fas fa-calendar"></i> My Appointments
+                            </button>
+                            <button onclick="showDashboardTab('profile')" class="w-full text-left px-4 py-3 rounded-xl hover:bg-white/10 transition flex items-center gap-3 dashboard-tab" data-tab="profile">
+                                <i class="fas fa-user-edit"></i> Profile
+                            </button>
+                        </nav>
+                    </div>
+
+                    <!-- Main Content -->
+                    <div class="flex-1">
+                        <!-- Overview Tab -->
+                        <div id="tab-overview" class="dashboard-content">
+                            <h2 class="text-3xl font-bold mb-8">Welcome Back! 👋</h2>
+                            <div class="grid md:grid-cols-3 gap-6 mb-8">
+                                <div class="glass-light rounded-2xl p-6 card-3d">
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-12 h-12 bg-indigo-500/20 rounded-xl flex items-center justify-center">
+                                            <i class="fas fa-calendar-check text-indigo-400 text-xl"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-gray-400 text-sm">Total Appointments</p>
+                                            <p class="text-2xl font-bold" id="totalAppointments">0</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="glass-light rounded-2xl p-6 card-3d">
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-12 h-12 bg-yellow-500/20 rounded-xl flex items-center justify-center">
+                                            <i class="fas fa-clock text-yellow-400 text-xl"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-gray-400 text-sm">Pending</p>
+                                            <p class="text-2xl font-bold" id="pendingAppointments">0</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="glass-light rounded-2xl p-6 card-3d">
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center">
+                                            <i class="fas fa-check-circle text-green-400 text-xl"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-gray-400 text-sm">Completed</p>
+                                            <p class="text-2xl font-bold" id="completedAppointments">0</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="glass-light rounded-2xl p-6">
+                                <h3 class="font-bold text-xl mb-4">Recent Activity</h3>
+                                <div id="recentActivity" class="space-y-4">
+                                    <p class="text-gray-400">No recent activity</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Appointments Tab -->
+                        <div id="tab-appointments" class="dashboard-content hidden">
+                            <h2 class="text-3xl font-bold mb-8">My Appointments</h2>
+                            <div id="appointmentsList" class="space-y-4">
+                                <p class="text-gray-400">No appointments yet</p>
+                            </div>
+                        </div>
+
+                        <!-- Profile Tab -->
+                        <div id="tab-profile" class="dashboard-content hidden">
+                            <h2 class="text-3xl font-bold mb-8">Update Profile</h2>
+                            <div class="glass-light rounded-2xl p-6">
+                                <form onsubmit="updateProfile(event)">
+                                    <div class="grid md:grid-cols-2 gap-6">
+                                        <div>
+                                            <label class="block text-sm font-medium mb-2">Full Name</label>
+                                            <input type="text" id="profileName" class="w-full px-4 py-3 rounded-xl input-3d text-white">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium mb-2">Phone</label>
+                                            <input type="tel" id="profilePhone" class="w-full px-4 py-3 rounded-xl input-3d text-white">
+                                        </div>
+                                        <div class="md:col-span-2">
+                                            <label class="block text-sm font-medium mb-2">Email</label>
+                                            <input type="email" id="profileEmail" class="w-full px-4 py-3 rounded-xl input-3d text-white" disabled>
+                                        </div>
+                                    </div>
+                                    <div class="mt-6">
+                                        <button type="submit" class="btn-3d px-8 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl font-semibold">
+                                            Update Profile
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div id="admin" class="page">
+        <section class="pt-24 pb-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex flex-col md:flex-row gap-8">
+                    <!-- Admin Sidebar -->
+                    <div class="w-full md:w-64 glass-light rounded-3xl p-6">
+                        <div class="text-center mb-6">
+                            <div class="w-20 h-20 bg-gradient-to-br from-red-500 to-orange-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-user-shield text-3xl"></i>
+                            </div>
+                            <h3 class="font-bold text-lg">Admin Panel</h3>
+                            <p class="text-gray-400 text-sm">TurnAround Experts</p>
+                        </div>
+                        <nav class="space-y-2">
+                            <button onclick="showAdminTab('analytics')" class="w-full text-left px-4 py-3 rounded-xl hover:bg-white/10 transition flex items-center gap-3 admin-tab active" data-tab="analytics">
+                                <i class="fas fa-chart-bar"></i> Analytics
+                            </button>
+                            <button onclick="showAdminTab('all-appointments')" class="w-full text-left px-4 py-3 rounded-xl hover:bg-white/10 transition flex items-center gap-3 admin-tab" data-tab="all-appointments">
+                                <i class="fas fa-calendar-alt"></i> All Appointments
+                            </button>
+                            <button onclick="showAdminTab('users')" class="w-full text-left px-4 py-3 rounded-xl hover:bg-white/10 transition flex items-center gap-3 admin-tab" data-tab="users">
+                                <i class="fas fa-users"></i> Users
+                            </button>
+                            <button onclick="showAdminTab('services-admin')" class="w-full text-left px-4 py-3 rounded-xl hover:bg-white/10 transition flex items-center gap-3 admin-tab" data-tab="services-admin">
+                                <i class="fas fa-cogs"></i> Services
+                            </button>
+                        </nav>
+                    </div>
+
+                        <!-- Admin Content -->
+                        <div class="flex-1">
+                            <!-- Analytics Tab -->
+                            <div id="admin-tab-analytics" class="admin-content">
+                                <h2 class="text-3xl font-bold mb-8">Dashboard Analytics</h2>
+                                <div class="grid md:grid-cols-4 gap-6 mb-8">
+                                    <div class="glass-light rounded-2xl p-6 card-3d">
+                                        <div class="flex items-center gap-4">
+                                            <div class="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center">
+                                                <i class="fas fa-eye text-blue-400 text-xl"></i>
+                                            </div>
+                                            <div>
+                                                <p class="text-gray-400 text-sm">Total Visits</p>
+                                                <p class="text-2xl font-bold" id="adminVisits">1,234</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="glass-light rounded-2xl p-6 card-3d">
+                                        <div class="flex items-center gap-4">
+                                            <div class="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center">
+                                                <i class="fas fa-calendar-check text-green-400 text-xl"></i>
+                                            </div>
+                                            <div>
+                                                <p class="text-gray-400 text-sm">Bookings</p>
+                                                <p class="text-2xl font-bold" id="adminBookings">0</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="glass-light rounded-2xl p-6 card-3d">
+                                        <div class="flex items-center gap-4">
+                                            <div class="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center">
+                                                <i class="fas fa-users text-purple-400 text-xl"></i>
+                                            </div>
+                                            <div>
+                                                <p class="text-gray-400 text-sm">Users</p>
+                                                <p class="text-2xl font-bold" id="adminUsers">0</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="glass-light rounded-2xl p-6 card-3d">
+                                        <div class="flex items-center gap-4">
+                                            <div class="w-12 h-12 bg-yellow-500/20 rounded-xl flex items-center justify-center">
+                                                <i class="fas fa-rupee-sign text-yellow-400 text-xl"></i>
+                                            </div>
+                                            <div>
+                                                <p class="text-gray-400 text-sm">Revenue</p>
+                                                <p class="text-2xl font-bold">₹45,000</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="glass-light rounded-2xl p-6">
+                                    <h3 class="font-bold text-xl mb-4">Recent Bookings Overview</h3>
+                                    <div class="h-48 flex items-center justify-center text-gray-400">
+                                        <div class="text-center">
+                                            <i class="fas fa-chart-line text-4xl mb-2"></i>
+                                            <p>Analytics visualization</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- All Appointments Tab -->
+                            <div id="admin-tab-all-appointments" class="admin-content hidden">
+                                <div class="flex justify-between items-center mb-8">
+                                    <h2 class="text-3xl font-bold">All Appointments</h2>
+                                    <button onclick="exportAppointments()" class="btn-3d px-6 py-2 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl font-medium">
+                                        <i class="fas fa-download mr-2"></i> Export CSV
+                                    </button>
+                                </div>
+                                <div id="adminAppointmentsList" class="space-y-4">
+                                    <p class="text-gray-400">No appointments</p>
+                                </div>
+                            </div>
+
+                            <!-- Users Tab -->
+                            <div id="admin-tab-users" class="admin-content hidden">
+                                <h2 class="text-3xl font-bold mb-8">Manage Users</h2>
+                                <div id="adminUsersList" class="space-y-4">
+                                    <p class="text-gray-400">No users</p>
+                                </div>
+                            </div>
+
+                            <!-- Services Admin Tab -->
+                            <div id="admin-tab-services-admin" class="admin-content hidden">
+                                <h2 class="text-3xl font-bold mb-8">Manage Services</h2>
+                                <div class="glass-light rounded-2xl p-6 mb-6">
+                                    <h3 class="font-bold mb-4">Add New Service</h3>
+                                    <div class="grid md:grid-cols-3 gap-4">
+                                        <input type="text" id="newServiceName" placeholder="Service Name" class="px-4 py-3 rounded-xl input-3d text-white">
+                                        <input type="text" id="newServicePrice" placeholder="Price" class="px-4 py-3 rounded-xl input-3d text-white">
+                                        <button onclick="addService()" class="btn-3d px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl font-medium">
+                                            Add Service
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+          <!-- Blogs Page -->
+        <div id="blogs" class="page">
+            <section class="pt-24 pb-20">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="text-center mb-16">
+                        <h1 class="text-5xl font-bold mb-4">Insights & <span class="gradient-text">Blogs</span></h1>
+                        <p class="text-gray-400 max-w-2xl mx-auto">Practical compliance insights, updates, and guides to help you run your business smoothly.</p>
+                    </div>
+
+                    <div class="grid lg:grid-cols-3 gap-8">
+                        <!-- Blog 1 -->
+                        <article class="glass-light rounded-3xl p-8 card-3d relative overflow-hidden">
+                            <div class="flex items-center justify-between mb-6">
+                                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center neon-glow">
+                                    <i class="fas fa-receipt text-2xl"></i>
+                                </div>
+                                <span class="text-xs tracking-widest uppercase text-indigo-300">GST</span>
+                            </div>
+                            <h3 class="text-2xl font-bold mb-3">GST Filing Checklist: Avoid Notices & Late Fees</h3>
+                            <p class="text-gray-400 mb-6">A clean checklist to keep your returns accurate—invoice matching, input tax credit hygiene, and common mistakes that trigger notices.</p>
+                            <div class="flex items-center justify-between text-sm text-gray-400">
+                                <span><i class="fas fa-clock mr-2"></i>6 min read</span>
+                                <button class="text-indigo-300 hover:text-white transition" onclick="openBlog('gstChecklist')">Read more →</button>
+                            </div>
+                        </article>
+
+                        <!-- Blog 2 -->
+                        <article class="glass-light rounded-3xl p-8 card-3d relative overflow-hidden">
+                            <div class="flex items-center justify-between mb-6">
+                                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-500/30">
+                                    <i class="fas fa-file-alt text-2xl"></i>
+                                </div>
+                                <span class="text-xs tracking-widest uppercase text-emerald-300">Income Tax</span>
+                            </div>
+                            <h3 class="text-2xl font-bold mb-3">ITR Filing: What to Keep Ready (Individuals & Businesses)</h3>
+                            <p class="text-gray-400 mb-6">From Form 16 to bank interest, AIS/TIS checks, and business P&L—here’s a simple prep guide for faster, error‑free filing.</p>
+                            <div class="flex items-center justify-between text-sm text-gray-400">
+                                <span><i class="fas fa-clock mr-2"></i>7 min read</span>
+                                <button class="text-indigo-300 hover:text-white transition" onclick="openBlog('itrReady')">Read more →</button>
+                            </div>
+                        </article>
+
+                        <!-- Blog 3 -->
+                        <article class="glass-light rounded-3xl p-8 card-3d relative overflow-hidden">
+                            <div class="flex items-center justify-between mb-6">
+                                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-yellow-500 to-orange-600 flex items-center justify-center shadow-lg shadow-orange-500/30">
+                                    <i class="fas fa-building text-2xl"></i>
+                                </div>
+                                <span class="text-xs tracking-widest uppercase text-yellow-300">MCA</span>
+                            </div>
+                            <h3 class="text-2xl font-bold mb-3">Company Registration: Pvt Ltd vs LLP (Quick Decision Guide)</h3>
+                            <p class="text-gray-400 mb-6">Confused between LLP and Pvt Ltd? Compare compliance, cost, ownership flexibility, and investor readiness in a crisp decision matrix.</p>
+                            <div class="flex items-center justify-between text-sm text-gray-400">
+                                <span><i class="fas fa-clock mr-2"></i>5 min read</span>
+                                <button class="text-indigo-300 hover:text-white transition" onclick="openBlog('pvtVsLlp')">Read more →</button>
+                            </div>
+                        </article>
+                    </div>
+
+                    <div class="mt-14 glass-light rounded-3xl p-8 card-3d">
+                        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                            <div>
+                                <h3 class="text-2xl font-bold mb-2">Want weekly compliance tips?</h3>
+                                <p class="text-gray-400">We’ll share simple reminders and checklists—no spam.</p>
+                            </div>
+                            <div class="flex w-full md:w-auto gap-3">
+                                <input id="blogEmail" type="email" class="flex-1 md:w-72 px-4 py-3 rounded-xl input-3d text-white" placeholder="Enter your email">
+                                <button onclick="subscribeBlog()" class="btn-3d px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl font-semibold neon-glow">
+                                    Subscribe
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Blog Read Modal -->
+        <div id="blogModal" class="modal">
+            <div class="glass-light rounded-3xl p-0 w-full max-w-3xl mx-4 card-3d overflow-hidden">
+                <div class="p-6 border-b border-white/10 flex items-start justify-between">
+                    <div>
+                        <p id="blogModalTag" class="text-xs uppercase tracking-[0.25em] text-indigo-300">BLOG</p>
+                        <h2 id="blogModalTitle" class="text-2xl md:text-3xl font-bold mt-2">Blog title</h2>
+                    </div>
+                    <button onclick="closeModal('blogModal')" class="text-gray-400 hover:text-white">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                <div class="p-6 md:p-8 max-h-[70vh] overflow-auto">
+                    <div id="blogModalMeta" class="text-sm text-gray-400 mb-6"></div>
+                    <div id="blogModalBody" class="text-gray-200 leading-relaxed space-y-4"></div>
+                    <div class="mt-8 flex flex-wrap gap-3">
+                        <button onclick="showPage('booking'); closeModal('blogModal');" class="btn-3d px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl font-semibold neon-glow">
+                            <i class="fas fa-calendar-check mr-2"></i> Book Appointment
+                        </button>
+                        <button onclick="showPage('services'); closeModal('blogModal');" class="btn-3d px-6 py-3 glass rounded-xl font-semibold border border-indigo-500/40">
+                            <i class="fas fa-th-large mr-2"></i> View Services
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="glass border-t border-white/10 mt-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+                <div class="grid md:grid-cols-4 gap-12">
+                    <div>
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="w-7 h-7 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center neon-glow">
+                                <img src="logo.jpg" class="w-8 h-8 object-contain" alt="Logo">
+                            </div>
+                            <span class="font-bold text-xl gradient-text">TurnAround Experts</span>
+                        </div>
+                        <p class="text-gray-400 mb-4">Your trusted partner for all business registration, taxation, and compliance needs.</p>
+                        <div class="flex gap-4">
+                            <a href="https://instagram.com" target="_blank" class="w-10 h-10 glass rounded-xl flex items-center justify-center hover:bg-white/10 transition">
+                                <i class="fab fa-instagram text-pink-400"></i>
+                            </a>
+                            <a href="mailto:turnaroundexperts4@gmail.com" class="w-10 h-10 glass rounded-xl flex items-center justify-center hover:bg-white/10 transition">
+                                <i class="fas fa-envelope text-blue-400"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-lg mb-4">Services</h4>
+                        <ul class="space-y-2 text-gray-400">
+                            <li><a href="#" onclick="showPage('services')" class="hover:text-white transition">GST Services</a></li>
+                            <li><a href="#" onclick="showPage('services')" class="hover:text-white transition">Income Tax</a></li>
+                            <li><a href="#" onclick="showPage('services')" class="hover:text-white transition">Company Registration</a></li>
+                            <li><a href="#" onclick="showPage('services')" class="hover:text-white transition">Food License</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-lg mb-4">Quick Links</h4>
+                        <ul class="space-y-2 text-gray-400">
+                            <li><a href="#" onclick="showPage('home')" class="hover:text-white transition">Home</a></li>
+                            <li><a href="#" onclick="showPage('blogs')" class="hover:text-white transition">Blogs</a></li>
+                            <li><a href="#" onclick="showPage('pricing')" class="hover:text-white transition">Pricing</a></li>
+                            <li><a href="#" onclick="showPage('booking')" class="hover:text-white transition">Book Appointment</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-lg mb-4">Contact</h4>
+                        <ul class="space-y-3 text-gray-400">
+                            <li class="flex items-center gap-3">
+                                <i class="fas fa-envelope text-indigo-400"></i>
+                                <a href="mailto:turnaroundexperts.info@gmail.com" class="hover:text-white transition">turnaroundexperts.info@gmail.com</a>
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <i class="fab fa-whatsapp text-green-400"></i>
+                                <span>WhatsApp Support</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="border-t border-white/10 mt-12 pt-8 text-center text-gray-400">
+                    <p>&copy; 2024 TurnAround Experts. All rights reserved.</p>
+                </div>
+            </div>
+        </footer>
+
+        <!-- WhatsApp Button -->
+       <a href="https://wa.me/919512384715?text=Hello%2C%20I%20want%20to%20book%20an%20appointment." 
+       target="_blank" 
+       class="whatsapp-btn w-14 h-14 bg-green-500 rounded-full flex items-center justify-center shadow-lg hover:bg-green-600 transition">
+        <i class="fab fa-whatsapp text-2xl text-white"></i>
+    </a>
+
+
+        <!-- Login Modal -->
+        <div id="loginModal" class="modal">
+            <div class="glass-light rounded-3xl p-8 w-full max-w-md mx-4 card-3d">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold">Welcome Back</h2>
+                    <button onclick="closeModal('loginModal')" class="text-gray-400 hover:text-white">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                <form onsubmit="handleLogin(event)">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Email</label>
+                            <input type="email" id="loginEmail" required class="w-full px-4 py-3 rounded-xl input-3d text-white" placeholder="Enter your email">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Password</label>
+                            <input type="password" id="loginPassword" required class="w-full px-4 py-3 rounded-xl input-3d text-white" placeholder="Enter your password">
+                        </div>
+                        <div class="flex justify-between items-center text-sm">
+                            <label class="flex items-center gap-2 text-gray-400">
+                                <input type="checkbox" class="rounded">
+                                Remember me
+                            </label>
+                            <a href="#" onclick="openModal('forgotModal'); closeModal('loginModal');" class="text-indigo-400 hover:text-indigo-300">Forgot Password?</a>
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full mt-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl font-semibold neon-glow">
+                        Login
+                    </button>
+                </form>
+                <div class="mt-6">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="flex-1 h-px bg-white/10"></div>
+                        <span class="text-gray-400 text-sm">or continue with</span>
+                        <div class="flex-1 h-px bg-white/10"></div>
+                    </div>
+                    <button onclick="googleLogin()" class="w-full py-3 glass rounded-xl font-medium flex items-center justify-center gap-3 hover:bg-white/10 transition">
+                        <i class="fab fa-google text-red-400"></i>
+                        Google
+                    </button>
+                </div>
+                <p class="mt-6 text-center text-gray-400 text-sm">
+                    Don't have an account? <a href="#" onclick="closeModal('loginModal'); openModal('signupModal');" class="text-indigo-400 hover:text-indigo-300">Sign Up</a>
+                </p>
+            </div>
+        </div>
+
+        <!-- Signup Modal -->
+        <div id="signupModal" class="modal">
+            <div class="glass-light rounded-3xl p-8 w-full max-w-md mx-4 card-3d">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold">Create Account</h2>
+                    <button onclick="closeModal('signupModal')" class="text-gray-400 hover:text-white">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                <form onsubmit="handleSignup(event)">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Full Name</label>
+                            <input type="text" id="signupName" required class="w-full px-4 py-3 rounded-xl input-3d text-white" placeholder="Enter your name">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Email</label>
+                            <input type="email" id="signupEmail" required class="w-full px-4 py-3 rounded-xl input-3d text-white" placeholder="Enter your email">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Password</label>
+                            <input type="password" id="signupPassword" required class="w-full px-4 py-3 rounded-xl input-3d text-white" placeholder="Create a password">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Role</label>
+                            <select id="signupRole" class="w-full px-4 py-3 rounded-xl input-3d text-white bg-transparent">
+                                <option value="client" class="bg-gray-800">Client</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full mt-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl font-semibold neon-glow">
+                        Create Account
+                    </button>
+                </form>
+                <div class="mt-6">
+                    <button onclick="googleLogin()" class="w-full py-3 glass rounded-xl font-medium flex items-center justify-center gap-3 hover:bg-white/10 transition">
+                        <i class="fab fa-google text-red-400"></i>
+                        Sign up with Google
+                    </button>
+                </div>
+                <p class="mt-6 text-center text-gray-400 text-sm">
+                    Already have an account? <a href="#" onclick="closeModal('signupModal'); openModal('loginModal');" class="text-indigo-400 hover:text-indigo-300">Login</a>
+                </p>
+            </div>
+        </div>
+
+        <!-- Forgot Password Modal -->
+        <div id="forgotModal" class="modal">
+            <div class="glass-light rounded-3xl p-8 w-full max-w-md mx-4 card-3d">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold">Reset Password</h2>
+                    <button onclick="closeModal('forgotModal')" class="text-gray-400 hover:text-white">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                <form onsubmit="handleForgotPassword(event)">
+                    <p class="text-gray-400 mb-4">Enter your email and we'll send you a reset link.</p>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Email</label>
+                        <input type="email" id="forgotEmail" required class="w-full px-4 py-3 rounded-xl input-3d text-white" placeholder="Enter your email">
+                    </div>
+                    <button type="submit" class="w-full mt-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl font-semibold neon-glow">
+                        Send Reset Link
+                    </button>
+                </form>
+                <p class="mt-6 text-center text-gray-400 text-sm">
+                    <a href="#" onclick="closeModal('forgotModal'); openModal('loginModal');" class="text-indigo-400 hover:text-indigo-300">← Back to Login</a>
+                </p>
+            </div>
+        </div>
+
+        <!-- Toast Notification -->
+        <div id="toast" class="fixed bottom-24 right-8 glass-light rounded-xl px-6 py-4 transform translate-x-full opacity-0 transition-all duration-300 z-50">
+            <div class="flex items-center gap-3">
+                <i id="toastIcon" class="fas fa-check-circle text-green-400"></i>
+                <span id="toastMessage">Success message</span>
+            </div>
+        </div>
+
+        <script>
+            // State Management
+            let currentUser = null;
+            let appointments = JSON.parse(localStorage.getItem('appointments')) || [];
+            let users = JSON.parse(localStorage.getItem('users')) || [];
+
+            // Initialize
+            document.addEventListener('DOMContentLoaded', () => {
+                initializeAdmin();
+                createParticles();
+                checkAuth();
+                updateStats();
+            });
+
+            // Initialize default admin account
+            function initializeAdmin() {
+                const adminExists = users.find(u => u.email === 'lucky@gmail.com');
+                if (!adminExists) {
+                    const adminUser = {
+                        id: 1000000,
+                        name: 'Lucky Admin',
+                        email: 'lucky@gmail.com',
+                        password: 'luckysabkabaap@1',
+                        role: 'admin',
+                        createdAt: new Date().toISOString()
+                    };
+                    users.push(adminUser);
+                    localStorage.setItem('users', JSON.stringify(users));
+                }
+            }
+
+            // Particles
+            function createParticles() {
+                const container = document.getElementById('particles');
+                for (let i = 0; i < 50; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    particle.style.left = Math.random() * 100 + '%';
+                    particle.style.top = Math.random() * 100 + '%';
+                    particle.style.animationDelay = Math.random() * 10 + 's';
+                    particle.style.animationDuration = (10 + Math.random() * 10) + 's';
+                    container.appendChild(particle);
+                }
+            }
+
+            // Navigation
+            function showPage(pageId) {
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                document.getElementById(pageId).classList.add('active');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                
+                if (pageId === 'dashboard' || pageId === 'admin') {
+                    updateDashboard();
+                }
+            }
+
+            function toggleMobileMenu() {
+                const menu = document.getElementById('mobileMenu');
+                menu.classList.toggle('hidden');
+            }
+
+            // Modals
+            function openModal(modalId) {
+                document.getElementById(modalId).classList.add('active');
+            }
+
+            function closeModal(modalId) {
+                document.getElementById(modalId).classList.remove('active');
+            }
+
+            // Authentication
+            function checkAuth() {
+                const savedUser = localStorage.getItem('currentUser');
+                if (savedUser) {
+                    currentUser = JSON.parse(savedUser);
+                    updateAuthUI();
+                }
+            }
+
+            function updateAuthUI() {
+                const authButtons = document.getElementById('authButtons');
+                const userMenu = document.getElementById('userMenu');
+                
+                if (currentUser) {
+                    authButtons.classList.add('hidden');
+                    userMenu.classList.remove('hidden');
+                    userMenu.classList.add('flex');
+                    document.getElementById('userName').textContent = currentUser.name;
+                    document.getElementById('dashboardUserName').textContent = currentUser.name;
+                    document.getElementById('dashboardUserEmail').textContent = currentUser.email;
+                    document.getElementById('profileName').value = currentUser.name;
+                    document.getElementById('profileEmail').value = currentUser.email;
+                    document.getElementById('profilePhone').value = currentUser.phone || '';
+                } else {
+                    authButtons.classList.remove('hidden');
+                    userMenu.classList.add('hidden');
+                }
+            }
+
+            function handleLogin(e) {
+                e.preventDefault();
+                const email = document.getElementById('loginEmail').value;
+                const password = document.getElementById('loginPassword').value;
+
+                const user = users.find(u => u.email === email && u.password === password);
+                if (user) {
+                    currentUser = user;
+                    localStorage.setItem('currentUser', JSON.stringify(user));
+                    closeModal('loginModal');
+                    updateAuthUI();
+                    showToast('Login successful!', 'success');
+                    if (user.role === 'admin') {
+                        showPage('admin');
+                    } else {
+                        showPage('dashboard');
+                    }
+                } else {
+                    showToast('Invalid credentials', 'error');
+                }
+            }
+
+            function handleSignup(e) {
+                e.preventDefault();
+                const name = document.getElementById('signupName').value;
+                const email = document.getElementById('signupEmail').value;
+                const password = document.getElementById('signupPassword').value;
+                const role = document.getElementById('signupRole').value;
+
+                if (users.find(u => u.email === email)) {
+                    showToast('Email already exists', 'error');
+                    return;
+                }
+
+                const newUser = {
+                    id: Date.now(),
+                    name,
+                    email,
+                    password,
+                    role,
+                    createdAt: new Date().toISOString()
+                };
+
+                users.push(newUser);
+                localStorage.setItem('users', JSON.stringify(users));
+                
+                currentUser = newUser;
+                localStorage.setItem('currentUser', JSON.stringify(newUser));
+                
+                closeModal('signupModal');
+                updateAuthUI();
+                showToast('Account created successfully!', 'success');
+                updateStats();
+            }
+
+            function googleLogin() {
+                const user = {
+                    id: Date.now(),
+                    name: 'Google User',
+                    email: 'googleuser@gmail.com',
+                    role: 'client',
+                    createdAt: new Date().toISOString()
+                };
+                
+                if (!users.find(u => u.email === user.email)) {
+                    users.push(user);
+                    localStorage.setItem('users', JSON.stringify(users));
+                }
+                
+                currentUser = user;
+                localStorage.setItem('currentUser', JSON.stringify(user));
+                closeModal('loginModal');
+                closeModal('signupModal');
+                updateAuthUI();
+                showToast('Logged in with Google!', 'success');
+                showPage('dashboard');
+            }
+
+            function handleForgotPassword(e) {
+                e.preventDefault();
+                const email = document.getElementById('forgotEmail').value;
+                showToast('Reset link sent to ' + email, 'success');
+                closeModal('forgotModal');
+            }
+
+            function logout() {
+                currentUser = null;
+                localStorage.removeItem('currentUser');
+                updateAuthUI();
+                showPage('home');
+                showToast('Logged out successfully', 'success');
+            }
+
+            // Booking
+            function submitBooking(e) {
+                e.preventDefault();
+
+                // Force login before booking
+                if (!currentUser) {
+                    showToast('Please login or sign up before booking an appointment.', 'error');
+                    openModal('loginModal');
+                    return;
+                }
+
+                const form = e.target;
+                const formData = new FormData(form);
+                
+                const appointment = {
+                    id: Date.now(),
+                    fullName: formData.get('fullName'),
+                    phone: formData.get('phone'),
+                    email: formData.get('email'),
+                    services: formData.get('services'), // Now stores comma-separated services
+                    city: formData.get('city'),
+                    businessName: formData.get('businessName'),
+                    hasGST: formData.get('hasGST'),
+                    businessType: formData.get('businessType'),
+                    description: formData.get('description'),
+                    status: 'Pending',
+                    userId: currentUser ? currentUser.id : null,
+                    createdAt: new Date().toISOString()
+                };
+
+                appointments.push(appointment);
+                localStorage.setItem('appointments', JSON.stringify(appointments));
+                
+                form.reset();
+                showToast('Appointment booked! Confirmation email sent.', 'success');
+                updateStats();
+                
+                if (currentUser) {
+                    showPage('dashboard');
+                }
+            }
+
+            // Dashboard
+            function showDashboardTab(tabId) {
+                document.querySelectorAll('.dashboard-content').forEach(c => c.classList.add('hidden'));
+                document.querySelectorAll('.dashboard-tab').forEach(t => t.classList.remove('active', 'bg-white/10'));
+                
+                document.getElementById('tab-' + tabId).classList.remove('hidden');
+                document.querySelector(`[data-tab="${tabId}"]`).classList.add('active', 'bg-white/10');
+                
+                updateDashboard();
+            }
+
+            function updateDashboard() {
+                if (!currentUser) return;
+                
+                const userAppointments = appointments.filter(a => 
+                    a.userId === currentUser.id || a.email === currentUser.email
+                );
+                
+                document.getElementById('totalAppointments').textContent = userAppointments.length;
+                document.getElementById('pendingAppointments').textContent = userAppointments.filter(a => a.status === 'Pending').length;
+                document.getElementById('completedAppointments').textContent = userAppointments.filter(a => a.status === 'Completed').length;
+                
+                const listContainer = document.getElementById('appointmentsList');
+                if (userAppointments.length > 0) {
+                    listContainer.innerHTML = userAppointments.map(a => `
+                        <div class="glass-light rounded-2xl p-6 card-3d">
+                            <div class="flex flex-wrap justify-between items-start gap-4">
+                                <div>
+                                    <h3 class="font-bold text-lg">${a.service}</h3>
+                                    <p class="text-gray-400 text-sm">${new Date(a.createdAt).toLocaleDateString()}</p>
+                                </div>
+                                <span class="px-3 py-1 rounded-full text-sm font-medium ${
+                                    a.status === 'Pending' ? 'status-pending' : 
+                                    a.status === 'In Review' ? 'status-review' : 'status-completed'
+                                }">${a.status}</span>
+                            </div>
+                            <p class="text-gray-300 mt-4">${a.description.substring(0, 100)}...</p>
+                            <div class="mt-4 flex gap-2">
+                                <button onclick="downloadReceipt(${a.id})" class="px-4 py-2 glass rounded-lg text-sm hover:bg-white/10 transition">
+                                    <i class="fas fa-download mr-1"></i> Receipt
+                                </button>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+                
+                // Recent activity
+                const recentActivity = document.getElementById('recentActivity');
+                if (userAppointments.length > 0) {
+                    recentActivity.innerHTML = userAppointments.slice(-3).reverse().map(a => `
+                        <div class="flex items-center gap-4 p-3 glass rounded-xl">
+                            <div class="w-10 h-10 bg-indigo-500/20 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-calendar text-indigo-400"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium">${a.service}</p>
+                                <p class="text-gray-400 text-sm">${a.status}</p>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            }
+
+            function updateProfile(e) {
+                e.preventDefault();
+                if (!currentUser) return;
+                
+                currentUser.name = document.getElementById('profileName').value;
+                currentUser.phone = document.getElementById('profilePhone').value;
+                
+                const userIndex = users.findIndex(u => u.id === currentUser.id);
+                if (userIndex > -1) {
+                    users[userIndex] = currentUser;
+                    localStorage.setItem('users', JSON.stringify(users));
+                }
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                updateAuthUI();
+                showToast('Profile updated!', 'success');
+            }
+
+           
+           function downloadReceipt(appointmentId) {
+        const appointment = appointments.find(a => a.id === appointmentId);
+        if (!appointment) {
+            showToast('Appointment not found', 'error');
+            return;
+        }
+
+        // Check if jsPDF is loaded
+        if (typeof window.jspdf === 'undefined') {
+            showToast('PDF library not loaded. Please refresh the page.', 'error');
+            console.error('jsPDF library is not loaded');
+            return;
+        }
+
+        try {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+            const margin = 20;
+            let y = 20;
+
+            // Safe bottom margin so footer never overlaps content
+            const safeBottom = pageHeight - 50; // leave ~50pt for footer area
+
+            // Overflow handler for long content: if about to draw past safeBottom, add page and reset y
+            function checkOverflow(lineHeight = 8) {
+                if (y + lineHeight > safeBottom) {
+                    doc.addPage();
+                    y = 20; // reset top margin on new page (keeps layout consistent)
+                }
+            }
+
+            // Header gradient background
+            doc.setFillColor(99, 102, 241);
+            doc.rect(0, 0, pageWidth, 50, 'F');
+            
+            // Accent line
+            doc.setFillColor(139, 92, 246);
+            doc.rect(0, 50, pageWidth, 3, 'F');
+
+            // Company name
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(24);
+            doc.setFont('helvetica', 'bold');
+            doc.text('TurnAround Experts', pageWidth / 2, 28, { align: 'center' });
+            
+            // Tagline
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
+            doc.text('GST, MCA & Business Services', pageWidth / 2, 38, { align: 'center' });
+
+            // Receipt title
+            y = 70;
+            doc.setTextColor(99, 102, 241);
+            doc.setFontSize(18);
+            doc.setFont('helvetica', 'bold');
+            doc.text('APPOINTMENT RECEIPT', pageWidth / 2, y, { align: 'center' });
+
+            // Decorative line
+            y += 10;
+            doc.setDrawColor(99, 102, 241);
+            doc.setLineWidth(0.5);
+            doc.line(margin, y, pageWidth - margin, y);
+
+            // Receipt info section
+            y += 15;
+            doc.setTextColor(100, 100, 100);
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
+            
+            const receiptDate = new Date().toLocaleDateString('en-IN', { 
+                year: 'numeric', month: 'long', day: 'numeric' 
+            });
+            doc.text(`Receipt Date: ${receiptDate}`, margin, y);
+            doc.text(`Receipt #: TAE-${appointment.id}`, pageWidth - margin, y, { align: 'right' });
+
+            // Ensure room for the main content box
+            y += 15;
+            checkOverflow(120); // ensure the big content box fits; will add page if not
+
+            // Main content box - increased height for multiple services
+            doc.setFillColor(248, 250, 252);
+            doc.roundedRect(margin, y, pageWidth - 2 * margin, 110, 3, 3, 'F');
+            
+            // Client details header
+            y += 12;
+            doc.setTextColor(99, 102, 241);
+            doc.setFontSize(12);
+            doc.setFont('helvetica', 'bold');
+            doc.text('CLIENT DETAILS', margin + 10, y);
+
+            // Client info
+            y += 10;
+            doc.setTextColor(60, 60, 60);
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
+            
+            const leftCol = margin + 10;
+            const rightCol = pageWidth / 2 + 10;
+            
+            doc.setFont('helvetica', 'bold');
+            doc.text('Name:', leftCol, y);
+            doc.setFont('helvetica', 'normal');
+            doc.text(appointment.fullName, leftCol + 25, y);
+            
+            doc.setFont('helvetica', 'bold');
+            doc.text('Phone:', rightCol, y);
+            doc.setFont('helvetica', 'normal');
+            doc.text(appointment.phone, rightCol + 25, y);
+
+            y += 8;
+            doc.setFont('helvetica', 'bold');
+            doc.text('Email:', leftCol, y);
+            doc.setFont('helvetica', 'normal');
+            doc.text(appointment.email, leftCol + 25, y);
+            
+            doc.setFont('helvetica', 'bold');
+            doc.text('City:', rightCol, y);
+            doc.setFont('helvetica', 'normal');
+            doc.text(appointment.city, rightCol + 25, y);
+
+            y += 8;
+            doc.setFont('helvetica', 'bold');
+            doc.text('Business:', leftCol, y);
+            doc.setFont('helvetica', 'normal');
+            doc.text(appointment.businessName || 'N/A', leftCol + 25, y);
+            
+            doc.setFont('helvetica', 'bold');
+            doc.text('Type:', rightCol, y);
+            doc.setFont('helvetica', 'normal');
+            doc.text(appointment.businessType, rightCol + 25, y);
+
+            // Service details header
+            y += 18;
+            doc.setTextColor(99, 102, 241);
+            doc.setFontSize(12);
+            doc.setFont('helvetica', 'bold');
+            doc.text('SERVICE DETAILS', margin + 10, y);
+
+            y += 10;
+            doc.setTextColor(60, 60, 60);
+            doc.setFontSize(10);
+            
+            // Handle multiple services display
+            const servicesText = appointment.services || 'N/A';
+            const servicesList = servicesText.split(',').map(s => s.trim()).filter(Boolean);
+            
+            doc.setFont('helvetica', 'bold');
+            doc.text('Services:', leftCol, y);
+            doc.setFont('helvetica', 'normal');
+            
+            // If single service or short text, display inline
+            if (servicesList.length === 1 || servicesText.length < 35) {
+                // check for one-line overflow
+                checkOverflow(8);
+                doc.text(servicesText, leftCol + 25, y);
+                y += 8;
+            } else {
+                // Multiple services - display as bullet list
+                y += 5;
+                servicesList.forEach((service, index) => {
+                    // ensure we don't run into footer while listing services
+                    checkOverflow(10);
+                    if (index < 5) { // Limit to 5 services to fit in box
+                        doc.setFillColor(99, 102, 241);
+                        doc.circle(leftCol + 2, y - 1.5, 1, 'F');
+                        doc.text(service.substring(0, 45), leftCol + 6, y);
+                        y += 6;
+                    }
+                });
+                if (servicesList.length > 5) {
+                    checkOverflow(8);
+                    doc.setTextColor(100, 100, 100);
+                    doc.setFontSize(8);
+                    doc.text(`+ ${servicesList.length - 5} more services`, leftCol + 6, y);
+                    y += 8;
+                    doc.setFontSize(10); // reset
+                    doc.setTextColor(60, 60, 60);
+                }
+            }
+            
+            // Reset position for Has GST
+            const gstY = y > 145 ? y + 5 : 145;
+            // If gstY is past safe bottom, add a page
+            if (gstY + 20 > safeBottom) {
+                doc.addPage();
+                y = 20;
+            } else {
+                y = gstY;
+            }
+
+            doc.setTextColor(60, 60, 60);
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Has GST:', leftCol, y);
+            doc.setFont('helvetica', 'normal');
+            doc.text(appointment.hasGST, leftCol + 25, y);
+            
+            // Status badge
+            y += 20;
+            // ensure status block doesn't overflow
+            checkOverflow(30);
+            const statusColors = {
+                'Pending': [245, 158, 11],
+                'In Review': [59, 130, 246],
+                'Completed': [16, 185, 129]
+            };
+            const statusColor = statusColors[appointment.status] || [100, 100, 100];
+            
+            doc.setFillColor(...statusColor);
+            doc.roundedRect(margin, y, 80, 12, 2, 2, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'bold');
+            doc.text(`Status: ${appointment.status}`, margin + 40, y + 8, { align: 'center' });
+
+            // Booking date
+            const bookingDate = new Date(appointment.createdAt).toLocaleDateString('en-IN', {
+                year: 'numeric', month: 'long', day: 'numeric'
+            });
+            doc.setTextColor(100, 100, 100);
+            doc.setFont('helvetica', 'normal');
+            doc.text(`Booking Date: ${bookingDate}`, pageWidth - margin, y + 8, { align: 'right' });
+
+            // Description section
+            y += 25;
+            checkOverflow(12);
+            doc.setTextColor(99, 102, 241);
+            doc.setFontSize(12);
+            doc.setFont('helvetica', 'bold');
+            doc.text('DESCRIPTION / REQUIREMENT', margin, y);
+
+            y += 8;
+            doc.setTextColor(60, 60, 60);
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'normal');
+            
+            const descLines = doc.splitTextToSize(appointment.description || 'N/A', pageWidth - 2 * margin);
+            // Print description lines with overflow checks
+            for (let i = 0; i < descLines.length; i++) {
+                checkOverflow(8);
+                doc.text(descLines[i], margin, y);
+                y += 7;
+            }
+
+            // ----- Footer: draw at the bottom of the current page -----
+            // If we're too low, add a new page so footer has its own space
+            if (y + 60 > pageHeight) {
+                doc.addPage();
+            }
+            const footerY = doc.internal.pageSize.getHeight() - 18;
+
+            // separator line above footer
+            doc.setDrawColor(200, 200, 200);
+            doc.setLineWidth(0.3);
+            doc.line(margin, footerY - 8, pageWidth - margin, footerY - 8);
+
+            doc.setTextColor(100, 100, 100);
+            doc.setFontSize(9);
+            doc.text('Thank you for choosing TurnAround Experts!', pageWidth / 2, footerY - 2, { align: 'center' });
+            
+            doc.setFontSize(8);
+            doc.text('turnaroundexperts.info | turnaroundexperts.info@gmail.com', pageWidth / 2, footerY + 6, { align: 'center' });
+
+            // bottom colored bar and small note
+            doc.setFillColor(99, 102, 241);
+            // draw bar at bottom of page (height 17)
+            doc.rect(0, pageHeight - 17, pageWidth, 17, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(8);
+            doc.text('This is a computer-generated receipt and does not require a signature.', pageWidth / 2, pageHeight - 6, { align: 'center' });
+
+            // Save the PDF
+            doc.save(`TurnAround-Receipt-${appointment.id}.pdf`);
+            showToast('PDF Receipt downloaded successfully!', 'success');
+            
+        } catch (error) {
+            console.error('PDF generation error:', error);
+            showToast('Failed to generate PDF. Please try again.', 'error');
+        }
+    }
+     // Admin Functions
+            function showAdminTab(tabId) {
+                document.querySelectorAll('.admin-content').forEach(c => c.classList.add('hidden'));
+                document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active', 'bg-white/10'));
+                
+                document.getElementById('admin-tab-' + tabId).classList.remove('hidden');
+                document.querySelector(`[data-tab="${tabId}"]`).classList.add('active', 'bg-white/10');
+                
+                updateAdminDashboard();
+            }
+
+            function updateAdminDashboard() {
+                document.getElementById('adminBookings').textContent = appointments.length;
+                document.getElementById('adminUsers').textContent = users.length;
+                
+                // Admin appointments list
+                const adminList = document.getElementById('adminAppointmentsList');
+                if (appointments.length > 0) {
+                    adminList.innerHTML = appointments.map(a => `
+                        <div class="glass-light rounded-2xl p-6 card-3d">
+                            <div class="flex flex-wrap justify-between items-start gap-4 mb-4">
+                                <div>
+                                    <h3 class="font-bold text-lg">${a.fullName}</h3>
+                                    <p class="text-gray-400">${a.email} | ${a.phone}</p>
+                                </div>
+                                <select onchange="updateStatus(${a.id}, this.value)" class="px-3 py-2 rounded-lg input-3d text-white bg-transparent">
+                                    <option value="Pending" ${a.status === 'Pending' ? 'selected' : ''} class="bg-gray-800">Pending</option>
+                                    <option value="In Review" ${a.status === 'In Review' ? 'selected' : ''} class="bg-gray-800">In Review</option>
+                                    <option value="Completed" ${a.status === 'Completed' ? 'selected' : ''} class="bg-gray-800">Completed</option>
+                                </select>
+                            </div>
+                            <div class="grid md:grid-cols-3 gap-4 text-sm">
+                                <div><strong>Services:</strong> ${a.services}</div>
+                                <div><strong>City:</strong> ${a.city}</div>
+                                <div><strong>Business:</strong> ${a.businessName || 'N/A'}</div>
+                                <div><strong>Has GST:</strong> ${a.hasGST}</div>
+                                <div><strong>Type:</strong> ${a.businessType}</div>
+                                <div><strong>Date:</strong> ${new Date(a.createdAt).toLocaleDateString()}</div>
+                            </div>
+                            <p class="text-gray-300 mt-4 text-sm">${a.description}</p>
+                        </div>
+                    `).join('');
+                }
+                
+                // Admin users list
+                const usersList = document.getElementById('adminUsersList');
+                if (users.length > 0) {
+                    usersList.innerHTML = users.map(u => `
+                        <div class="glass-light rounded-2xl p-6 card-3d">
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-bold">${u.name}</h3>
+                                        <p class="text-gray-400 text-sm">${u.email}</p>
+                                    </div>
+                                </div>
+                                <span class="px-3 py-1 rounded-full text-sm ${u.role === 'admin' ? 'bg-red-500/20 text-red-400' : 'bg-blue-500/20 text-blue-400'}">${u.role}</span>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            }
+
+            function updateStatus(appointmentId, newStatus) {
+                const index = appointments.findIndex(a => a.id === appointmentId);
+                if (index > -1) {
+                    appointments[index].status = newStatus;
+                    localStorage.setItem('appointments', JSON.stringify(appointments));
+                    showToast('Status updated!', 'success');
+                }
+            }
+
+            function exportAppointments() {
+                if (appointments.length === 0) {
+                    showToast('No appointments to export', 'error');
+                    return;
+                }
+                
+                const headers = ['ID', 'Name', 'Email', 'Phone', 'Service', 'City', 'Business', 'Has GST', 'Type', 'Status', 'Date'];
+                const csvContent = [
+                    headers.join(','),
+                    ...appointments.map(a => [
+                        a.id, a.fullName, a.email, a.phone, a.service, a.city,
+                        a.businessName || '', a.hasGST, a.businessType, a.status,
+                        new Date(a.createdAt).toLocaleDateString()
+                    ].join(','))
+                ].join('\n');
+                
+                const blob = new Blob([csvContent], { type: 'text/csv' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'appointments.csv';
+                a.click();
+                showToast('Appointments exported!', 'success');
+            }
+
+            function addService() {
+                const name = document.getElementById('newServiceName').value;
+                const price = document.getElementById('newServicePrice').value;
+                if (name && price) {
+                    showToast(`Service "${name}" added!`, 'success');
+                    document.getElementById('newServiceName').value = '';
+                    document.getElementById('newServicePrice').value = '';
+                }
+            }
+
+            function updateStats() {
+                document.getElementById('adminBookings').textContent = appointments.length;
+                document.getElementById('adminUsers').textContent = users.length;
+            }
+
+            // Toast
+            function showToast(message, type = 'success') {
+                const toast = document.getElementById('toast');
+                const icon = document.getElementById('toastIcon');
+                const msg = document.getElementById('toastMessage');
+                
+                msg.textContent = message;
+                icon.className = type === 'success' ? 'fas fa-check-circle text-green-400' : 'fas fa-exclamation-circle text-red-400';
+                
+                toast.classList.remove('translate-x-full', 'opacity-0');
+                setTimeout(() => {
+                    toast.classList.add('translate-x-full', 'opacity-0');
+                }, 3000);
+            }
+
+            // Click outside modal to close
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        modal.classList.remove('active');
+                    }
+                });
+            }); 
+
+               // Blogs
+            const blogPosts = {
+                gstChecklist: {
+                    tag: 'GST',
+                    title: 'GST Filing Checklist: Avoid Notices & Late Fees',
+                    meta: 'Updated: ' + new Date().toLocaleDateString() + ' • Category: GST • Reading time: 6 min',
+                    body: [
+                        '<p><strong>Filing GST returns on time</strong> keeps your compliance clean and helps you avoid unnecessary interest/late fees. Use this quick checklist before you file.</p>',
+                        '<p><strong>1) Reconcile sales & purchase data</strong><br>Match outward supplies with invoice details and confirm purchase invoices for eligible ITC.</p>',
+                        '<p><strong>2) ITC hygiene</strong><br>Check if vendor invoices reflect properly, ensure correct GSTIN, and avoid claiming blocked credits.</p>',
+                        '<p><strong>3) Common triggers for notices</strong><br>Mismatch between GSTR-1 and GSTR-3B, incorrect HSN, unusual tax liability drops, or repeated NIL returns.</p>',
+                        '<p><strong>4) Keep proofs ready</strong><br>Maintain invoice copies, e-way bills (where applicable), and payment/ledger evidence to respond quickly if asked.</p>',
+                        '<p>If you want, book a call and we’ll help you set up a monthly reconciliation habit so your filings stay stress‑free.</p>'
+                    ]
+                },
+                itrReady: {
+                    tag: 'Income Tax',
+                    title: 'ITR Filing: What to Keep Ready (Individuals & Businesses)',
+                    meta: 'Updated: ' + new Date().toLocaleDateString() + ' • Category: Income Tax • Reading time: 7 min',
+                    body: [
+                        '<p>Before filing your ITR, keeping documents ready reduces errors and speeds up processing/refunds.</p>',
+                        '<p><strong>For Individuals</strong><br>Form 16 (if salaried), bank interest certificates, capital gains statements, rent receipts (if applicable), and deductions proof (80C/80D etc.).</p>',
+                        '<p><strong>AIS/TIS check</strong><br>Review AIS/TIS for mismatches in income, interest, dividends, and high‑value transactions.</p>',
+                        '<p><strong>For Businesses</strong><br>Sales register, expense proofs, GST returns summary, P&L and balance sheet, and TDS/TCS credits.</p>',
+                        '<p><strong>Pro tip</strong><br>Keep track of advance tax/self‑assessment tax payments and challans to avoid demand notices.</p>'
+                    ]
+                },
+                pvtVsLlp: {
+                    tag: 'MCA',
+                    title: 'Company Registration: Pvt Ltd vs LLP (Quick Decision Guide)',
+                    meta: 'Updated: ' + new Date().toLocaleDateString() + ' • Category: Company Registration • Reading time: 5 min',
+                    body: [
+                        '<p>Choosing between <strong>Pvt Ltd</strong> and <strong>LLP</strong> depends on funding plans, compliance appetite, and how you want ownership structured.</p>',
+                        '<p><strong>Pvt Ltd is ideal when:</strong><br>You plan to raise investor funding, issue ESOPs, or scale with structured shareholding.</p>',
+                        '<p><strong>LLP is ideal when:</strong><br>You want lower compliance overhead, flexible profit sharing, and you’re running a professional or service business.</p>',
+                        '<p><strong>Quick comparison</strong><br>• Compliance: LLP (lower) vs Pvt Ltd (higher)<br>• Investor readiness: Pvt Ltd (higher)<br>• Ownership transfer: Pvt Ltd (easier)</p>',
+                        '<p>Not sure? Book an appointment and we’ll recommend the best structure based on your goals.</p>'
+                    ]
+                }
+            };
+
+            function openBlog(key) {
+                const post = blogPosts[key];
+                if (!post) return;
+                document.getElementById('blogModalTag').textContent = post.tag;
+                document.getElementById('blogModalTitle').textContent = post.title;
+                document.getElementById('blogModalMeta').textContent = post.meta;
+                document.getElementById('blogModalBody').innerHTML = post.body.map(p => `<div>${p}</div>`).join('');
+                openModal('blogModal');
+            }
+
+            function subscribeBlog() {
+                const email = (document.getElementById('blogEmail')?.value || '').trim();
+                if (!email) {
+                    showToast('Please enter your email to subscribe.', 'error');
+                    return;
+                }
+                showToast('Subscribed successfully! (Demo)', 'success');
+                document.getElementById('blogEmail').value = '';
+            }
+
+            // Toast
+            function showToast(message, type = 'success') {
+                const toast = document.getElementById('toast');
+                const icon = document.getElementById('toastIcon');
+                const msg = document.getElementById('toastMessage');
+                
+                msg.textContent = message;
+                icon.className = type === 'success' ? 'fas fa-check-circle text-green-400' : 'fas fa-exclamation-circle text-red-400';
+                
+                toast.classList.remove('translate-x-full');
+                setTimeout(() => {
+                    toast.classList.add('translate-x-full');
+                }, 3000);
+            }
+
+            // Click outside modal to close
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        modal.classList.remove('active');
+                    }
+                });
+            });
+          // Multi-Select Services System
+    const allServices = [
+        // Marketing Services
+        { category: 'Marketing', name: 'On-Ground Marketing' },
+        { category: 'Marketing', name: 'Digital Marketing' },
+        { category: 'Marketing', name: 'Content Marketing' },
+        { category: 'Marketing', name: 'SEO & SEM' },
+        
+        // Designing Services
+        { category: 'Designing', name: 'Logo Design' },
+        { category: 'Designing', name: 'Visiting Card Design' },
+        { category: 'Designing', name: 'Poster & Banner Design' },
+        { category: 'Designing', name: 'Social Media Creative Design' },
+        { category: 'Designing', name: 'Brochure & Pamphlet Design' },
+        { category: 'Designing', name: 'Complete Brand Kit' },
+        
+        // Business Registration
+        { category: 'Business Registration', name: 'MSME' },
+        { category: 'Business Registration', name: 'Startup India' },
+        { category: 'Business Registration', name: 'Partnership' },
+        { category: 'Business Registration', name: 'Pvt Ltd' },
+        { category: 'Business Registration', name: 'LLP' },
+        { category: 'Business Registration', name: 'Section 8' },
+        
+        // GST Services
+        { category: 'GST', name: 'GST Registration' },
+        { category: 'GST', name: 'GST Filing' },
+        { category: 'GST', name: 'GST Cancellation' },
+        { category: 'GST', name: 'GST Amendment' },
+        
+        // Income Tax
+        { category: 'Income Tax', name: 'ITR Filing' },
+        { category: 'Income Tax', name: 'TDS Return' },
+        
+        // Food License (FSSAI)
+        { category: 'Food License', name: 'FSSAI Basic' },
+        { category: 'Food License', name: 'FSSAI State' },
+        { category: 'Food License', name: 'FSSAI Central' },
+        { category: 'Food License', name: 'FSSAI Renewals' },
+        
+        // Development Services
+        { category: 'Development', name: 'App Development' },
+        { category: 'Development', name: 'Web Development' },
+        { category: 'Development', name: 'E-Commerce Development' },
+        { category: 'Development', name: 'Custom Software Development' },
+        { category: 'Development', name: 'UI/UX Design' },
+        { category: 'Development', name: 'Maintenance & Support' },
+        
+        // PAN/TAN
+        { category: 'PAN/TAN', name: 'PAN Application' },
+        { category: 'PAN/TAN', name: 'TAN Application' },
+        { category: 'PAN/TAN', name: 'PAN Correction' },
+        
+        // Accounting
+        { category: 'Accounting', name: 'Bookkeeping' },
+        { category: 'Accounting', name: 'Ledger Maintenance' },
+        { category: 'Accounting', name: 'Budget Planning' },
+    ];
+
+    let selectedServices = [];
+
+    // Initialize service selector
+    document.addEventListener('DOMContentLoaded', () => {
+        initializeServiceSelector();
+    });
+
+    function initializeServiceSelector() {
+        const toggle = document.getElementById('serviceDropdownToggle');
+        const menu = document.getElementById('serviceDropdownMenu');
+        const search = document.getElementById('serviceSearch');
+        const icon = document.getElementById('serviceDropdownIcon');
+        
+        if (!toggle || !menu || !search) return; // Safety check
+        
+        // Toggle dropdown
+        toggle.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevent event bubbling
+            menu.classList.toggle('hidden');
+            icon.classList.toggle('rotate-180');
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!toggle.contains(e.target) && !menu.contains(e.target)) {
+                menu.classList.add('hidden');
+                icon.classList.remove('rotate-180');
+            }
+        });
+        
+        // Prevent dropdown close when clicking inside menu
+        menu.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+        
+        // Search functionality
+        search.addEventListener('input', (e) => {
+            renderServicesList(e.target.value);
+        });
+        
+        // Initial render
+        renderServicesList();
+    }
+
+    function renderServicesList(searchTerm = '') {
+        const servicesList = document.getElementById('servicesList');
+        if (!servicesList) return;
+        
+        // Filter services
+        const filtered = allServices.filter(service =>
+            service.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            service.category.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+        
+        // Group by category
+        const grouped = filtered.reduce((acc, service) => {
+            if (!acc[service.category]) acc[service.category] = [];
+            acc[service.category].push(service);
+            return acc;
+        }, {});
+        
+        // Render
+        let html = '';
+        for (const [category, services] of Object.entries(grouped)) {
+            html += `
+                <div class="mb-4">
+                    <div class="px-3 py-2 text-xs font-semibold text-indigo-300 uppercase tracking-wider">
+                        ${category}
+                    </div>
+                    ${services.map(service => {
+                        const isSelected = selectedServices.includes(service.name);
+                        const escapedName = service.name.replace(/'/g, "\\'");
+                        return `
+                            <div onclick="toggleServiceSelection('${escapedName}')" 
+                                 class="px-4 py-3 mx-2 rounded-lg cursor-pointer transition flex items-center justify-between ${
+                                     isSelected ? 'bg-indigo-500/30 border border-indigo-500/50' : 'hover:bg-white/10'
+                                 }">
+                                <span class="text-white">${service.name}</span>
+                                ${isSelected ? '<i class="fas fa-check text-green-400"></i>' : ''}
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        }
+        
+        if (filtered.length === 0) {
+            html = '<div class="text-center py-8 text-gray-400">No services found</div>';
+        }
+        
+        servicesList.innerHTML = html;
+    }
+
+    function toggleServiceSelection(serviceName) {
+        if (selectedServices.includes(serviceName)) {
+            selectedServices = selectedServices.filter(s => s !== serviceName);
+        } else {
+            selectedServices.push(serviceName);
+        }
+        updateSelectedServicesDisplay();
+        renderServicesList(document.getElementById('serviceSearch')?.value || '');
+    }
+
+    function removeServiceSelection(serviceName) {
+        selectedServices = selectedServices.filter(s => s !== serviceName);
+        updateSelectedServicesDisplay();
+        renderServicesList(document.getElementById('serviceSearch')?.value || '');
+    }
+
+    function updateSelectedServicesDisplay() {
+        const display = document.getElementById('selectedServicesDisplay');
+        const text = document.getElementById('serviceDropdownText');
+        const input = document.getElementById('selectedServicesInput');
+        
+        if (!display || !text || !input) return;
+        
+        // Update hidden input
+        input.value = selectedServices.join(', ');
+        
+        // Update display text
+        if (selectedServices.length === 0) {
+            text.textContent = 'Select services...';
+            text.classList.add('text-gray-400');
+            display.classList.add('hidden');
+        } else {
+            text.textContent = `${selectedServices.length} service(s) selected`;
+            text.classList.remove('text-gray-400');
+            display.classList.remove('hidden');
+            display.classList.add('flex');
+        }
+        
+        // Render selected services badges
+        display.innerHTML = selectedServices.map(service => {
+            const escapedName = service.replace(/'/g, "\\'");
+            return `
+                <div class="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full text-sm">
+                    <span>${service}</span>
+                    <button type="button" onclick="removeServiceSelection('${escapedName}')" class="hover:bg-white/20 rounded-full p-1 transition">
+                        <i class="fas fa-times text-xs"></i>
+                    </button>
+                </div>
+            `;
+        }).join('');
+    }
+        </script>
+        </script>
+    </body>
+    </html>
