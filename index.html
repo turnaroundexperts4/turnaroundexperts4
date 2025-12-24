@@ -8,10 +8,6 @@
     <meta name="description" content="TurnAround Experts offers GST registration, GST filing, MCA compliance, company registration, website development and creative designing services for startups and businesses across India.">
     <title>TurnAround Experts -- GST & MCA Consultants | Website Development & Designing.</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-
-<!-- Google Identity Services -->
-<script src="https://accounts.google.com/gsi/client" async defer></script>
-
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://unpkg.com/jspdf@latest/dist/jspdf.umd.min.js"></script>
@@ -1522,11 +1518,6 @@
                         Login
                     </button>
                 </form>
-                <!-- Google Login -->
-<div class="mt-6 text-center">
-  <div id="googleLoginBtn" class="flex justify-center"></div>
-</div>
-
                 <div class="mt-6">
                     <div class="flex items-center gap-4 mb-4">
                         <div class="flex-1 h-px bg-white/10"></div>
@@ -1578,12 +1569,7 @@
                         Create Account
                     </button>
                 </form>
-                <!-- Google Login -->
-<div class="mt-6 text-center">
-  <div id="googleLoginBtn" class="flex justify-center"></div>
-</div>
-
-                <div class="mt-6">
+                    <div class="mt-6">
                     <button onclick="googleLogin()" class="w-full py-3 glass rounded-xl font-medium flex items-center justify-center gap-3 hover:bg-white/10 transition">
                         <i class="fab fa-google text-red-400"></i>
                         Sign up with Google
@@ -2762,72 +2748,6 @@
     "Graphic Designing"
   ]
 }
-</script>
-<script>
-const GOOGLE_CLIENT_ID = "252829479096-6sm2645i6d4ur8mafiblh2vjcqrtv610.apps.googleusercontent.com";
-
-window.onload = function () {
-  google.accounts.id.initialize({
-    client_id: GOOGLE_CLIENT_ID,
-    callback: handleGoogleResponse
-  });
-
-  google.accounts.id.renderButton(
-    document.getElementById("googleLoginBtn"),
-    { theme: "outline", size: "large", width: 280 }
-  );
-
-  google.accounts.id.renderButton(
-    document.getElementById("googleSignupBtn"),
-    { theme: "outline", size: "large", width: 280 }
-  );
-};
-
-function handleGoogleResponse(response) {
-  const user = parseJwt(response.credential);
-
-  const userData = {
-    name: user.name,
-    email: user.email,
-    picture: user.picture,
-    role: "user"
-  };
-
-  localStorage.setItem("tae_user", JSON.stringify(userData));
-  loginSuccess(userData);
-}
-
-function parseJwt(token) {
-  const base64Url = token.split('.')[1];
-  const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-  return JSON.parse(atob(base64));
-}
-
-function loginSuccess(user) {
-  document.getElementById("authButtons").classList.add("hidden");
-  document.getElementById("userMenu").classList.remove("hidden");
-
-  document.getElementById("userName").innerText = user.name;
-  document.getElementById("dashboardUserName").innerText = user.name;
-  document.getElementById("dashboardUserEmail").innerText = user.email;
-
-  closeModal("loginModal");
-  closeModal("signupModal");
-
-  showPage("dashboard");
-}
-
-function logout() {
-  localStorage.removeItem("tae_user");
-  location.reload();
-}
-
-(function autoLogin() {
-  const savedUser = localStorage.getItem("tae_user");
-  if (savedUser) {
-    loginSuccess(JSON.parse(savedUser));
-  }
-})();
 </script>
     </body>
     </html>
