@@ -1807,38 +1807,63 @@
             }
 
             // Booking
-            function submitBooking(e) {
-                e.preventDefault();
+              function submitBooking(e) {
+    e.preventDefault();
 
-                // Force login before booking
-                if (!currentUser) {
-                    showToast('Please login or sign up before booking an appointment.', 'error');
-                    openModal('loginModal');
-                    return;
-                }
+    // Force login before booking
+    if (!currentUser) {
+        showToast('Please login or sign up before booking an appointment.', 'error');
+        openModal('loginModal');
+        return;
+    }
 
-                const form = e.target;
-                const formData = new FormData(form);
-                
-                const appointment = {
-                    id: Date.now(),
-                    fullName: formData.get('fullName'),
-                    phone: formData.get('phone'),
-                    email: formData.get('email'),
-                    services: formData.get('services'), // Now stores comma-separated services
-                    city: formData.get('city'),
-                    businessName: formData.get('businessName'),
-                    hasGST: formData.get('hasGST'),
-                    businessType: formData.get('businessType'),
-                    description: formData.get('description'),
-                    status: 'Pending',
-                    userId: currentUser ? currentUser.id : null,
-                    createdAt: new Date().toISOString()
-                };
+    const form = e.target;
+    const formData = new FormData(form);
 
-                appointments.push(appointment);
-                localStorage.setItem('appointments', JSON.stringify(appointments));
-                
+    const appointment = {
+        id: Date.now(),
+        fullName: formData.get('fullName'),
+        phone: formData.get('phone'),
+        email: formData.get('email'),
+        services: formData.get('services'),
+        city: formData.get('city'),
+        businessName: formData.get('businessName'),
+        hasGST: formData.get('hasGST'),
+        businessType: formData.get('businessType'),
+        description: formData.get('description'),
+        status: 'Pending',
+        userId: currentUser.id,
+        createdAt: new Date().toISOString()
+    };
+
+    // Save appointment (UNCHANGED)
+    appointments.push(appointment);
+    localStorage.setItem('appointments', JSON.stringify(appointments));
+
+    /* ============================
+       ✅ EMAILJS (NEW – ADDITIVE)
+    ============================ */
+    const templateParams = {
+        full_name: appointment.fullName,
+        phone: appointment.phone,
+        email: appointment.email,
+        city: appointment.city,
+        business: appointment.businessName || 'N/A',
+        services: appointment.services,
+        gst: appointment.hasGST,
+        business_type: appointment.businessType,
+        description: appointment.description
+    };
+
+    emailjs.send(
+        "service_mxpce7x",
+        "template_3oswymb",
+        templateParams
+    ).then(() => {
+        console.log('Email sent successfully');
+    }).catch(err => {
+        console.error('EmailJS error:', err);
+    });       
                 // Generate and download receipt immediately
                 downloadReceipt(appointment.id);
                 
@@ -2748,6 +2773,16 @@
     "Graphic Designing"
   ]
 }
+</script>
+    <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+<script>
+  emailjs.init("ofApQm0NDPnGPn102");
+</script>
+
+    <script>
+(function(){
+  emailjs.init("ofApQm0NDPnGPn102");
+})();
 </script>
     </body>
     </html>
