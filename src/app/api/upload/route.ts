@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
 import { getSession } from "@/lib/auth";
+import { requireFirebaseAdmin } from "@/lib/firebase-admin";
 import { nanoid } from "nanoid";
 
 export const dynamic = "force-dynamic";
@@ -19,7 +18,7 @@ const MAX_BYTES = 6 * 1024 * 1024; // 6MB
 
 export async function POST(req: Request) {
   const session = await getSession();
-  if (!session.adminId) {
+  if (!session.adminId && !session.adminUid) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -51,10 +50,18 @@ export async function POST(req: Request) {
       ? "svg"
       : file.type.split("/")[1]?.replace("jpeg", "jpg") || "jpg";
   const name = `${Date.now()}-${nanoid(8)}.${ext}`;
-  const dir = path.join(process.cwd(), "public", "uploads", folder);
-  await mkdir(dir, { recursive: true });
   const buffer = Buffer.from(await file.arrayBuffer());
-  await writeFile(path.join(dir, name), buffer);
-  const url = `/uploads/${folder}/${name}`;
-  return NextResponse.json({ url, name });
+  const { firebaseStorage } = requireFirebaseAdmin();
+  const objectPath = `uploads/${folder}/${name}`;
+  const bucket = firebaseStorage.bucket();
+  const object = bucket.file(objectPath);
+  await object.save(buffer, {
+    metadata: { contentType: file.type, cacheControl: "public,max-age=31536000,immutable" },
+    resumable: false,
+  });
+  const [url] = await object.getSignedUrl({
+    action: "read",
+    expires: "01-01-2100",
+  });
+  return NextResponse.json({ url, name, path: objectPath });
 }

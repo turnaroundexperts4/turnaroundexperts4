@@ -20,9 +20,66 @@ service cloud.firestore {
         exists(/databases/$(database)/documents/adminUsers/$(request.auth.uid));
     }
 
+    match /blogCategories/{document} {
+      allow read: if true;
+      allow write: if request.auth != null &&
+        exists(/databases/$(database)/documents/adminUsers/$(request.auth.uid));
+    }
+
+    match /blogPosts/{document} {
+      allow read: if resource.data.published == true || (
+        request.auth != null &&
+        exists(/databases/$(database)/documents/adminUsers/$(request.auth.uid))
+      );
+      allow write: if request.auth != null &&
+        exists(/databases/$(database)/documents/adminUsers/$(request.auth.uid));
+    }
+
     match /adminUsers/{uid} {
       allow read: if request.auth != null && request.auth.uid == uid;
       allow write: if false;
+    }
+
+    match /availabilityRules/{document} {
+      allow read: if true;
+      allow write: if request.auth != null &&
+        exists(/databases/$(database)/documents/adminUsers/$(request.auth.uid));
+    }
+
+    match /blockedDates/{document} {
+      allow read: if true;
+      allow write: if request.auth != null &&
+        exists(/databases/$(database)/documents/adminUsers/$(request.auth.uid));
+    }
+
+    match /appointments/{document} {
+      allow create: if true;
+      allow read, update, delete: if request.auth != null &&
+        exists(/databases/$(database)/documents/adminUsers/$(request.auth.uid));
+    }
+
+    match /enquiries/{document} {
+      allow create: if true;
+      allow read, update, delete: if request.auth != null &&
+        exists(/databases/$(database)/documents/adminUsers/$(request.auth.uid));
+    }
+
+    match /founders/{document} {
+      allow read: if true;
+      allow write: if request.auth != null &&
+        exists(/databases/$(database)/documents/adminUsers/$(request.auth.uid));
+    }
+
+    match /teamMembers/{document} {
+      allow read: if true;
+      allow write: if request.auth != null &&
+        exists(/databases/$(database)/documents/adminUsers/$(request.auth.uid));
+    }
+
+    match /siteSettings/{document} {
+      allow read: if true;
+      allow write: if request.auth != null &&
+        exists(/databases/$(database)/documents/adminUsers/$(request.auth.uid));
     }
   }
 }

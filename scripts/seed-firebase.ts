@@ -3,7 +3,10 @@ import "dotenv/config";
 import { FieldValue, getFirestore } from "firebase-admin/firestore";
 import { cert, getApps, initializeApp } from "firebase-admin/app";
 import {
+  DEFAULT_FOUNDERS,
   DEFAULT_PORTFOLIO_CATEGORIES,
+  DEFAULT_SETTINGS,
+  DEFAULT_TEAM,
   DEFAULT_SERVICES,
 } from "../src/lib/seed";
 import { PORTFOLIO_SAMPLES } from "../src/lib/seed-portfolio";
@@ -141,6 +144,24 @@ async function seed() {
         },
         { merge: true },
       );
+  }
+  for (const [index, founder] of DEFAULT_FOUNDERS.entries()) {
+    await firestore.collection("founders").doc(String(index + 1)).set({
+      id: index + 1,
+      ...founder,
+    }, { merge: true });
+  }
+  for (const [index, member] of DEFAULT_TEAM.entries()) {
+    await firestore.collection("teamMembers").doc(String(index + 1)).set({
+      id: index + 1,
+      ...member,
+    }, { merge: true });
+  }
+  for (const [key, value] of Object.entries(DEFAULT_SETTINGS)) {
+    await firestore.collection("siteSettings").doc(key).set({
+      key,
+      value,
+    }, { merge: true });
   }
   console.log("Firebase Services and Portfolio content seeded.");
 }

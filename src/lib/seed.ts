@@ -153,7 +153,7 @@ export const DEFAULT_PORTFOLIO_CATEGORIES = [
   { name: "Logo Designs", slug: "logo-designs", displayOrder: 100 },
 ];
 
-const DEFAULT_FOUNDERS = [
+export const DEFAULT_FOUNDERS = [
   {
     name: "Lucky Varandani Nevendram",
     role: "Founder · Strategy & Operations",
@@ -190,7 +190,7 @@ const DEFAULT_FOUNDERS = [
   },
 ];
 
-const DEFAULT_TEAM = [
+export const DEFAULT_TEAM = [
   {
     name: "Design Lead",
     role: "Design & Brand",
@@ -243,7 +243,7 @@ const DEFAULT_AVAILABILITY = [
   { dayOfWeek: 0, enabled: false, startTime: "10:00", endTime: "14:00", slotMinutes: 60 },
 ];
 
-const DEFAULT_SETTINGS = {
+export const DEFAULT_SETTINGS = {
   company: {
     name: "TurnAround Experts",
     short: "TAE",

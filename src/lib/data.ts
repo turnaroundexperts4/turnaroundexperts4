@@ -29,6 +29,26 @@ import {
   firebaseListProjects,
   firebaseListBlogCategories,
   firebaseListBlogPosts,
+  firebaseListAvailability,
+  firebaseSaveAvailability,
+  firebaseListBlockedDates,
+  firebaseSaveBlockedDate,
+  firebaseDeleteBlockedDate,
+  firebaseListAppointments,
+  firebaseGetAppointmentByRef,
+  firebaseGetBookedTimes,
+  firebaseCreateAppointment,
+  firebaseUpdateAppointment,
+  firebaseListEnquiries,
+  firebaseCreateEnquiry,
+  firebaseUpdateEnquiryStatus,
+  firebaseGetSetting,
+  firebaseSetSetting,
+  firebaseListCollection,
+  firebaseListFounders,
+  firebaseListTeamMembers,
+  firebaseSaveCollectionItem,
+  firebaseDeleteCollectionItem,
   firebaseListServices,
   firebaseSaveCategory,
   firebaseSaveProject,
@@ -36,6 +56,7 @@ import {
   firebaseSaveBlogPost,
   firebaseSaveService,
 } from "@/lib/firebase-content";
+import { firebaseAdminConfigured } from "@/lib/firebase-admin";
 
 function isDatabaseUnavailableError(error: unknown) {
   const parts: string[] = [];
@@ -73,6 +94,8 @@ export async function getSetting<T = unknown>(
   key: string,
   fallback: T,
 ): Promise<T> {
+  const firebaseValue = await firebaseGetSetting<T>(key);
+  if (firebaseValue !== null) return firebaseValue;
   return withDbFallback(fallback, async () => {
     const rows = await db
       .select()
@@ -85,6 +108,10 @@ export async function getSetting<T = unknown>(
 }
 
 export async function setSetting(key: string, value: unknown): Promise<void> {
+  if (firebaseAdminConfigured) {
+    await firebaseSetSetting(key, value);
+    return;
+  }
   try {
     const existing = await db
       .select()
@@ -580,6 +607,8 @@ export async function deleteProject(id: number) {
 
 // ---------------- Founders ----------------
 export async function listFounders() {
+  const firebaseFounders = await firebaseListFounders();
+  if (firebaseFounders) return firebaseFounders;
   return withDbFallback([], async () =>
     db
       .select()
@@ -602,6 +631,10 @@ export async function updateFounder(
     isPrimary: boolean;
   }>,
 ) {
+  if (await firebaseListCollection("founders")) {
+    await firebaseSaveCollectionItem("founders", id, patch);
+    return;
+  }
   try {
     await db.update(founders).set(patch).where(eq(founders.id, id));
   } catch (error) {
@@ -610,6 +643,9 @@ export async function updateFounder(
 }
 
 export async function getFounderById(id: number) {
+  const firebaseFounders = await firebaseListFounders();
+  const firebaseFounder = firebaseFounders?.find((founder) => founder.id === id);
+  if (firebaseFounder) return firebaseFounder;
   return withDbFallback(null, async () => {
     const rows = await db
       .select()
@@ -622,6 +658,8 @@ export async function getFounderById(id: number) {
 
 // ---------------- Team ----------------
 export async function listActiveTeam() {
+  const firebaseTeam = await firebaseListTeamMembers();
+  if (firebaseTeam) return firebaseTeam.filter((member) => member.active !== false);
   return withDbFallback([], async () =>
     db
       .select()
@@ -632,6 +670,8 @@ export async function listActiveTeam() {
 }
 
 export async function listAllTeam() {
+  const firebaseTeam = await firebaseListTeamMembers();
+  if (firebaseTeam) return firebaseTeam;
   return withDbFallback([], async () =>
     db
       .select()
@@ -641,6 +681,9 @@ export async function listAllTeam() {
 }
 
 export async function getTeamMemberById(id: number) {
+  const firebaseTeam = await firebaseListTeamMembers();
+  const firebaseMember = firebaseTeam?.find((member) => member.id === id);
+  if (firebaseMember) return firebaseMember;
   return withDbFallback(null, async () => {
     const rows = await db
       .select()
@@ -662,6 +705,8 @@ export async function createTeamMember(input: {
   active?: boolean;
   displayOrder?: number;
 }) {
+  const firebaseId = await firebaseSaveCollectionItem("teamMembers", undefined, input);
+  if (firebaseId) return firebaseId;
   return withDbFallback(0, async () => {
     const ins = await db
       .insert(teamMembers)
@@ -685,6 +730,10 @@ export async function updateTeamMember(
     displayOrder: number;
   }>,
 ) {
+  if (await firebaseListCollection("teamMembers")) {
+    await firebaseSaveCollectionItem("teamMembers", id, patch);
+    return;
+  }
   try {
     await db
       .update(teamMembers)
@@ -696,6 +745,10 @@ export async function updateTeamMember(
 }
 
 export async function deleteTeamMember(id: number) {
+  if (await firebaseListCollection("teamMembers")) {
+    await firebaseDeleteCollectionItem("teamMembers", id);
+    return;
+  }
   try {
     await db.delete(teamMembers).where(eq(teamMembers.id, id));
   } catch (error) {
@@ -705,6 +758,8 @@ export async function deleteTeamMember(id: number) {
 
 // ---------------- Availability ----------------
 export async function listAvailabilityRules() {
+  const firebaseRules = await firebaseListAvailability();
+  if (firebaseRules) return firebaseRules;
   return withDbFallback([], async () =>
     db
       .select()
@@ -720,6 +775,10 @@ export async function upsertAvailabilityRule(input: {
   endTime: string;
   slotMinutes: number;
 }) {
+  if (await firebaseListAvailability()) {
+    await firebaseSaveAvailability(input);
+    return;
+  }
   try {
     const existing = await db
       .select()
@@ -745,6 +804,8 @@ export async function upsertAvailabilityRule(input: {
 }
 
 export async function listBlockedDates() {
+  const firebaseDates = await firebaseListBlockedDates();
+  if (firebaseDates) return firebaseDates;
   return withDbFallback([], async () =>
     db
       .select()
@@ -754,6 +815,10 @@ export async function listBlockedDates() {
 }
 
 export async function addBlockedDate(date: string, reason?: string) {
+  if (await firebaseListBlockedDates()) {
+    await firebaseSaveBlockedDate(date, reason);
+    return;
+  }
   try {
     await db.insert(blockedDates).values({ date, reason });
   } catch (error) {
@@ -762,6 +827,10 @@ export async function addBlockedDate(date: string, reason?: string) {
 }
 
 export async function removeBlockedDate(id: number) {
+  if (await firebaseListBlockedDates()) {
+    await firebaseDeleteBlockedDate(id);
+    return;
+  }
   try {
     await db.delete(blockedDates).where(eq(blockedDates.id, id));
   } catch (error) {
@@ -771,6 +840,8 @@ export async function removeBlockedDate(id: number) {
 
 // ---------------- Appointments ----------------
 export async function listAppointments(opts?: { status?: string }) {
+  const firebaseAppointments = await firebaseListAppointments(opts?.status);
+  if (firebaseAppointments) return firebaseAppointments;
   return withDbFallback([], async () => {
     const conditions = [] as ReturnType<typeof eq>[];
     if (opts?.status) conditions.push(eq(appointments.status, opts.status as never));
@@ -783,6 +854,8 @@ export async function listAppointments(opts?: { status?: string }) {
 }
 
 export async function getAppointmentByRef(reference: string) {
+  const firebaseAppointment = await firebaseGetAppointmentByRef(reference);
+  if (firebaseAppointment) return firebaseAppointment;
   return withDbFallback(null, async () => {
     const rows = await db
       .select()
@@ -794,6 +867,8 @@ export async function getAppointmentByRef(reference: string) {
 }
 
 export async function getBookedTimesForDate(date: string) {
+  const firebaseTimes = await firebaseGetBookedTimes(date);
+  if (firebaseTimes) return firebaseTimes;
   return withDbFallback([], async () => {
     const rows = await db
       .select({
@@ -825,6 +900,8 @@ export async function createAppointment(input: {
   message?: string;
   history: { at: string; action: string; note?: string }[];
 }) {
+  const firebaseAppointment = await firebaseCreateAppointment(input);
+  if (firebaseAppointment) return firebaseAppointment;
   return withDbFallback(null, async () => {
     const ins = await db
       .insert(appointments)
@@ -863,6 +940,10 @@ export async function updateAppointmentStatus(
     historyEntry?: { at: string; action: string; note?: string };
   },
 ) {
+  if (await firebaseListAppointments()) {
+    await firebaseUpdateAppointment(id, next);
+    return;
+  }
   try {
     const existing = await db
       .select()
@@ -1073,6 +1154,8 @@ export async function createBlogCategory(name: string, slug: string) {
 
 // ---------------- Enquiries ----------------
 export async function listEnquiries() {
+  const firebaseEnquiries = await firebaseListEnquiries();
+  if (firebaseEnquiries) return firebaseEnquiries;
   return withDbFallback([], async () =>
     db
       .select()
@@ -1089,6 +1172,8 @@ export async function createEnquiry(input: {
   service?: string;
   message: string;
 }) {
+  const firebaseId = await firebaseCreateEnquiry(input);
+  if (firebaseId) return firebaseId;
   return withDbFallback(0, async () => {
     const ins = await db
       .insert(enquiries)
@@ -1102,6 +1187,10 @@ export async function updateEnquiryStatus(
   id: number,
   status: "new" | "contacted" | "in_progress" | "closed",
 ) {
+  if (await firebaseListEnquiries()) {
+    await firebaseUpdateEnquiryStatus(id, status);
+    return;
+  }
   try {
     await db
       .update(enquiries)

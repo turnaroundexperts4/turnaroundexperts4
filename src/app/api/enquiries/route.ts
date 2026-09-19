@@ -28,5 +28,11 @@ export async function POST(req: Request) {
     );
   }
   const id = await createEnquiry(parsed.data);
-  return NextResponse.json({ id, ok: true });
+  if (!id) {
+    return NextResponse.json(
+      { error: "Unable to save enquiry right now." },
+      { status: 503 },
+    );
+  }
+  return NextResponse.json({ id, ok: true }, { status: 201 });
 }
