@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminLoginPage() {
   const session = await getSession();
-  if (session.adminId) redirect("/admin/dashboard");
+  if (session.adminId || session.adminUid) redirect("/admin/dashboard");
   return (
     <main className="grid min-h-screen place-items-center bg-navy-950 text-paper px-5">
       <div className="relative w-full max-w-md">

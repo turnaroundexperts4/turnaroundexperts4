@@ -16,6 +16,20 @@ import {
 } from "@/db/schema";
 import { and, asc, desc, eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
+import {
+  firebaseDeleteCategory,
+  firebaseDeleteProject,
+  firebaseDeleteService,
+  firebaseGetCategoryBySlug,
+  firebaseGetProjectBySlug,
+  firebaseGetServiceBySlug,
+  firebaseListCategories,
+  firebaseListProjects,
+  firebaseListServices,
+  firebaseSaveCategory,
+  firebaseSaveProject,
+  firebaseSaveService,
+} from "@/lib/firebase-content";
 
 function isDatabaseUnavailableError(error: unknown) {
   const parts: string[] = [];
@@ -144,6 +158,8 @@ export async function ensureSeedAdmin(email: string, password: string, name: str
 
 // ---------------- Services ----------------
 export async function listActiveServices() {
+  const firebaseServices = await firebaseListServices(true);
+  if (firebaseServices) return firebaseServices;
   return withDbFallback([], async () =>
     db
       .select()
@@ -154,6 +170,8 @@ export async function listActiveServices() {
 }
 
 export async function listAllServices() {
+  const firebaseServices = await firebaseListServices(false);
+  if (firebaseServices) return firebaseServices;
   return withDbFallback([], async () =>
     db
       .select()
@@ -163,6 +181,8 @@ export async function listAllServices() {
 }
 
 export async function getServiceBySlug(slug: string) {
+  const firebaseService = await firebaseGetServiceBySlug(slug);
+  if (firebaseService) return firebaseService;
   return withDbFallback(null, async () => {
     const rows = await db
       .select()
@@ -197,6 +217,8 @@ export async function createService(input: {
   active?: boolean;
   displayOrder?: number;
 }) {
+  const firebaseId = await firebaseSaveService(undefined, input);
+  if (firebaseId) return firebaseId;
   return withDbFallback(0, async () => {
     const inserted = await db
       .insert(services)
@@ -234,6 +256,10 @@ export async function updateService(
     displayOrder: number;
   }>,
 ) {
+  if (await firebaseListServices(false)) {
+    await firebaseSaveService(id, patch);
+    return;
+  }
   try {
     await db
       .update(services)
@@ -245,6 +271,10 @@ export async function updateService(
 }
 
 export async function deleteService(id: number) {
+  if (await firebaseListServices(false)) {
+    await firebaseDeleteService(id);
+    return;
+  }
   try {
     await db.delete(services).where(eq(services.id, id));
   } catch (error) {
@@ -254,6 +284,8 @@ export async function deleteService(id: number) {
 
 // ---------------- Portfolio categories ----------------
 export async function listActivePortfolioCategories() {
+  const firebaseCategories = await firebaseListCategories(true);
+  if (firebaseCategories) return firebaseCategories;
   return withDbFallback([], async () =>
     db
       .select()
@@ -264,6 +296,8 @@ export async function listActivePortfolioCategories() {
 }
 
 export async function listAllPortfolioCategories() {
+  const firebaseCategories = await firebaseListCategories(false);
+  if (firebaseCategories) return firebaseCategories;
   return withDbFallback([], async () =>
     db
       .select()
@@ -273,6 +307,8 @@ export async function listAllPortfolioCategories() {
 }
 
 export async function getCategoryBySlug(slug: string) {
+  const firebaseCategory = await firebaseGetCategoryBySlug(slug);
+  if (firebaseCategory) return firebaseCategory;
   return withDbFallback(null, async () => {
     const rows = await db
       .select()
@@ -301,6 +337,8 @@ export async function createPortfolioCategory(input: {
   active?: boolean;
   displayOrder?: number;
 }) {
+  const firebaseId = await firebaseSaveCategory(undefined, input);
+  if (firebaseId) return firebaseId;
   return withDbFallback(0, async () => {
     const ins = await db
       .insert(portfolioCategories)
@@ -320,6 +358,10 @@ export async function updatePortfolioCategory(
     displayOrder: number;
   }>,
 ) {
+  if (await firebaseListCategories(false)) {
+    await firebaseSaveCategory(id, patch);
+    return;
+  }
   try {
     await db
       .update(portfolioCategories)
@@ -331,6 +373,10 @@ export async function updatePortfolioCategory(
 }
 
 export async function deletePortfolioCategory(id: number) {
+  if (await firebaseListCategories(false)) {
+    await firebaseDeleteCategory(id);
+    return;
+  }
   try {
     await db.delete(portfolioCategories).where(eq(portfolioCategories.id, id));
   } catch (error) {
@@ -344,6 +390,28 @@ export async function listVisibleProjects(opts?: {
   search?: string;
   featuredOnly?: boolean;
 }) {
+  const firebaseProjects = await firebaseListProjects();
+  if (firebaseProjects) {
+    const categories = await firebaseListCategories(true);
+    const activeCategoryIds = new Set((categories ?? []).map((category) => category.id));
+    const search = opts?.search?.trim().toLowerCase();
+    return firebaseProjects.filter(({ project, category }) => {
+      if (!project.visible || !activeCategoryIds.has(project.categoryId)) return false;
+      if (opts?.featuredOnly && !project.featured) return false;
+      if (opts?.categorySlug && category?.slug !== opts.categorySlug) return false;
+      if (!search) return true;
+      const haystack = [
+        project.title,
+        project.description,
+        category?.name ?? "",
+        project.client ?? "",
+        ...project.tags,
+      ]
+        .join(" ")
+        .toLowerCase();
+      return haystack.includes(search);
+    });
+  }
   return withDbFallback([], async () => {
     const conditions = [eq(portfolioProjects.visible, true)];
     if (opts?.featuredOnly) conditions.push(eq(portfolioProjects.featured, true));
@@ -384,6 +452,8 @@ export async function listVisibleProjects(opts?: {
 }
 
 export async function listAllProjects() {
+  const firebaseProjects = await firebaseListProjects();
+  if (firebaseProjects) return firebaseProjects;
   return withDbFallback([], async () =>
     db
       .select({
@@ -400,6 +470,8 @@ export async function listAllProjects() {
 }
 
 export async function getProjectBySlug(slug: string) {
+  const firebaseProject = await firebaseGetProjectBySlug(slug);
+  if (firebaseProject) return firebaseProject;
   return withDbFallback(null, async () => {
     const rows = await db
       .select({
@@ -444,6 +516,8 @@ export async function createProject(input: {
   visible?: boolean;
   displayOrder?: number;
 }) {
+  const firebaseId = await firebaseSaveProject(undefined, input);
+  if (firebaseId) return firebaseId;
   return withDbFallback(0, async () => {
     const ins = await db
       .insert(portfolioProjects)
@@ -472,6 +546,10 @@ export async function updateProject(
     displayOrder: number;
   }>,
 ) {
+  if (await firebaseListProjects()) {
+    await firebaseSaveProject(id, patch);
+    return;
+  }
   try {
     await db
       .update(portfolioProjects)
@@ -483,6 +561,10 @@ export async function updateProject(
 }
 
 export async function deleteProject(id: number) {
+  if (await firebaseListProjects()) {
+    await firebaseDeleteProject(id);
+    return;
+  }
   try {
     await db.delete(portfolioProjects).where(eq(portfolioProjects.id, id));
   } catch (error) {

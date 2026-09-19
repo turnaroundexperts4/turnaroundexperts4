@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 
 export type AdminSession = {
   adminId?: number;
+  adminUid?: string;
   email?: string;
   name?: string;
 };
@@ -27,6 +28,6 @@ export async function getSession() {
 
 export async function requireAdmin(): Promise<AdminSession | null> {
   const session = await getSession();
-  if (!session.adminId) return null;
+  if (!session.adminId && !session.adminUid) return null;
   return session;
 }

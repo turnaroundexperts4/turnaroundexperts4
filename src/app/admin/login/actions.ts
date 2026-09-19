@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { getSession } from "@/lib/auth";
 import { verifyAdminPassword } from "@/lib/data";
+import { verifyFirebasePassword } from "@/lib/firebase-auth";
 
 const Schema = z.object({
   email: z.string().email(),
@@ -25,15 +26,18 @@ export async function loginAction(
   if (!parsed.success) {
     return { error: "Please enter a valid email and password." };
   }
-  const verified = await verifyAdminPassword(
-    parsed.data.email,
-    parsed.data.password,
-  );
+  const verified =
+    (await verifyFirebasePassword(parsed.data.email, parsed.data.password)) ??
+    (await verifyAdminPassword(parsed.data.email, parsed.data.password));
   if (!verified) {
     return { error: "Invalid email or password." };
   }
   const session = await getSession();
-  session.adminId = verified.id;
+  if ("uid" in verified) {
+    session.adminUid = verified.uid;
+  } else {
+    session.adminId = verified.id;
+  }
   session.email = verified.email;
   session.name = verified.name;
   await session.save();

@@ -17,7 +17,7 @@ import {
 } from "@/lib/data";
 import { sql } from "drizzle-orm";
 
-const DEFAULT_SERVICES = [
+export const DEFAULT_SERVICES = [
   {
     title: "Business Consulting",
     slug: "business-consulting",
@@ -140,7 +140,7 @@ const DEFAULT_SERVICES = [
   },
 ];
 
-const DEFAULT_PORTFOLIO_CATEGORIES = [
+export const DEFAULT_PORTFOLIO_CATEGORIES = [
   { name: "Landing Pages", slug: "landing-pages", displayOrder: 10 },
   { name: "Webapps", slug: "webapps", displayOrder: 20 },
   { name: "ERP Solutions", slug: "erp-solutions", displayOrder: 30 },
@@ -391,9 +391,11 @@ async function seedIfEmpty() {
   console.log(`Admin ready: ${adminEmail}`);
 }
 
-seedIfEmpty()
-  .then(() => process.exit(0))
-  .catch((e) => {
-    console.error(e);
-    process.exit(1);
-  });
+if (process.argv[1]?.endsWith("seed.ts")) {
+  seedIfEmpty()
+    .then(() => process.exit(0))
+    .catch((e) => {
+      console.error(e);
+      process.exit(1);
+    });
+}

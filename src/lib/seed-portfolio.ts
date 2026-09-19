@@ -4,7 +4,7 @@ import { portfolioCategories, portfolioProjects } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { slugify } from "@/lib/utils";
 
-const SAMPLES: {
+export const PORTFOLIO_SAMPLES: {
   title: string;
   categorySlug: string;
   shortDescription: string;
@@ -206,7 +206,7 @@ async function seedPortfolio() {
   const cats = await db.select().from(portfolioCategories);
   const bySlug = new Map(cats.map((c) => [c.slug, c]));
 
-  for (const sample of SAMPLES) {
+  for (const sample of PORTFOLIO_SAMPLES) {
     const cat = bySlug.get(sample.categorySlug);
     if (!cat) {
       console.warn(`Missing category: ${sample.categorySlug}`);
@@ -262,12 +262,14 @@ async function seedPortfolio() {
   }
 }
 
-seedPortfolio()
-  .then(() => {
-    console.log("Portfolio samples ready.");
-    process.exit(0);
-  })
-  .catch((e) => {
-    console.error(e);
-    process.exit(1);
-  });
+if (process.argv[1]?.endsWith("seed-portfolio.ts")) {
+  seedPortfolio()
+    .then(() => {
+      console.log("Portfolio samples ready.");
+      process.exit(0);
+    })
+    .catch((e) => {
+      console.error(e);
+      process.exit(1);
+    });
+}
