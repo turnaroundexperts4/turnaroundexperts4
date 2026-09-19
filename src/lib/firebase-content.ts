@@ -620,8 +620,18 @@ export async function firebaseCreateAppointment(input: Record<string, unknown>) 
   if (!collection) return null;
   const id = nextId((await collection.get()).docs);
   const now = new Date();
-  await collection.doc(String(id)).set({ ...input, id, status: "pending", createdAt: now, updatedAt: now });
-  return mapAppointment(String(id), { ...input, id, status: "pending", createdAt: now, updatedAt: now });
+  const record = Object.fromEntries(
+    Object.entries(input).filter(([, value]) => value !== undefined),
+  );
+  const saved = {
+    ...record,
+    id,
+    status: "pending",
+    createdAt: now,
+    updatedAt: now,
+  };
+  await collection.doc(String(id)).set(saved);
+  return mapAppointment(String(id), saved);
 }
 
 export async function firebaseUpdateAppointment(

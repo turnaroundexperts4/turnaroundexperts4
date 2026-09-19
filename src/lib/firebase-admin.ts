@@ -15,20 +15,31 @@ export const firebaseAdminConfigured = Boolean(
   clientEmail && privateKey && projectId,
 );
 
-const app =
-  getApps()[0] ??
-  (firebaseAdminConfigured && !isBuildPhase
-    ? initializeApp({
-        credential: cert({
-          projectId,
-          clientEmail,
-          privateKey,
-        }),
-        databaseURL:
-          process.env.FIREBASE_DATABASE_URL ??
-          `https://${projectId}-default-rtdb.firebaseio.com`,
-      })
-    : null);
+let initializationError: Error | null = null;
+let app = getApps()[0] ?? null;
+
+if (!app && firebaseAdminConfigured && !isBuildPhase) {
+  try {
+    app = initializeApp({
+      credential: cert({
+        projectId,
+        clientEmail: clientEmail!,
+        privateKey: privateKey!,
+      }),
+      databaseURL:
+        process.env.FIREBASE_DATABASE_URL ??
+        `https://${projectId}-default-rtdb.firebaseio.com`,
+    });
+  } catch (error) {
+    initializationError =
+      error instanceof Error
+        ? error
+        : new Error("Firebase Admin initialization failed.");
+    console.error("Firebase Admin initialization failed:", initializationError);
+  }
+}
+
+export { initializationError as firebaseAdminInitializationError };
 
 export const firestore = app ? getFirestore(app) : null;
 export const realtimeDatabase = app ? getDatabase(app) : null;
@@ -37,7 +48,8 @@ export const firebaseAuth = app ? getAuth(app) : null;
 export function requireFirebaseAdmin() {
   if (!firestore || !firebaseAuth || !realtimeDatabase) {
     throw new Error(
-      "Firebase Admin is not configured. Set FIREBASE_CLIENT_EMAIL and FIREBASE_PRIVATE_KEY.",
+      initializationError?.message ??
+        "Firebase Admin is not configured. Set FIREBASE_CLIENT_EMAIL and FIREBASE_PRIVATE_KEY.",
     );
   }
   return { firestore, firebaseAuth, realtimeDatabase };

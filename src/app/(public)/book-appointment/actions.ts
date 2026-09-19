@@ -68,69 +68,76 @@ export async function submitAppointment(
   if (data.requestedDate < today) {
     return { ok: false, error: "Selected date is in the past." };
   }
-  const bookingCfg = await getSetting<{ minLeadDays: number; maxLeadDays: number }>(
-    "booking",
-    { minLeadDays: 1, maxLeadDays: 60 },
-  );
-  const min = addDays(today, bookingCfg.minLeadDays);
-  const max = addDays(today, bookingCfg.maxLeadDays);
-  if (data.requestedDate < min) {
+  try {
+    const bookingCfg = await getSetting<{ minLeadDays: number; maxLeadDays: number }>(
+      "booking",
+      { minLeadDays: 1, maxLeadDays: 60 },
+    );
+    const min = addDays(today, bookingCfg.minLeadDays);
+    const max = addDays(today, bookingCfg.maxLeadDays);
+    if (data.requestedDate < min) {
+      return {
+        ok: false,
+        error: `Please select a date at least ${bookingCfg.minLeadDays} day(s) from today.`,
+      };
+    }
+    if (data.requestedDate > max) {
+      return {
+        ok: false,
+        error: `Please select a date within ${bookingCfg.maxLeadDays} days from today.`,
+      };
+    }
+
+    const taken = await getBookedTimesForDate(data.requestedDate);
+    if (taken.includes(data.requestedTime)) {
+      return {
+        ok: false,
+        error:
+          "That time slot has just been booked. Please choose another available slot.",
+      };
+    }
+
+    let serviceTitle: string | undefined;
+    if (data.serviceId) {
+      const s = await getServiceById(data.serviceId);
+      if (s) serviceTitle = s.title;
+    }
+
+    const created = await createAppointment({
+      reference: generateReference("TAE"),
+      customerName: data.customerName,
+      email: data.email,
+      phone: data.phone,
+      company: data.company || undefined,
+      serviceId: data.serviceId,
+      serviceTitle,
+      requestedDate: data.requestedDate,
+      requestedTime: data.requestedTime,
+      message: data.message || undefined,
+      history: [
+        {
+          at: new Date().toISOString(),
+          action: "request_submitted",
+          note: "Customer submitted appointment request via website.",
+        },
+      ],
+    });
+
+    if (!created) {
+      return {
+        ok: false,
+        error: "The booking service is unavailable right now. Please try again later.",
+      };
+    }
+    revalidatePath("/admin/appointments");
+    return { ok: true, reference: created.reference };
+  } catch (error) {
+    console.error("Appointment submission failed:", error);
     return {
       ok: false,
-      error: `Please select a date at least ${bookingCfg.minLeadDays} day(s) from today.`,
+      error: "We could not save your appointment. Please try again.",
     };
   }
-  if (data.requestedDate > max) {
-    return {
-      ok: false,
-      error: `Please select a date within ${bookingCfg.maxLeadDays} days from today.`,
-    };
-  }
-
-  // Server-side conflict check — prevents race-condition-style duplicate bookings
-  const taken = await getBookedTimesForDate(data.requestedDate);
-  if (taken.includes(data.requestedTime)) {
-    return {
-      ok: false,
-      error:
-        "That time slot has just been booked. Please choose another available slot.",
-    };
-  }
-
-  // Resolve service title for admin readability
-  let serviceTitle: string | undefined = undefined;
-  if (data.serviceId) {
-    const s = await getServiceById(data.serviceId);
-    if (s) serviceTitle = s.title;
-  }
-
-  // Create
-  const reference = generateReference("TAE");
-  const created = await createAppointment({
-    reference,
-    customerName: data.customerName,
-    email: data.email,
-    phone: data.phone,
-    company: data.company || undefined,
-    serviceId: data.serviceId,
-    serviceTitle,
-    requestedDate: data.requestedDate,
-    requestedTime: data.requestedTime,
-    message: data.message || undefined,
-    history: [
-      {
-        at: new Date().toISOString(),
-        action: "request_submitted",
-        note: "Customer submitted appointment request via website.",
-      },
-    ],
-  });
-
-  revalidatePath("/admin/appointments");
-  if (!created) {
-    return { ok: false, error: "The booking service is unavailable right now. Please try again later." };
-  }
-  return { ok: true, reference: created.reference };
 }
 
 function addDays(date: string, days: number): string {

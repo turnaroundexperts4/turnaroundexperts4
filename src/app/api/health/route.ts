@@ -1,4 +1,8 @@
-import { firebaseAdminConfigured, firestore } from "@/lib/firebase-admin";
+import {
+  firebaseAdminConfigured,
+  firestore,
+  firebaseAdminInitializationError,
+} from "@/lib/firebase-admin";
 
 export const dynamic = "force-dynamic";
 
@@ -6,7 +10,13 @@ export async function GET() {
   try {
     if (!firebaseAdminConfigured || !firestore) {
       return Response.json(
-        { ok: false, service: "firebase", error: "Firebase Admin is not configured." },
+        {
+          ok: false,
+          service: "firebase",
+          error:
+            firebaseAdminInitializationError?.message ??
+            "Firebase Admin is not configured.",
+        },
         { status: 503 },
       );
     }
