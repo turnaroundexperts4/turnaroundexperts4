@@ -1216,6 +1216,60 @@ export async function getDashboardStats() {
 }
 
 export async function getDashboardStatsDetailed() {
+  const [
+    firebaseAppts,
+    firebaseProjects,
+    firebaseServices,
+    firebaseTeam,
+    firebaseEnquiries,
+  ] = await Promise.all([
+    firebaseListAppointments(),
+    firebaseListProjects(),
+    firebaseListServices(false),
+    firebaseListTeamMembers(),
+    firebaseListEnquiries(),
+  ]);
+
+  if (
+    firebaseAppts &&
+    firebaseProjects &&
+    firebaseServices &&
+    firebaseTeam &&
+    firebaseEnquiries
+  ) {
+    const countStatus = (rows: { status?: string | null }[], status: string) =>
+      rows.filter((row) => row.status === status).length;
+
+    return {
+      appointments: {
+        total: firebaseAppts.length,
+        pending: countStatus(firebaseAppts, "pending"),
+        approved: countStatus(firebaseAppts, "approved"),
+        rejected: countStatus(firebaseAppts, "rejected"),
+        rescheduled: countStatus(firebaseAppts, "rescheduled"),
+        completed: countStatus(firebaseAppts, "completed"),
+        cancelled: countStatus(firebaseAppts, "cancelled"),
+      },
+      portfolio: {
+        total: firebaseProjects.length,
+        visible: firebaseProjects.filter(({ project }) => project.visible).length,
+        featured: firebaseProjects.filter(({ project }) => project.featured).length,
+      },
+      services: {
+        total: firebaseServices.length,
+        active: firebaseServices.filter((service) => service.active).length,
+      },
+      team: {
+        total: firebaseTeam.length,
+        active: firebaseTeam.filter((member) => member.active).length,
+      },
+      enquiries: {
+        total: firebaseEnquiries.length,
+        new: countStatus(firebaseEnquiries, "new"),
+      },
+    };
+  }
+
   return withDbFallback(
     {
       appointments: { total: 0, pending: 0, approved: 0, rejected: 0, rescheduled: 0, completed: 0, cancelled: 0 },
