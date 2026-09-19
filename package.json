@@ -7,9 +7,12 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "seed:firebase": "tsx scripts/seed-firebase.ts"
+    "seed:firebase": "tsx scripts/seed-firebase.ts",
+    "preview:cloudflare": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+    "deploy:cloudflare": "opennextjs-cloudflare build && opennextjs-cloudflare deploy"
   },
   "dependencies": {
+    "@opennextjs/cloudflare": "^1.20.6",
     "@types/bcryptjs": "^2.4.6",
     "bcryptjs": "^3.0.3",
     "clsx": "^2.1.1",
@@ -40,6 +43,7 @@
     "postcss": "8.5.8",
     "tailwindcss": "4.1.17",
     "tsx": "^4.23.13",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "wrangler": "^4.135.0"
   }
 }
