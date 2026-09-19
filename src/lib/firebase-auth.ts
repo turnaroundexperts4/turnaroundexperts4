@@ -1,5 +1,3 @@
-import "server-only";
-
 import { firebaseAdminConfigured, firebaseAuth, firestore } from "@/lib/firebase-admin";
 
 type FirebaseSignIn = {
