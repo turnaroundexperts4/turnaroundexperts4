@@ -26,7 +26,7 @@ const ProjectSchema = z.object({
   description: z.string().min(5),
   shortDescription: z.string().max(400).optional().or(z.literal("")),
   projectUrl: z.string().max(500).optional().or(z.literal("")),
-  thumbnailUrl: z.string().max(500).optional().or(z.literal("")),
+  thumbnailUrl: z.string().max(10_000_000).optional().or(z.literal("")),
   imageUrls: z.string().optional().or(z.literal("")), // JSON
   tags: z.string().optional().or(z.literal("")), // comma or JSON
   client: z.string().max(200).optional().or(z.literal("")),

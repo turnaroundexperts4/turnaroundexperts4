@@ -14,7 +14,7 @@ const ALLOWED = new Set([
   "image/gif",
   "image/svg+xml",
 ]);
-const MAX_BYTES = 6 * 1024 * 1024; // 6MB
+const MAX_BYTES = 5 * 1024 * 1024;
 
 export async function POST(req: Request) {
   const session = await getSession();
@@ -45,23 +45,21 @@ export async function POST(req: Request) {
     );
   }
 
-  const ext =
-    file.type === "image/svg+xml"
-      ? "svg"
-      : file.type.split("/")[1]?.replace("jpeg", "jpg") || "jpg";
-  const name = `${Date.now()}-${nanoid(8)}.${ext}`;
+  const name = `${Date.now()}-${nanoid(8)}`;
   const buffer = Buffer.from(await file.arrayBuffer());
-  const { firebaseStorage } = requireFirebaseAdmin();
-  const objectPath = `uploads/${folder}/${name}`;
-  const bucket = firebaseStorage.bucket();
-  const object = bucket.file(objectPath);
-  await object.save(buffer, {
-    metadata: { contentType: file.type, cacheControl: "public,max-age=31536000,immutable" },
-    resumable: false,
+  const dataUrl = `data:${file.type};base64,${buffer.toString("base64")}`;
+  const path = `uploads/${folder}/${name}`;
+  const { realtimeDatabase } = requireFirebaseAdmin();
+  await realtimeDatabase.ref(path).set({
+    name,
+    contentType: file.type,
+    size: file.size,
+    dataUrl,
+    createdAt: Date.now(),
   });
-  const [url] = await object.getSignedUrl({
-    action: "read",
-    expires: "01-01-2100",
+  return NextResponse.json({
+    url: `/api/media?path=${encodeURIComponent(path)}`,
+    name,
+    path,
   });
-  return NextResponse.json({ url, name, path: objectPath });
 }

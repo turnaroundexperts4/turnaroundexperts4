@@ -2,7 +2,6 @@ import { cert, getApps, initializeApp } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
 import { getDatabase } from "firebase-admin/database";
 import { getAuth } from "firebase-admin/auth";
-import { getStorage } from "firebase-admin/storage";
 
 const projectId = process.env.FIREBASE_PROJECT_ID || "tae-bef9c";
 const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
@@ -24,22 +23,18 @@ const app =
         databaseURL:
           process.env.FIREBASE_DATABASE_URL ??
           `https://${projectId}-default-rtdb.firebaseio.com`,
-        storageBucket:
-          process.env.FIREBASE_STORAGE_BUCKET ??
-          `${projectId}.firebasestorage.app`,
       })
     : null);
 
 export const firestore = app ? getFirestore(app) : null;
 export const realtimeDatabase = app ? getDatabase(app) : null;
 export const firebaseAuth = app ? getAuth(app) : null;
-export const firebaseStorage = app ? getStorage(app) : null;
 
 export function requireFirebaseAdmin() {
-  if (!firestore || !firebaseAuth || !firebaseStorage) {
+  if (!firestore || !firebaseAuth || !realtimeDatabase) {
     throw new Error(
       "Firebase Admin is not configured. Set FIREBASE_CLIENT_EMAIL and FIREBASE_PRIVATE_KEY.",
     );
   }
-  return { firestore, firebaseAuth, firebaseStorage };
+  return { firestore, firebaseAuth, realtimeDatabase };
 }

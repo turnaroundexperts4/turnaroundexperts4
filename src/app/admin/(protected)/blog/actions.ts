@@ -30,6 +30,9 @@ export async function savePost(formData: FormData) {
   const excerpt = String(formData.get("excerpt") ?? "").trim() || null;
   const content = String(formData.get("content") ?? "").trim();
   const coverUrl = String(formData.get("coverUrl") ?? "").trim() || null;
+  if (coverUrl && coverUrl.length > 500) {
+    return { ok: false, error: "Cover image URL is too long." };
+  }
   const categoryIdRaw = formData.get("categoryId");
   const categoryId =
     categoryIdRaw && String(categoryIdRaw) !== ""
