@@ -107,6 +107,7 @@ type Appointment = {
   history: { at: string; action: string; note?: string }[];
   createdAt: Date;
   updatedAt: Date;
+  uid: string | null;
 };
 
 type Enquiry = {
@@ -274,6 +275,7 @@ function mapAppointment(id: string, data: FirebaseFirestore.DocumentData): Appoi
     history: Array.isArray(data.history) ? data.history : [],
     createdAt: dateValue(data.createdAt),
     updatedAt: dateValue(data.updatedAt),
+    uid: data.uid ? String(data.uid) : null,
   };
 }
 
@@ -607,6 +609,17 @@ export async function firebaseGetAppointmentByRef(reference: string) {
   return doc ? mapAppointment(doc.id, doc.data()) : null;
 }
 
+export async function firebaseGetAppointmentByUid(uid: string) {
+  const collection = await firebaseCollection("appointments");
+  if (!collection) return null;
+  const snapshot = await collection.where("uid", "==", uid).limit(20).get();
+  const active = snapshot.docs
+    .map((doc) => mapAppointment(doc.id, doc.data()))
+    .filter((appointment) => !["cancelled", "completed", "rejected"].includes(appointment.status))
+    .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  return active[0] ?? null;
+}
+
 export async function firebaseGetBookedTimes(date: string) {
   const rows = await firebaseListAppointments();
   if (!rows) return null;
@@ -659,7 +672,8 @@ export async function firebaseCreateEnquiry(input: Record<string, unknown>) {
   if (!collection) return 0;
   const id = nextId((await collection.get()).docs);
   const now = new Date();
-  await collection.doc(String(id)).set({ ...input, id, status: "new", createdAt: now, updatedAt: now });
+  const record = Object.fromEntries(Object.entries(input).filter(([, value]) => value !== undefined));
+  await collection.doc(String(id)).set({ ...record, id, status: "new", createdAt: now, updatedAt: now });
   return id;
 }
 

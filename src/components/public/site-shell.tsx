@@ -15,6 +15,7 @@ const NAV = [
   { label: "Blog", href: "/blog" },
   { label: "Pricing", href: "/pricing" },
   { label: "Contact", href: "/contact" },
+  { label: "My account", href: "/account" },
 ];
 
 export function PublicNav() {

@@ -8,8 +8,10 @@ import {
   getBookedTimesForDate,
   getServiceById,
   getSetting,
+  getAppointmentByUid,
 } from "@/lib/data";
 import { generateReference, todayISODate } from "@/lib/utils";
+import { verifyFirebaseIdToken } from "@/lib/firebase-auth";
 
 const TimeRegex = /^([01]\d|2[0-3]):[0-5]\d$/;
 const DateRegex = /^\d{4}-\d{2}-\d{2}$/;
@@ -62,6 +64,9 @@ export async function submitAppointment(
     return { ok: false, error: "Please fix the highlighted fields.", fieldErrors: errors };
   }
   const data = parsed.data;
+  const idToken = String(formData.get("idToken") ?? "");
+  const user = await verifyFirebaseIdToken(idToken);
+  if (!user) return { ok: false, error: "Please sign in before requesting an appointment." };
 
   // Server-side validation: date is not in past + within allowed lead window
   const today = todayISODate();
@@ -69,6 +74,10 @@ export async function submitAppointment(
     return { ok: false, error: "Selected date is in the past." };
   }
   try {
+    const existing = await getAppointmentByUid(user.uid);
+    if (existing) {
+      return { ok: false, error: "You already have an active appointment. Please wait for its status to change." };
+    }
     const bookingCfg = await getSetting<{ minLeadDays: number; maxLeadDays: number }>(
       "booking",
       { minLeadDays: 1, maxLeadDays: 60 },
@@ -104,6 +113,7 @@ export async function submitAppointment(
     }
 
     const created = await createAppointment({
+      uid: user.uid,
       reference: generateReference("TAE"),
       customerName: data.customerName,
       email: data.email,

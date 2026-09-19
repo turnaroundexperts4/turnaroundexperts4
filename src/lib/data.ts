@@ -36,6 +36,7 @@ import {
   firebaseDeleteBlockedDate,
   firebaseListAppointments,
   firebaseGetAppointmentByRef,
+  firebaseGetAppointmentByUid,
   firebaseGetBookedTimes,
   firebaseCreateAppointment,
   firebaseUpdateAppointment,
@@ -866,6 +867,12 @@ export async function getAppointmentByRef(reference: string) {
   });
 }
 
+export async function getAppointmentByUid(uid: string) {
+  const firebaseAppointment = await firebaseGetAppointmentByUid(uid);
+  if (firebaseAppointment) return firebaseAppointment;
+  return null;
+}
+
 export async function getBookedTimesForDate(date: string) {
   const firebaseTimes = await firebaseGetBookedTimes(date);
   if (firebaseTimes) return firebaseTimes;
@@ -888,6 +895,7 @@ export async function getBookedTimesForDate(date: string) {
 }
 
 export async function createAppointment(input: {
+  uid: string;
   reference: string;
   customerName: string;
   email: string;
@@ -1165,6 +1173,7 @@ export async function listEnquiries() {
 }
 
 export async function createEnquiry(input: {
+  uid: string;
   name: string;
   email: string;
   phone?: string;

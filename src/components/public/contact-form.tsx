@@ -3,10 +3,13 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Check } from "lucide-react";
+import { AuthRequired } from "@/components/auth/auth-required";
+import { useUserAuth } from "@/components/auth/user-auth-provider";
 
 type ServiceOpt = { id: number; title: string };
 
 export function ContactForm({ services }: { services: ServiceOpt[] }) {
+  const { user } = useUserAuth();
   const [state, setState] = useState<
     | { kind: "idle" }
     | { kind: "loading" }
@@ -41,9 +44,13 @@ export function ContactForm({ services }: { services: ServiceOpt[] }) {
     setErrors({});
     setState({ kind: "loading" });
     try {
+      if (!user) {
+        setState({ kind: "error", message: "Please sign in before sending an enquiry." });
+        return;
+      }
       const res = await fetch("/api/enquiries", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${await user.getIdToken()}` },
         body: JSON.stringify({ name, email, phone, company, service, message }),
       });
       if (!res.ok) {
@@ -92,6 +99,7 @@ export function ContactForm({ services }: { services: ServiceOpt[] }) {
   }
 
   return (
+    <AuthRequired>
     <form onSubmit={onSubmit} className="rounded-2xl border border-ink-900/5 bg-white p-7">
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
         <Field label="Your name" name="name" required error={errors.name} />
@@ -157,6 +165,7 @@ export function ContactForm({ services }: { services: ServiceOpt[] }) {
         </button>
       </div>
     </form>
+    </AuthRequired>
   );
 }
 

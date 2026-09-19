@@ -7,6 +7,15 @@ type FirebaseSignIn = {
   idToken: string;
 };
 
+export async function verifyFirebaseIdToken(token: string) {
+  if (!firebaseAdminConfigured || !firebaseAuth) return null;
+  try {
+    return await firebaseAuth.verifyIdToken(token);
+  } catch {
+    return null;
+  }
+}
+
 export async function verifyFirebasePassword(email: string, password: string) {
   if (!firebaseAdminConfigured || !firebaseAuth) return null;
 

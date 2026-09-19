@@ -6,6 +6,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Calendar, Check, ChevronLeft, ChevronRight, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { submitAppointment, type BookingState } from "@/app/(public)/book-appointment/actions";
+import { AuthRequired } from "@/components/auth/auth-required";
+import { useUserAuth } from "@/components/auth/user-auth-provider";
 
 type Service = { id: number; title: string; slug: string };
 type SlotResp = {
@@ -60,6 +62,7 @@ export function BookingForm({ services }: { services: Service[] }) {
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [slotData, setSlotData] = useState<SlotResp | null>(null);
   const [loadingSlots, setLoadingSlots] = useState(false);
+  const { user } = useUserAuth();
 
   // Fetch slots when date selected.
   /* eslint-disable react-hooks/set-state-in-effect */
@@ -261,7 +264,12 @@ export function BookingForm({ services }: { services: Service[] }) {
                     </div>
                   </div>
 
-                  <form action={formAction} className="mt-7 grid grid-cols-1 gap-5 md:grid-cols-2">
+                  <AuthRequired>
+                  <form action={async (formData) => {
+                    if (!user) return;
+                    formData.set("idToken", await user.getIdToken());
+                    return formAction(formData);
+                  }} className="mt-7 grid grid-cols-1 gap-5 md:grid-cols-2">
                     <input type="hidden" name="requestedDate" value={selectedDate ?? ""} />
                     <input type="hidden" name="requestedTime" value={selectedTime ?? ""} />
                     <Field
@@ -333,6 +341,7 @@ export function BookingForm({ services }: { services: Service[] }) {
                       <SubmitButton />
                     </div>
                   </form>
+                  </AuthRequired>
                 </div>
               </motion.div>
             )}

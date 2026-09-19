@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Fraunces, Inter } from "next/font/google";
 import type { ReactNode } from "react";
 import "./globals.css";
+import { UserAuthProvider } from "@/components/auth/user-auth-provider";
 
 const fraunces = Fraunces({
   variable: "--font-fraunces",
@@ -41,7 +42,9 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" className={`${fraunces.variable} ${inter.variable}`}>
-      <body className="bg-paper text-ink-900 antialiased">{children}</body>
+      <body className="bg-paper text-ink-900 antialiased">
+        <UserAuthProvider>{children}</UserAuthProvider>
+      </body>
     </html>
   );
 }

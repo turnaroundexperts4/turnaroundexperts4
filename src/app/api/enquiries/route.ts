@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createEnquiry } from "@/lib/data";
+import { verifyFirebaseIdToken } from "@/lib/firebase-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -14,6 +15,9 @@ const Schema = z.object({
 });
 
 export async function POST(req: Request) {
+  const token = req.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
+  const user = token ? await verifyFirebaseIdToken(token) : null;
+  if (!user) return NextResponse.json({ error: "Please sign in before sending an enquiry." }, { status: 401 });
   let body: unknown;
   try {
     body = await req.json();
@@ -27,7 +31,7 @@ export async function POST(req: Request) {
       { status: 400 },
     );
   }
-  const id = await createEnquiry(parsed.data);
+  const id = await createEnquiry({ ...parsed.data, uid: user.uid });
   if (!id) {
     return NextResponse.json(
       { error: "Unable to save enquiry right now." },
