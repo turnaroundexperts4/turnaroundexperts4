@@ -4,8 +4,12 @@ import { getDatabase } from "firebase-admin/database";
 import { getAuth } from "firebase-admin/auth";
 
 const projectId = process.env.FIREBASE_PROJECT_ID || "tae-bef9c";
-const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
-const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n");
+const clientEmail = process.env.FIREBASE_CLIENT_EMAIL?.trim();
+const privateKey = process.env.FIREBASE_PRIVATE_KEY
+  ?.trim()
+  .replace(/^(['"])|(['"])$/g, "")
+  .replace(/\\n/g, "\n");
+const isBuildPhase = process.env.NEXT_PHASE === "phase-production-build";
 
 export const firebaseAdminConfigured = Boolean(
   clientEmail && privateKey && projectId,
@@ -13,7 +17,7 @@ export const firebaseAdminConfigured = Boolean(
 
 const app =
   getApps()[0] ??
-  (firebaseAdminConfigured
+  (firebaseAdminConfigured && !isBuildPhase
     ? initializeApp({
         credential: cert({
           projectId,
