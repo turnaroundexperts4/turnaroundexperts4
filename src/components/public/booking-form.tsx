@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, useTransition } from "react";
-import { useFormState, useFormStatus } from "react-dom";
+import { useActionState, useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { useFormStatus } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Calendar, Check, ChevronLeft, ChevronRight, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -43,7 +43,7 @@ const ISODate = (d: Date) => {
 };
 
 export function BookingForm({ services }: { services: Service[] }) {
-  const [rawState, formAction] = useFormState<BookingState | null, FormData>(
+  const [rawState, formAction] = useActionState<BookingState | null, FormData>(
     submitAppointment,
     initialState,
   );

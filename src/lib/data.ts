@@ -18,16 +18,22 @@ import { and, asc, desc, eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import {
   firebaseDeleteCategory,
+  firebaseDeleteBlogPost,
   firebaseDeleteProject,
   firebaseDeleteService,
   firebaseGetCategoryBySlug,
   firebaseGetProjectBySlug,
+  firebaseGetBlogPostBySlug,
   firebaseGetServiceBySlug,
   firebaseListCategories,
   firebaseListProjects,
+  firebaseListBlogCategories,
+  firebaseListBlogPosts,
   firebaseListServices,
   firebaseSaveCategory,
   firebaseSaveProject,
+  firebaseSaveBlogCategory,
+  firebaseSaveBlogPost,
   firebaseSaveService,
 } from "@/lib/firebase-content";
 
@@ -889,6 +895,25 @@ export async function updateAppointmentStatus(
 
 // ---------------- Blog ----------------
 export async function listPublishedPosts(opts?: { search?: string; categorySlug?: string }) {
+  const firebasePosts = await firebaseListBlogPosts();
+  if (firebasePosts) {
+    const search = opts?.search?.trim().toLowerCase();
+    return firebasePosts.filter(({ post, category }) => {
+      if (!post.published) return false;
+      if (opts?.categorySlug && category?.slug !== opts.categorySlug) return false;
+      if (!search) return true;
+      return [
+        post.title,
+        post.excerpt ?? "",
+        post.content,
+        category?.name ?? "",
+        ...post.tags,
+      ]
+        .join(" ")
+        .toLowerCase()
+        .includes(search);
+    });
+  }
   return withDbFallback([], async () => {
     const conditions = [eq(blogPosts.published, true)];
     if (opts?.categorySlug) {
@@ -925,6 +950,8 @@ export async function listPublishedPosts(opts?: { search?: string; categorySlug?
 }
 
 export async function listAllPosts() {
+  const firebasePosts = await firebaseListBlogPosts();
+  if (firebasePosts) return firebasePosts;
   return withDbFallback([], async () =>
     db
       .select({ post: blogPosts, category: blogCategories })
@@ -935,6 +962,8 @@ export async function listAllPosts() {
 }
 
 export async function getPostBySlug(slug: string) {
+  const firebasePost = await firebaseGetBlogPostBySlug(slug);
+  if (firebasePost) return firebasePost;
   return withDbFallback(null, async () => {
     const rows = await db
       .select({ post: blogPosts, category: blogCategories })
@@ -957,6 +986,8 @@ export async function createPost(input: {
   published?: boolean;
   publishedAt?: Date | null;
 }) {
+  const firebaseId = await firebaseSaveBlogPost(undefined, input);
+  if (firebaseId) return firebaseId;
   return withDbFallback(0, async () => {
     const ins = await db
       .insert(blogPosts)
@@ -991,6 +1022,10 @@ export async function updatePost(
     publishedAt: Date | null;
   }>,
 ) {
+  if (await firebaseListBlogPosts()) {
+    await firebaseSaveBlogPost(id, patch);
+    return;
+  }
   try {
     await db
       .update(blogPosts)
@@ -1002,6 +1037,10 @@ export async function updatePost(
 }
 
 export async function deletePost(id: number) {
+  if (await firebaseListBlogPosts()) {
+    await firebaseDeleteBlogPost(id);
+    return;
+  }
   try {
     await db.delete(blogPosts).where(eq(blogPosts.id, id));
   } catch (error) {
@@ -1010,6 +1049,8 @@ export async function deletePost(id: number) {
 }
 
 export async function listBlogCategories() {
+  const firebaseCategories = await firebaseListBlogCategories();
+  if (firebaseCategories) return firebaseCategories;
   return withDbFallback([], async () =>
     db
       .select()
@@ -1019,6 +1060,8 @@ export async function listBlogCategories() {
 }
 
 export async function createBlogCategory(name: string, slug: string) {
+  const firebaseId = await firebaseSaveBlogCategory(undefined, { name, slug });
+  if (firebaseId) return firebaseId;
   return withDbFallback(0, async () => {
     const ins = await db
       .insert(blogCategories)

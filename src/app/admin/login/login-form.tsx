@@ -1,12 +1,13 @@
 "use client";
 
-import { useFormState, useFormStatus } from "react-dom";
+import { useActionState } from "react";
+import { useFormStatus } from "react-dom";
 import { loginAction, type LoginState } from "@/app/admin/login/actions";
 
 const initial: LoginState = {};
 
 export function LoginForm() {
-  const [state, action] = useFormState(loginAction, initial);
+  const [state, action] = useActionState(loginAction, initial);
   return (
     <form action={action} className="mt-6 grid grid-cols-1 gap-4">
       <div>

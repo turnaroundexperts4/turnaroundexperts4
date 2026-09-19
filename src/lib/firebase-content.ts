@@ -50,6 +50,27 @@ type Project = {
   updatedAt: Date;
 };
 
+type BlogCategory = {
+  id: number;
+  name: string;
+  slug: string;
+};
+
+type BlogPost = {
+  id: number;
+  title: string;
+  slug: string;
+  excerpt: string | null;
+  content: string;
+  coverUrl: string | null;
+  categoryId: number | null;
+  tags: string[];
+  published: boolean;
+  publishedAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
 function dateValue(value: unknown) {
   if (value && typeof value === "object" && "toDate" in value) {
     return (value as { toDate: () => Date }).toDate();
@@ -108,6 +129,34 @@ function mapProject(id: string, data: FirebaseFirestore.DocumentData): Project {
     featured: data.featured === true,
     visible: data.visible !== false,
     displayOrder: Number(data.displayOrder ?? 0),
+    createdAt: dateValue(data.createdAt),
+    updatedAt: dateValue(data.updatedAt),
+  };
+}
+
+function mapBlogCategory(
+  id: string,
+  data: FirebaseFirestore.DocumentData,
+): BlogCategory {
+  return {
+    id: Number(data.id ?? id),
+    name: String(data.name ?? ""),
+    slug: String(data.slug ?? id),
+  };
+}
+
+function mapBlogPost(id: string, data: FirebaseFirestore.DocumentData): BlogPost {
+  return {
+    id: Number(data.id ?? id),
+    title: String(data.title ?? ""),
+    slug: String(data.slug ?? id),
+    excerpt: data.excerpt ?? null,
+    content: String(data.content ?? ""),
+    coverUrl: data.coverUrl ?? null,
+    categoryId: data.categoryId == null ? null : Number(data.categoryId),
+    tags: asStringArray(data.tags),
+    published: data.published === true,
+    publishedAt: data.publishedAt ? dateValue(data.publishedAt) : null,
     createdAt: dateValue(data.createdAt),
     updatedAt: dateValue(data.updatedAt),
   };
@@ -275,4 +324,97 @@ export async function firebaseDeleteProject(id: number) {
   if (!enabled()) return;
   const { firestore: store } = requireFirebaseAdmin();
   await store.collection("portfolioProjects").doc(String(id)).delete();
+}
+
+export async function firebaseListBlogCategories() {
+  if (!enabled()) return null;
+  const snapshot = await firestore!.collection("blogCategories").get();
+  return snapshot.docs
+    .map((doc) => mapBlogCategory(doc.id, doc.data()))
+    .sort((a, b) => a.id - b.id);
+}
+
+export async function firebaseSaveBlogCategory(
+  id: number | undefined,
+  input: Record<string, unknown>,
+) {
+  if (!enabled()) return 0;
+  const { firestore: store } = requireFirebaseAdmin();
+  const collection = store.collection("blogCategories");
+  const target = id
+    ? collection.doc(String(id))
+    : collection.doc(String(nextId((await collection.get()).docs)));
+  await target.set({ ...input, id: Number(target.id) }, { merge: true });
+  return Number(target.id);
+}
+
+export async function firebaseListBlogPosts() {
+  if (!enabled()) return null;
+  const [postSnapshot, categorySnapshot] = await Promise.all([
+    firestore!.collection("blogPosts").get(),
+    firestore!.collection("blogCategories").get(),
+  ]);
+  const categories = new Map(
+    categorySnapshot.docs.map((doc) => {
+      const category = mapBlogCategory(doc.id, doc.data());
+      return [category.id, category] as const;
+    }),
+  );
+  return postSnapshot.docs
+    .map((doc) => {
+      const post = mapBlogPost(doc.id, doc.data());
+      return { post, category: post.categoryId ? categories.get(post.categoryId) ?? null : null };
+    })
+    .sort(
+      (a, b) =>
+        (b.post.publishedAt?.getTime() ?? 0) -
+          (a.post.publishedAt?.getTime() ?? 0) ||
+        b.post.createdAt.getTime() - a.post.createdAt.getTime(),
+    );
+}
+
+export async function firebaseGetBlogPostBySlug(slug: string) {
+  if (!enabled()) return null;
+  const rows = await firestore!
+    .collection("blogPosts")
+    .where("slug", "==", slug)
+    .limit(1)
+    .get();
+  const doc = rows.docs[0];
+  if (!doc) return null;
+  const post = mapBlogPost(doc.id, doc.data());
+  const category = post.categoryId
+    ? (await firestore!.collection("blogCategories").doc(String(post.categoryId)).get())
+    : null;
+  return {
+    post,
+    category:
+      category?.exists && category.data()
+        ? mapBlogCategory(category.id, category.data()!)
+        : null,
+  };
+}
+
+export async function firebaseSaveBlogPost(
+  id: number | undefined,
+  input: Record<string, unknown>,
+) {
+  if (!enabled()) return 0;
+  const { firestore: store } = requireFirebaseAdmin();
+  const collection = store.collection("blogPosts");
+  const target = id
+    ? collection.doc(String(id))
+    : collection.doc(String(nextId((await collection.get()).docs)));
+  const now = new Date();
+  await target.set(
+    { ...input, id: Number(target.id), createdAt: now, updatedAt: now },
+    { merge: true },
+  );
+  return Number(target.id);
+}
+
+export async function firebaseDeleteBlogPost(id: number) {
+  if (!enabled()) return;
+  const { firestore: store } = requireFirebaseAdmin();
+  await store.collection("blogPosts").doc(String(id)).delete();
 }
