@@ -8,25 +8,29 @@ export type AdminSession = {
   name?: string;
 };
 
-const sessionSecret = process.env.SESSION_SECRET;
-if (!sessionSecret || sessionSecret.length < 32) {
-  throw new Error("SESSION_SECRET must be set and at least 32 characters long.");
-}
+function getSessionOptions(): SessionOptions {
+  const sessionSecret = process.env.SESSION_SECRET;
+  if (!sessionSecret || sessionSecret.length < 32) {
+    throw new Error(
+      "SESSION_SECRET must be set and at least 32 characters long.",
+    );
+  }
 
-export const sessionOptions: SessionOptions = {
-  password: sessionSecret,
-  cookieName: "tae_admin_session",
-  cookieOptions: {
-    secure: process.env.NODE_ENV === "production",
-    httpOnly: true,
-    sameSite: "lax",
-    path: "/",
-  },
-};
+  return {
+    password: sessionSecret,
+    cookieName: "tae_admin_session",
+    cookieOptions: {
+      secure: process.env.NODE_ENV === "production",
+      httpOnly: true,
+      sameSite: "lax",
+      path: "/",
+    },
+  };
+}
 
 export async function getSession() {
   const cookieStore = await cookies();
-  return getIronSession<AdminSession>(cookieStore, sessionOptions);
+  return getIronSession<AdminSession>(cookieStore, getSessionOptions());
 }
 
 export async function requireAdmin(): Promise<AdminSession | null> {
