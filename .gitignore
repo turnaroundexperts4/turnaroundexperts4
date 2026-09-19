@@ -18,3 +18,5 @@ pnpm-debug.log*
 # Local Firebase notes/config snippets are not part of the application source.
 firebase information
 firebase-service-account*.json
+.dev.vars
+.wrangler/
