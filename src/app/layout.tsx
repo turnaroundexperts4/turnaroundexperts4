@@ -25,8 +25,10 @@ export const metadata: Metadata = {
     "TurnAround Experts (TAE) is a technology, digital services and consulting company helping businesses solve operational and growth problems across Gujarat and India.",
   metadataBase: new URL("https://turnaroundexperts.info"),
   icons: {
-    icon: [{ url: "/favicon.png", type: "image/png" }],
-    apple: [{ url: "/apple-touch-icon.png" }],
+    icon: [{ url: "/favicon.png", type: "image/png", sizes: "48x48" }],
+    apple: [
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
   },
   openGraph: {
     type: "website",
