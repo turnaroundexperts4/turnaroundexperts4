@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
-import { Eyebrow, Reveal } from "@/components/public/reveal";
+import { Reveal } from "@/components/public/reveal";
 import { getPostBySlug } from "@/lib/data";
 import { formatDate } from "@/lib/utils";
 

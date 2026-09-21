@@ -72,7 +72,7 @@ export async function GET(req: Request) {
   const today = new Date();
   const isToday = date === today.toISOString().slice(0, 10);
   const nowMinutes = today.getHours() * 60 + today.getMinutes();
-  const available = slots.filter((slot, idx) => {
+  const available = slots.filter((slot) => {
     if (booked.includes(slot)) return false;
     if (isToday) {
       const [sh, sm] = slot.split(":").map(Number);

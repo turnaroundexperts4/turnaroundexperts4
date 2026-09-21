@@ -10,18 +10,12 @@ import {
   listActiveTeam,
   listPublishedPosts,
   listFounders,
-  listActivePortfolioCategories,
 } from "@/lib/data";
 import { formatDate } from "@/lib/utils";
 import { ServiceIcon } from "@/components/public/service-icon";
 
 export const dynamic = "force-dynamic";
 
-type Seo = {
-  title: string;
-  description: string;
-  keywords: string[];
-};
 type Company = {
   name: string;
   short: string;
@@ -94,14 +88,8 @@ const WHY_TAE = [
 ];
 
 export default async function HomePage() {
-  const [seo, company, services, allProjects, team, posts, founders, categories] =
+  const [company, services, allProjects, team, posts, founders] =
     await Promise.all([
-      getSetting<Seo>("seo", {
-        title: "TurnAround Experts — Turning Challenges into Profits",
-        description:
-          "TAE helps businesses across India with technology, digital services and consulting.",
-        keywords: [],
-      }),
       getSetting<Company>("company", {
         name: "TurnAround Experts",
         short: "TAE",
@@ -116,7 +104,6 @@ export default async function HomePage() {
       listActiveTeam(),
       listPublishedPosts(),
       listFounders(),
-      listActivePortfolioCategories(),
     ]);
 
   const featured = allProjects

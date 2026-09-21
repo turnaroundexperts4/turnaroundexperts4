@@ -339,7 +339,6 @@ function AppointmentDetail({
   const [tab, setTab] = useState<"approve" | "reject" | "reschedule" | "complete">(
     a.status === "pending" ? "approve" : "reschedule",
   );
-  const [, startTransition] = useTransition();
   return (
     <div className="px-7 py-6">
       <h2 className="display-font text-[24px] font-medium leading-tight text-navy-900">

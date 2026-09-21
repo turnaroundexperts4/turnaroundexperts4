@@ -1,7 +1,6 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { Eyebrow, Reveal } from "@/components/public/reveal";
+import { Reveal } from "@/components/public/reveal";
 
 export function LegalPage({
   title,

@@ -7,15 +7,11 @@ import {
   portfolioCategories,
   services,
   teamMembers,
-  siteSettings,
-  admins,
 } from "@/db/schema";
 import {
-  createAdmin,
   ensureSeedAdmin,
   setSetting,
 } from "@/lib/data";
-import { sql } from "drizzle-orm";
 
 export const DEFAULT_SERVICES = [
   {
