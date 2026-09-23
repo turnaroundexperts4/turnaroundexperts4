@@ -2,10 +2,11 @@
 
 import {
   createUserWithEmailAndPassword,
+  getRedirectResult,
   GoogleAuthProvider,
   onAuthStateChanged,
   signInWithEmailAndPassword,
-  signInWithPopup,
+  signInWithRedirect,
   signOut,
   type User,
 } from "firebase/auth";
@@ -22,6 +23,7 @@ import { clientAuth } from "@/lib/firebase-client";
 type UserAuthContextValue = {
   user: User | null;
   loading: boolean;
+  authError: string;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
@@ -33,18 +35,36 @@ const UserAuthContext = createContext<UserAuthContextValue | null>(null);
 export function UserAuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [authError, setAuthError] = useState("");
 
   useEffect(() => {
-    return onAuthStateChanged(clientAuth, (nextUser) => {
+    const unsubscribe = onAuthStateChanged(clientAuth, (nextUser) => {
       setUser(nextUser);
       setLoading(false);
     });
+    void getRedirectResult(clientAuth)
+      .then((result) => {
+        if (result?.user) setUser(result.user);
+      })
+      .catch((error) => {
+        console.error("Google redirect sign-in failed:", error);
+        const code =
+          typeof error === "object" &&
+          error !== null &&
+          "code" in error &&
+          typeof error.code === "string"
+            ? error.code
+            : "";
+        setAuthError(code ? `Google sign-in failed (${code}).` : "Google sign-in was not completed.");
+      });
+    return unsubscribe;
   }, []);
 
   const value = useMemo<UserAuthContextValue>(
     () => ({
       user,
       loading,
+      authError,
       signIn: async (email, password) => {
         await signInWithEmailAndPassword(clientAuth, email, password);
       },
@@ -52,13 +72,13 @@ export function UserAuthProvider({ children }: { children: ReactNode }) {
         await createUserWithEmailAndPassword(clientAuth, email, password);
       },
       signInWithGoogle: async () => {
-        await signInWithPopup(clientAuth, new GoogleAuthProvider());
+        await signInWithRedirect(clientAuth, new GoogleAuthProvider());
       },
       signOutUser: async () => {
         await signOut(clientAuth);
       },
     }),
-    [loading, user],
+    [authError, loading, user],
   );
 
   return <UserAuthContext.Provider value={value}>{children}</UserAuthContext.Provider>;

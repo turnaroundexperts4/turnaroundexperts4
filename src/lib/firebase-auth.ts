@@ -24,15 +24,22 @@ export async function verifyFirebasePassword(email: string, password: string) {
     throw new Error("NEXT_PUBLIC_FIREBASE_API_KEY is required for Firebase login.");
   }
 
-  const response = await fetch(
-    `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${apiKey}`,
-    {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ email, password, returnSecureToken: true }),
-      cache: "no-store",
-    },
-  );
+  let response: Response;
+  try {
+    response = await fetch(
+      `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${apiKey}`,
+      {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ email, password, returnSecureToken: true }),
+        cache: "no-store",
+        signal: AbortSignal.timeout(5000),
+      },
+    );
+  } catch (error) {
+    console.error("Firebase password sign-in request failed:", error);
+    return null;
+  }
   if (!response.ok) return null;
 
   const result = (await response.json()) as FirebaseSignIn;

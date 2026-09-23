@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useUserAuth } from "./user-auth-provider";
 
 export function UserAuthCard() {
-  const { signIn, signUp, signInWithGoogle } = useUserAuth();
+  const { authError, signIn, signUp, signInWithGoogle } = useUserAuth();
   const [mode, setMode] = useState<"signIn" | "signUp">("signIn");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -55,7 +55,9 @@ export function UserAuthCard() {
           placeholder="Password"
           className="rounded-xl border border-ink-900/10 bg-paper px-4 py-3 text-[15px]"
         />
-        {error ? <p className="text-[13px] text-red-700">{error}</p> : null}
+        {error || authError ? (
+          <p className="text-[13px] text-red-700">{error || authError}</p>
+        ) : null}
         <button
           type="submit"
           disabled={busy}
@@ -66,7 +68,24 @@ export function UserAuthCard() {
       </form>
       <button
         type="button"
-        onClick={() => void signInWithGoogle().catch(() => setError("Google sign-in was not completed."))}
+        onClick={() =>
+          void signInWithGoogle().catch((error: unknown) => {
+            const code =
+              typeof error === "object" &&
+              error !== null &&
+              "code" in error &&
+              typeof error.code === "string"
+                ? error.code
+                : "";
+            setError(
+              code === "auth/popup-blocked"
+                ? "Google sign-in was blocked by the browser. Allow redirects for this site and try again."
+                : code
+                  ? `Google sign-in failed (${code}).`
+                  : "Google sign-in was not completed.",
+            );
+          })
+        }
         className="mt-3 w-full rounded-full border border-ink-900/15 px-5 py-3 text-[14px] font-medium text-navy-900"
       >
         Continue with Google
