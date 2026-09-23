@@ -78,11 +78,13 @@ export function UserAuthCard() {
                 ? error.code
                 : "";
             setError(
-              code === "auth/popup-blocked"
-                ? "Google sign-in was blocked by the browser. Allow redirects for this site and try again."
-                : code
-                  ? `Google sign-in failed (${code}).`
-                  : "Google sign-in was not completed.",
+              code === "auth/invalid-credential"
+                ? "Google sign-in is not configured correctly in Firebase. Enable the Google provider and save its support email."
+                : code === "auth/popup-blocked"
+                  ? "Google sign-in was blocked by the browser. Allow popups for this site and try again."
+                  : code
+                    ? `Google sign-in failed (${code}).`
+                    : "Google sign-in was not completed.",
             );
           })
         }

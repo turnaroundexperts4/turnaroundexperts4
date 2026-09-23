@@ -2,11 +2,10 @@
 
 import {
   createUserWithEmailAndPassword,
-  getRedirectResult,
   GoogleAuthProvider,
   onAuthStateChanged,
   signInWithEmailAndPassword,
-  signInWithRedirect,
+  signInWithPopup,
   signOut,
   type User,
 } from "firebase/auth";
@@ -42,21 +41,6 @@ export function UserAuthProvider({ children }: { children: ReactNode }) {
       setUser(nextUser);
       setLoading(false);
     });
-    void getRedirectResult(clientAuth)
-      .then((result) => {
-        if (result?.user) setUser(result.user);
-      })
-      .catch((error) => {
-        console.error("Google redirect sign-in failed:", error);
-        const code =
-          typeof error === "object" &&
-          error !== null &&
-          "code" in error &&
-          typeof error.code === "string"
-            ? error.code
-            : "";
-        setAuthError(code ? `Google sign-in failed (${code}).` : "Google sign-in was not completed.");
-      });
     return unsubscribe;
   }, []);
 
@@ -72,7 +56,8 @@ export function UserAuthProvider({ children }: { children: ReactNode }) {
         await createUserWithEmailAndPassword(clientAuth, email, password);
       },
       signInWithGoogle: async () => {
-        await signInWithRedirect(clientAuth, new GoogleAuthProvider());
+        setAuthError("");
+        await signInWithPopup(clientAuth, new GoogleAuthProvider());
       },
       signOutUser: async () => {
         await signOut(clientAuth);
