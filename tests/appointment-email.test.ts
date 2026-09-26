@@ -3,7 +3,7 @@ import { sendAppointmentEmail } from "../src/lib/appointment-email";
 import type { AppointmentEmailData } from "../src/lib/appointment-email-template";
 
 const emailData: AppointmentEmailData = {
-  eventType: "booking_received",
+  eventType: "approved",
   reference: "TAE-AB12-123456",
   customerName: "Taylor",
   email: "taylor@example.com",
@@ -11,8 +11,8 @@ const emailData: AppointmentEmailData = {
   requestedDate: "2026-06-16",
   requestedTime: "09:30",
   durationMinutes: 45,
-  status: "pending",
-  googleMeetLink: null,
+  status: "confirmed",
+  googleMeetLink: "https://meet.google.com/abc-defg-hij",
   cancellationReason: null,
   previousDate: null,
   previousTime: null,
@@ -27,41 +27,66 @@ afterEach(() => {
 
 describe("sendAppointmentEmail", () => {
   it("requires server-side provider configuration", async () => {
-    vi.stubEnv("RESEND_API_KEY", "");
-    vi.stubEnv("APPOINTMENT_EMAIL_FROM", "appointments@example.com");
     vi.stubEnv("APP_BASE_URL", "https://turnaroundexperts.info");
+    vi.stubEnv("GOOGLE_CLIENT_ID", "client-id");
+    vi.stubEnv("GOOGLE_CLIENT_SECRET", "client-secret");
+    vi.stubEnv("GOOGLE_MAIL_REFRESH_TOKEN", "");
     const fetchMock = vi.fn();
     vi.stubGlobal("fetch", fetchMock);
 
     await expect(sendAppointmentEmail(emailData, "TAE-AB12-123456_1"))
-      .rejects.toThrow("missing_resend_api_key");
+      .rejects.toThrow("missing_google_mail_refresh_token");
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
-  it("uses the outbox job id as the provider idempotency key", async () => {
-    vi.stubEnv("RESEND_API_KEY", "test-api-key");
-    vi.stubEnv("APPOINTMENT_EMAIL_FROM", "appointments@example.com");
+  it("sends from the configured Gmail account and uses a stable Message-ID", async () => {
+    vi.stubEnv("GOOGLE_CLIENT_ID", "client-id");
+    vi.stubEnv("GOOGLE_CLIENT_SECRET", "client-secret");
+    vi.stubEnv("GOOGLE_MAIL_REFRESH_TOKEN", "mail-refresh-token");
     vi.stubEnv("APP_BASE_URL", "https://turnaroundexperts.info");
-    const fetchMock = vi.fn(
-      async (_url: string | URL | Request, _request?: RequestInit) =>
-        Response.json({ id: "email-123" }),
-    );
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(Response.json({ access_token: "access-token" }))
+      .mockResolvedValueOnce(Response.json({ id: "email-123" }));
     vi.stubGlobal("fetch", fetchMock);
 
     await expect(sendAppointmentEmail(emailData, "TAE-AB12-123456_1"))
       .resolves.toBe("email-123");
-    const request = fetchMock.mock.calls[0]?.[1];
-    expect(new Headers(request?.headers).get("idempotency-key"))
-      .toBe("TAE-AB12-123456_1");
+    expect(fetchMock.mock.calls[1]?.[0]).toBe(
+      "https://gmail.googleapis.com/gmail/v1/users/me/messages/send",
+    );
+    const request = fetchMock.mock.calls[1]?.[1];
+    expect(new Headers(request?.headers).get("authorization")).toBe("Bearer access-token");
+    const raw = (
+      JSON.parse(String(request?.body)) as { raw: string }
+    ).raw;
+    const mime = Buffer.from(raw, "base64url").toString("utf8");
+    expect(mime).toContain("From: TurnAround Experts <turnaroundexpertshp@gmail.com>");
+    expect(mime).toContain("Message-ID:");
+    const htmlEncoded = mime
+      .split('Content-Type: text/html; charset="UTF-8"')[1]
+      ?.split("\r\n\r\n")[1]
+      ?.split("\r\n--")[0];
+    expect(htmlEncoded).toBeDefined();
+    expect(
+      Buffer.from(htmlEncoded?.replace(/\s/g, "") ?? "", "base64").toString("utf8"),
+    ).toContain("Join on Google Meet");
   });
 
   it("surfaces provider failures for outbox retry handling", async () => {
-    vi.stubEnv("RESEND_API_KEY", "test-api-key");
-    vi.stubEnv("APPOINTMENT_EMAIL_FROM", "appointments@example.com");
+    vi.stubEnv("GOOGLE_CLIENT_ID", "client-id");
+    vi.stubEnv("GOOGLE_CLIENT_SECRET", "client-secret");
+    vi.stubEnv("GOOGLE_MAIL_REFRESH_TOKEN", "mail-refresh-token");
     vi.stubEnv("APP_BASE_URL", "https://turnaroundexperts.info");
-    vi.stubGlobal("fetch", vi.fn(async () => new Response(null, { status: 503 })));
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockResolvedValueOnce(Response.json({ access_token: "access-token" }))
+        .mockResolvedValueOnce(new Response(null, { status: 503 })),
+    );
 
     await expect(sendAppointmentEmail(emailData, "TAE-AB12-123456_1"))
-      .rejects.toThrow("resend_http_503");
+      .rejects.toThrow("google_mail_http_503");
   });
 });
