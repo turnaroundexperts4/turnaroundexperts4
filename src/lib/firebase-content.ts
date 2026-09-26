@@ -645,11 +645,13 @@ export async function firebaseGetLatestAppointmentByUid(uid: string) {
   if (!collection) return null;
   const snapshot = await collection
     .where("uid", "==", uid)
-    .orderBy("createdAt", "desc")
-    .limit(1)
+    .limit(20)
     .get();
-  const doc = snapshot.docs[0];
-  return doc ? mapAppointment(doc.id, doc.data()) : null;
+  return (
+    snapshot.docs
+      .map((doc) => mapAppointment(doc.id, doc.data()))
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())[0] ?? null
+  );
 }
 
 export async function firebaseGetBookedTimes(date: string) {

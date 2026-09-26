@@ -7,6 +7,9 @@ type CalendarEvent = {
   hangoutLink?: string;
   conferenceData?: {
     entryPoints?: { entryPointType?: string; uri?: string }[];
+    createRequest?: {
+      status?: { statusCode?: "pending" | "success" | "failure" };
+    };
   };
 };
 
@@ -77,6 +80,22 @@ function meetingUrl(event: CalendarEvent) {
   return url;
 }
 
+function hasMeetingLink(event: CalendarEvent) {
+  try {
+    meetingUrl(event);
+    return true;
+  } catch (error) {
+    if (error instanceof Error && error.message === "google_meet_link_not_ready") {
+      return false;
+    }
+    throw error;
+  }
+}
+
+function delay(milliseconds: number) {
+  return new Promise((resolve) => setTimeout(resolve, milliseconds));
+}
+
 export async function ensureGoogleMeeting(input: {
   reference: string;
   customerName: string;
@@ -90,12 +109,13 @@ export async function ensureGoogleMeeting(input: {
     process.env.GOOGLE_CALENDAR_ID?.trim() || "primary",
   );
   const id = eventId(input.reference);
-  const url = `https://www.googleapis.com/calendar/v3/calendars/${calendar}/events/${id}?conferenceDataVersion=1`;
+  const eventUrl = `https://www.googleapis.com/calendar/v3/calendars/${calendar}/events/${id}`;
+  const updateUrl = `${eventUrl}?conferenceDataVersion=1`;
   const headers = {
     authorization: `Bearer ${token}`,
     "content-type": "application/json",
   };
-  const existingResponse = await fetch(url, {
+  const existingResponse = await fetch(eventUrl, {
     headers,
     signal: AbortSignal.timeout(10_000),
     cache: "no-store",
@@ -120,7 +140,7 @@ export async function ensureGoogleMeeting(input: {
   let event: CalendarEvent;
   if (existingResponse.ok) {
     const existing = (await existingResponse.json()) as CalendarEvent;
-    const updateResponse = await fetch(url, {
+    const updateResponse = await fetch(updateUrl, {
       method: "PATCH",
       headers,
       body: JSON.stringify({ start, end }),
@@ -131,8 +151,14 @@ export async function ensureGoogleMeeting(input: {
       throw new Error(`google_event_update_http_${updateResponse.status}`);
     }
     event = (await updateResponse.json()) as CalendarEvent;
-    if (!event.hangoutLink && !existing.hangoutLink) {
-      const conferenceResponse = await fetch(url, {
+    if (!hasMeetingLink(event) && hasMeetingLink(existing)) {
+      event = existing;
+    }
+    if (
+      !hasMeetingLink(event) &&
+      event.conferenceData?.createRequest?.status?.statusCode !== "pending"
+    ) {
+      const conferenceResponse = await fetch(updateUrl, {
         method: "PATCH",
         headers,
         body: JSON.stringify({ conferenceData }),
@@ -143,8 +169,6 @@ export async function ensureGoogleMeeting(input: {
         throw new Error(`google_meet_request_http_${conferenceResponse.status}`);
       }
       event = (await conferenceResponse.json()) as CalendarEvent;
-    } else if (!event.hangoutLink) {
-      event = existing;
     }
   } else if (existingResponse.status === 404) {
     const createResponse = await fetch(
@@ -177,6 +201,25 @@ export async function ensureGoogleMeeting(input: {
     event = (await createResponse.json()) as CalendarEvent;
   } else {
     throw new Error(`google_event_lookup_http_${existingResponse.status}`);
+  }
+
+  if (!hasMeetingLink(event)) {
+    for (const waitMs of [500, 1_000, 2_000, 3_000, 3_000]) {
+      await delay(waitMs);
+      const refreshed = await fetch(eventUrl, {
+        headers,
+        signal: AbortSignal.timeout(10_000),
+        cache: "no-store",
+      });
+      if (!refreshed.ok) {
+        throw new Error(`google_event_lookup_http_${refreshed.status}`);
+      }
+      event = (await refreshed.json()) as CalendarEvent;
+      if (hasMeetingLink(event)) break;
+      if (event.conferenceData?.createRequest?.status?.statusCode === "failure") {
+        throw new Error("google_meet_creation_failed");
+      }
+    }
   }
   return { googleEventId: event.id || id, googleMeetLink: meetingUrl(event) };
 }

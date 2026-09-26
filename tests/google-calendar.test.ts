@@ -68,6 +68,15 @@ describe("ensureGoogleMeeting", () => {
           init?.method === "POST",
       ),
     ).toHaveLength(1);
+    const getCalls = fetchMock.mock.calls.filter(
+      ([url, init]) =>
+        String(url).includes("calendar/v3/calendars") &&
+        !init?.method,
+    );
+    expect(getCalls.length).toBeGreaterThan(0);
+    expect(
+      getCalls.every(([url]) => !String(url).includes("conferenceDataVersion")),
+    ).toBe(true);
     const createCall = fetchMock.mock.calls.find(
       ([url, init]) =>
         String(url).includes("calendar/v3/calendars") &&
@@ -88,6 +97,71 @@ describe("ensureGoogleMeeting", () => {
     expect(
       fetchMock.mock.calls.filter(([, init]) => init?.method === "PATCH"),
     ).toHaveLength(1);
+  });
+
+  it("waits for Calendar to finish creating the conference before returning a link", async () => {
+    process.env.GOOGLE_CLIENT_ID = "client-id";
+    process.env.GOOGLE_CLIENT_SECRET = "client-secret";
+    process.env.GOOGLE_REFRESH_TOKEN = "refresh-token";
+    process.env.GOOGLE_CALENDAR_ID = "primary";
+
+    let eventReads = 0;
+    const fetchMock = vi.fn(
+      async (input: string | URL | Request, init?: RequestInit) => {
+        const url = String(input);
+        if (url.includes("oauth2.googleapis.com/token")) {
+          return Response.json({ access_token: "access-token" });
+        }
+        if (init?.method === "POST") {
+          return Response.json({
+            id: "stable-event-id",
+            conferenceData: { createRequest: { status: { statusCode: "pending" } } },
+          });
+        }
+        if (init?.method === "PATCH") {
+          return Response.json({
+            id: "stable-event-id",
+            conferenceData: { createRequest: { status: { statusCode: "pending" } } },
+          });
+        }
+        if (url.includes("calendar/v3/calendars")) {
+          eventReads += 1;
+          if (eventReads === 1) return new Response(null, { status: 404 });
+          if (eventReads < 4) {
+            return Response.json({
+              id: "stable-event-id",
+              conferenceData: {
+                createRequest: { status: { statusCode: "pending" } },
+              },
+            });
+          }
+          return Response.json({
+            id: "stable-event-id",
+            hangoutLink: "https://meet.google.com/abc-defg-hij",
+            conferenceData: {
+              createRequest: { status: { statusCode: "success" } },
+            },
+          });
+        }
+        throw new Error(`Unexpected request: ${url}`);
+      },
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(
+      ensureGoogleMeeting({
+        reference: "TAE-AB12-123456",
+        customerName: "Taylor",
+        email: "taylor@example.com",
+        requestedDate: "2026-06-16",
+        requestedTime: "09:30",
+        durationMinutes: 45,
+      }),
+    ).resolves.toEqual({
+      googleEventId: "stable-event-id",
+      googleMeetLink: "https://meet.google.com/abc-defg-hij",
+    });
+    expect(eventReads).toBe(4);
   });
 
   it("surfaces Calendar API outages without claiming a meeting was created", async () => {
