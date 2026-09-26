@@ -7,8 +7,9 @@ const projectId = process.env.FIREBASE_PROJECT_ID || "tae-lucky-509808";
 const clientEmail = process.env.FIREBASE_CLIENT_EMAIL?.trim();
 const privateKey = process.env.FIREBASE_PRIVATE_KEY
   ?.trim()
-  .replace(/^(['"])|(['"])$/g, "")
-  .replace(/\\n/g, "\n");
+  .replace(/^(['"])([\s\S]*)\1$/, "$2")
+  .replace(/\\+r/g, "\r")
+  .replace(/\\+n/g, "\n");
 const isBuildPhase = process.env.NEXT_PHASE === "phase-production-build";
 
 export const firebaseAdminConfigured = Boolean(
