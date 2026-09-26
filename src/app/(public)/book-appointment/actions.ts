@@ -9,6 +9,8 @@ import {
   getServiceById,
   getSetting,
   getAppointmentByUid,
+  listAvailabilityRules,
+  listBlockedDates,
 } from "@/lib/data";
 import { generateReference, todayISODate } from "@/lib/utils";
 import { verifyFirebaseIdToken } from "@/lib/firebase-auth";
@@ -85,10 +87,22 @@ export async function submitAppointment(
   if (!user || user.status !== "authenticated") {
     return { ok: false, error: "Please sign in before requesting an appointment." };
   }
+  if (!user.email || !user.emailVerified) {
+    return {
+      ok: false,
+      error: "Verify your account email before requesting an appointment.",
+    };
+  }
+  if (data.email.trim().toLowerCase() !== user.email.trim().toLowerCase()) {
+    return {
+      ok: false,
+      error: "Use the verified email address for your signed-in account.",
+    };
+  }
 
   // Server-side validation: date is not in past + within allowed lead window
   const today = todayISODate();
-  if (data.requestedDate < today) {
+  if (!isValidISODate(data.requestedDate) || data.requestedDate < today) {
     return { ok: false, error: "Selected date is in the past." };
   }
   try {
@@ -115,6 +129,36 @@ export async function submitAppointment(
       };
     }
 
+    const [rules, blockedDates] = await Promise.all([
+      listAvailabilityRules(),
+      listBlockedDates(),
+    ]);
+    const [year, month, day] = data.requestedDate.split("-").map(Number);
+    const dayOfWeek = new Date(Date.UTC(year, month - 1, day)).getUTCDay();
+    const rule = rules.find((candidate) => candidate.dayOfWeek === dayOfWeek);
+    const blocked = blockedDates.some((candidate) => candidate.date === data.requestedDate);
+    if (!rule?.enabled || blocked) {
+      return {
+        ok: false,
+        error: "That date is not available. Please choose another day.",
+      };
+    }
+    const [startHour, startMinute] = rule.startTime.split(":").map(Number);
+    const [endHour, endMinute] = rule.endTime.split(":").map(Number);
+    const [selectedHour, selectedMinute] = data.requestedTime.split(":").map(Number);
+    const startMinutes = startHour * 60 + startMinute;
+    const endMinutes = endHour * 60 + endMinute;
+    const selectedMinutes = selectedHour * 60 + selectedMinute;
+    if (
+      selectedMinutes < startMinutes ||
+      selectedMinutes + rule.slotMinutes > endMinutes ||
+      (selectedMinutes - startMinutes) % rule.slotMinutes !== 0
+    ) {
+      return {
+        ok: false,
+        error: "That time is not part of the available schedule.",
+      };
+    }
     const taken = await getBookedTimesForDate(data.requestedDate);
     if (taken.includes(data.requestedTime)) {
       return {
@@ -141,6 +185,7 @@ export async function submitAppointment(
       serviceTitle,
       requestedDate: data.requestedDate,
       requestedTime: data.requestedTime,
+      durationMinutes: rule.slotMinutes,
       message: data.message || undefined,
       history: [
         {
@@ -160,7 +205,21 @@ export async function submitAppointment(
     revalidatePath("/admin/appointments");
     return { ok: true, reference: created.reference };
   } catch (error) {
-    console.error("Appointment submission failed:", error);
+    if (
+      error instanceof Error &&
+      error.name === "AppointmentConflictError"
+    ) {
+      return {
+        ok: false,
+        error: "That booking was just taken. Please choose another available time.",
+      };
+    }
+    console.error("Appointment submission failed", {
+      errorCode:
+        error instanceof Error && /^[A-Za-z0-9_-]{1,80}$/.test(error.name)
+          ? error.name
+          : "unknown",
+    });
     return {
       ok: false,
       error: "We could not save your appointment. Please try again.",
@@ -169,10 +228,20 @@ export async function submitAppointment(
 }
 
 function addDays(date: string, days: number): string {
-  const d = new Date(date + "T00:00:00");
-  d.setDate(d.getDate() + days);
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const dd = String(d.getDate()).padStart(2, "0");
+  const [year, month, day] = date.split("-").map(Number);
+  const d = new Date(Date.UTC(year, month - 1, day + days));
+  const y = d.getUTCFullYear();
+  const m = String(d.getUTCMonth() + 1).padStart(2, "0");
+  const dd = String(d.getUTCDate()).padStart(2, "0");
   return `${y}-${m}-${dd}`;
+}
+
+function isValidISODate(value: string) {
+  const [year, month, day] = value.split("-").map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  return (
+    date.getUTCFullYear() === year &&
+    date.getUTCMonth() === month - 1 &&
+    date.getUTCDate() === day
+  );
 }

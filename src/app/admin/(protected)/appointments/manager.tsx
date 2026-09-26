@@ -18,6 +18,8 @@ import {
   completeAppointment,
   rejectAppointment,
   rescheduleAppointment,
+  retryAppointmentNotification,
+  type ActionResult,
 } from "@/app/admin/(protected)/appointments/actions";
 
 type Appointment = {
@@ -42,6 +44,15 @@ type Appointment = {
   adminNote: string | null;
   proposedDate: string | null;
   proposedTime: string | null;
+  durationMinutes: number;
+  googleEventId: string | null;
+  googleMeetLink: string | null;
+  meetingStatus: string;
+  cancellationReason: string | null;
+  internalNote: string | null;
+  notificationStatus: string;
+  lastNotificationType: string | null;
+  lastNotificationError: string | null;
   createdAt: Date;
   history: { at: string; action: string; note?: string }[];
 };
@@ -84,6 +95,7 @@ export function AppointmentsManager({
   const [openId, setOpenId] = useState<number | null>(null);
   const [status, setStatus] = useState(statusFilter);
   const [q, setQ] = useState(query);
+  const [actionError, setActionError] = useState("");
   const [, startTransition] = useTransition();
 
   const filtered = useMemo(() => {
@@ -104,10 +116,15 @@ export function AppointmentsManager({
 
   const open = appointments.find((a) => a.id === openId) ?? null;
 
-  function updateAction(action: (fd: FormData) => Promise<unknown>, fd: FormData) {
+  function updateAction(action: (fd: FormData) => Promise<ActionResult>, fd: FormData) {
     startTransition(async () => {
-      await action(fd);
+      const result = await action(fd);
+      if (!result.ok) {
+        setActionError(result.error ?? "The appointment action failed.");
+        return;
+      }
       setOpenId(null);
+      setActionError("");
     });
   }
 
@@ -166,6 +183,12 @@ export function AppointmentsManager({
           })}
         </div>
       </header>
+
+      {actionError ? (
+        <p role="alert" className="mt-4 rounded-xl border border-red-200 bg-red-50 p-4 text-[14px] text-red-800">
+          {actionError}
+        </p>
+      ) : null}
 
       <div className="mt-6 flex items-center gap-3 rounded-full border border-ink-900/10 bg-paper px-5 py-3">
         <Search className="h-4 w-4 text-ink-500" />
@@ -244,7 +267,10 @@ export function AppointmentsManager({
                 <div className="md:col-span-1 md:text-right">
                   <button
                     type="button"
-                    onClick={() => setOpenId(a.id)}
+                    onClick={() => {
+                      setActionError("");
+                      setOpenId(a.id);
+                    }}
                     className="inline-flex items-center gap-1 rounded-full border border-ink-900/10 bg-paper px-3 py-1.5 text-[12px] font-medium text-ink-900 transition hover:border-navy-900/30"
                   >
                     Open
@@ -267,6 +293,7 @@ export function AppointmentsManager({
               onReschedule={(fd) => updateAction(rescheduleAppointment, fd)}
               onComplete={(fd) => updateAction(completeAppointment, fd)}
               onCancel={(fd) => updateAction(cancelAppointment, fd)}
+              onRetry={(fd) => updateAction(retryAppointmentNotification, fd)}
             />
           </Drawer>
         ) : null}
@@ -328,6 +355,7 @@ function AppointmentDetail({
   onReschedule,
   onComplete,
   onCancel,
+  onRetry,
 }: {
   appointment: Appointment;
   onApprove: (fd: FormData) => void;
@@ -335,7 +363,9 @@ function AppointmentDetail({
   onReschedule: (fd: FormData) => void;
   onComplete: (fd: FormData) => void;
   onCancel: (fd: FormData) => void;
+  onRetry: (fd: FormData) => void;
 }) {
+  const [cancellationReason, setCancellationReason] = useState("");
   const [tab, setTab] = useState<"approve" | "reject" | "reschedule" | "complete">(
     a.status === "pending" ? "approve" : "reschedule",
   );
@@ -381,6 +411,59 @@ function AppointmentDetail({
           <Field label="Note" value={a.adminNote ?? "—"} />
         )}
       </dl>
+
+      <div className="mt-6 rounded-xl border border-ink-900/5 bg-paper-deep p-4 text-[13px]">
+        <p>
+          <strong>Google Meet:</strong>{" "}
+          {a.meetingStatus === "failed"
+            ? "Creation failed — retry the notification after fixing the configuration."
+            : a.meetingStatus}
+        </p>
+        {a.googleMeetLink ? (
+          <a
+            href={a.googleMeetLink}
+            target="_blank"
+            rel="noreferrer noopener"
+            className="mt-2 inline-block break-all text-navy-900 underline"
+          >
+            {a.googleMeetLink}
+          </a>
+        ) : null}
+        {a.googleEventId ? (
+          <p className="mt-2 break-all text-ink-600">Calendar event: {a.googleEventId}</p>
+        ) : null}
+        <p className="mt-2">
+          <strong>Email:</strong> {a.notificationStatus}
+          {a.lastNotificationType ? ` · ${a.lastNotificationType}` : ""}
+        </p>
+        {a.lastNotificationError ? (
+          <p className="mt-1 text-red-700">Last error: {a.lastNotificationError}</p>
+        ) : null}
+        {a.notificationStatus === "failed" ? (
+          <form
+            className="mt-3"
+            onSubmit={(event) => {
+              event.preventDefault();
+              const fd = new FormData();
+              fd.append("id", String(a.id));
+              onRetry(fd);
+            }}
+          >
+            <button
+              type="submit"
+              className="rounded-full border border-navy-900/20 px-4 py-2 text-[12px] font-medium text-navy-900"
+            >
+              Retry notification
+            </button>
+          </form>
+        ) : null}
+      </div>
+
+      {a.internalNote ? (
+        <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-[13px]">
+          <strong>Internal note:</strong> {a.internalNote}
+        </div>
+      ) : null}
 
       {a.message ? (
         <div className="mt-7 rounded-2xl border border-ink-900/5 bg-paper-deep p-5">
@@ -616,11 +699,22 @@ function AppointmentDetail({
       </div>
 
       <div className="mt-8 border-t border-ink-900/5 pt-6">
+        <label className="mb-2 block text-[12.5px] font-medium text-navy-900">
+          Cancellation reason (optional)
+        </label>
+        <textarea
+          value={cancellationReason}
+          onChange={(event) => setCancellationReason(event.target.value)}
+          maxLength={1000}
+          rows={2}
+          className="mb-3 w-full rounded-xl border border-ink-900/10 bg-white px-4 py-3 text-[14px]"
+        />
         <form
           onSubmit={(e) => {
             e.preventDefault();
             const fd = new FormData();
             fd.append("id", String(a.id));
+            fd.append("reason", cancellationReason);
             onCancel(fd);
           }}
         >

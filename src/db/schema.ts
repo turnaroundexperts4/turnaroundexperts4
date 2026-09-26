@@ -208,6 +208,16 @@ export const appointments = pgTable(
     adminNote: text("admin_note"),
     proposedDate: varchar("proposed_date", { length: 10 }),
     proposedTime: varchar("proposed_time", { length: 5 }),
+    durationMinutes: integer("duration_minutes").notNull().default(60),
+    googleEventId: varchar("google_event_id", { length: 255 }),
+    googleMeetLink: varchar("google_meet_link", { length: 1000 }),
+    meetingStatus: varchar("meeting_status", { length: 24 }).notNull().default("not_required"),
+    cancellationReason: text("cancellation_reason"),
+    internalNote: text("internal_note"),
+    notificationVersion: integer("notification_version").notNull().default(0),
+    notificationStatus: varchar("notification_status", { length: 24 }).notNull().default("none"),
+    lastNotificationType: varchar("last_notification_type", { length: 40 }),
+    lastNotificationError: varchar("last_notification_error", { length: 120 }),
     history: jsonb("history")
       .$type<
         { at: string; action: string; note?: string }[]
@@ -229,6 +239,41 @@ export const appointments = pgTable(
     activeSlotUnique: uniqueIndex("appointments_active_slot_unique")
       .on(t.requestedDate, t.requestedTime)
       .where(sql`"status" in ('pending', 'approved', 'rescheduled')`),
+  }),
+);
+
+export const appointmentNotificationJobs = pgTable(
+  "appointment_notification_jobs",
+  {
+    id: varchar("id", { length: 300 }).primaryKey(),
+    appointmentId: integer("appointment_id").notNull(),
+    appointmentReference: varchar("appointment_reference", { length: 32 }).notNull(),
+    eventType: varchar("event_type", { length: 40 }).notNull(),
+    version: integer("version").notNull(),
+    previousDate: varchar("previous_date", { length: 10 }),
+    previousTime: varchar("previous_time", { length: 5 }),
+    status: varchar("status", { length: 24 }).notNull().default("pending"),
+    attempts: integer("attempts").notNull().default(0),
+    nextAttemptAt: timestamp("next_attempt_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+    leaseUntil: timestamp("lease_until", { withTimezone: true }),
+    lastErrorCode: varchar("last_error_code", { length: 120 }),
+    providerMessageId: varchar("provider_message_id", { length: 255 }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+  },
+  (t) => ({
+    appointmentVersionUnique: uniqueIndex("appointment_notification_jobs_version_unique")
+      .on(t.appointmentReference, t.version),
+    pendingIdx: index("appointment_notification_jobs_pending_idx").on(
+      t.status,
+      t.nextAttemptAt,
+    ),
   }),
 );
 

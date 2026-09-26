@@ -9,6 +9,7 @@
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "seed:firebase": "tsx scripts/seed-firebase.ts",
+    "appointments:process-outbox": "tsx scripts/process-appointment-outbox.ts",
     "preview:cloudflare": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
     "deploy:cloudflare": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
     "deploy:cloudflare-built": "opennextjs-cloudflare deploy"

@@ -12,7 +12,13 @@ export type FirebaseAuthResult =
   | { status: "invalid_credentials" }
   | { status: "service_unavailable"; reason: string };
 export type FirebaseIdTokenResult =
-  | { status: "authenticated"; uid: string; email?: string; name?: string }
+  | {
+      status: "authenticated";
+      uid: string;
+      email?: string;
+      emailVerified: boolean;
+      name?: string;
+    }
   | { status: "unauthenticated" }
   | { status: "service_unavailable"; reason: string };
 
@@ -36,6 +42,7 @@ export async function verifyFirebaseIdToken(token: string) {
       status: "authenticated",
       uid: decoded.uid,
       email: decoded.email,
+      emailVerified: decoded.email_verified === true,
       name: decoded.name,
     } satisfies FirebaseIdTokenResult;
   } catch (error) {

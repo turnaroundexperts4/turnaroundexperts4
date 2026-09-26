@@ -2,6 +2,7 @@ import { db } from "@/db";
 import {
   admins,
   appointments,
+  appointmentNotificationJobs,
   availabilityRules,
   blockedDates,
   blogCategories,
@@ -37,6 +38,7 @@ import {
   firebaseListAppointments,
   firebaseGetAppointmentByRef,
   firebaseGetAppointmentByUid,
+  firebaseGetLatestAppointmentByUid,
   firebaseGetBookedTimes,
   firebaseCreateAppointment,
   firebaseUpdateAppointment,
@@ -56,6 +58,8 @@ import {
   firebaseSaveBlogCategory,
   firebaseSaveBlogPost,
   firebaseSaveService,
+  firebaseRetryLatestAppointmentNotification,
+  firebaseAcceptAppointmentReschedule,
 } from "@/lib/firebase-content";
 import { firebaseAdminConfigured } from "@/lib/firebase-admin";
 
@@ -886,6 +890,20 @@ export async function getAppointmentByUid(uid: string) {
   });
 }
 
+export async function getLatestAppointmentByUid(uid: string) {
+  const firebaseAppointment = await firebaseGetLatestAppointmentByUid(uid);
+  if (firebaseAppointment) return firebaseAppointment;
+  return withDbFallback(null, async () => {
+    const rows = await db
+      .select()
+      .from(appointments)
+      .where(eq(appointments.uid, uid))
+      .orderBy(desc(appointments.createdAt))
+      .limit(1);
+    return rows[0] ?? null;
+  });
+}
+
 export async function getBookedTimesForDate(date: string) {
   const firebaseTimes = await firebaseGetBookedTimes(date);
   if (firebaseTimes) return firebaseTimes;
@@ -918,13 +936,14 @@ export async function createAppointment(input: {
   serviceTitle?: string;
   requestedDate: string;
   requestedTime: string;
+  durationMinutes?: number;
   message?: string;
   history: { at: string; action: string; note?: string }[];
 }) {
   const firebaseAppointment = await firebaseCreateAppointment(input);
   if (firebaseAppointment) return firebaseAppointment;
-  return withDbFallback(null, async () => {
-    const ins = await db
+  return db.transaction(async (transaction) => {
+    const [created] = await transaction
       .insert(appointments)
       .values({
         reference: input.reference,
@@ -937,12 +956,23 @@ export async function createAppointment(input: {
         serviceTitle: input.serviceTitle,
         requestedDate: input.requestedDate,
         requestedTime: input.requestedTime,
+        durationMinutes: input.durationMinutes ?? 60,
         message: input.message,
         history: input.history,
         status: "pending",
+        notificationVersion: 1,
+        notificationStatus: "queued",
+        lastNotificationType: "booking_received",
       })
       .returning({ id: appointments.id, reference: appointments.reference });
-    return ins[0];
+    await transaction.insert(appointmentNotificationJobs).values({
+      id: `${created.reference}_1`,
+      appointmentId: created.id,
+      appointmentReference: created.reference,
+      eventType: "booking_received",
+      version: 1,
+    });
+    return created;
   });
 }
 
@@ -959,41 +989,227 @@ export async function updateAppointmentStatus(
     adminNote?: string | null;
     proposedDate?: string | null;
     proposedTime?: string | null;
+    requestedDate?: string;
+    requestedTime?: string;
+    cancellationReason?: string | null;
+    internalNote?: string | null;
+    durationMinutes?: number;
+    notificationType?:
+      | "approved"
+      | "rejected"
+      | "reschedule_proposed"
+      | "rescheduled_confirmed"
+      | "cancelled";
+    previousDate?: string;
+    previousTime?: string;
     historyEntry?: { at: string; action: string; note?: string };
   },
 ) {
-  if (await firebaseListAppointments()) {
-    await firebaseUpdateAppointment(id, next);
-    return;
+  if (firebaseAdminConfigured) {
+    const updated = await firebaseUpdateAppointment(id, next);
+    if (!updated) throw new Error("Appointment not found.");
+    return updated;
   }
-  try {
-    const existing = await db
+  return db.transaction(async (transaction) => {
+    const [current] = await transaction
       .select()
       .from(appointments)
       .where(eq(appointments.id, id))
+      .for("update")
       .limit(1);
-    const current = existing[0];
-    if (!current) return;
-    const history = (current.history ?? []) as {
-      at: string;
-      action: string;
-      note?: string;
-    }[];
-    if (next.historyEntry) history.push(next.historyEntry);
-    await db
+    if (!current) throw new Error("Appointment not found.");
+    const {
+      historyEntry,
+      notificationType,
+      previousDate,
+      previousTime,
+      ...patch
+    } = next;
+    const unchanged =
+      current.status === patch.status &&
+      Object.entries(patch).every(([key, value]) => {
+        if (key === "status") return true;
+        const oldValue = (current as unknown as Record<string, unknown>)[key];
+        return JSON.stringify(oldValue ?? null) === JSON.stringify(value ?? null);
+      });
+    if (notificationType && unchanged) return current;
+    const history = [
+      ...((current.history ?? []) as {
+        at: string;
+        action: string;
+        note?: string;
+      }[]),
+      ...(historyEntry ? [historyEntry] : []),
+    ];
+    const version = notificationType
+      ? current.notificationVersion + 1
+      : current.notificationVersion;
+    const [updated] = await transaction
       .update(appointments)
       .set({
-        status: next.status,
-        adminNote: next.adminNote ?? current.adminNote,
-        proposedDate: next.proposedDate ?? current.proposedDate,
-        proposedTime: next.proposedTime ?? current.proposedTime,
+        ...patch,
         history,
+        notificationVersion: version,
+        notificationStatus: notificationType
+          ? "queued"
+          : current.notificationStatus,
+        lastNotificationType:
+          notificationType ?? current.lastNotificationType,
+        lastNotificationError: notificationType
+          ? null
+          : current.lastNotificationError,
         updatedAt: new Date(),
       })
-      .where(eq(appointments.id, id));
-  } catch (error) {
-    if (!isDatabaseUnavailableError(error)) throw error;
+      .where(eq(appointments.id, id))
+      .returning();
+    if (notificationType) {
+      await transaction.insert(appointmentNotificationJobs).values({
+        id: `${current.reference}_${version}`,
+        appointmentId: id,
+        appointmentReference: current.reference,
+        eventType: notificationType,
+        version,
+        previousDate: previousDate ?? current.requestedDate,
+        previousTime: previousTime ?? current.requestedTime,
+      });
+    }
+    return updated;
+  });
+}
+
+export async function retryLatestAppointmentNotification(id: number) {
+  if (firebaseAdminConfigured) {
+    return firebaseRetryLatestAppointmentNotification(id);
   }
+  return db.transaction(async (transaction) => {
+    const [appointment] = await transaction
+      .select()
+      .from(appointments)
+      .where(eq(appointments.id, id))
+      .for("update")
+      .limit(1);
+    if (!appointment) throw new Error("Appointment not found.");
+    const [job] = await transaction
+      .select()
+      .from(appointmentNotificationJobs)
+      .where(
+        and(
+          eq(appointmentNotificationJobs.appointmentId, id),
+          eq(appointmentNotificationJobs.status, "failed"),
+        ),
+      )
+      .orderBy(desc(appointmentNotificationJobs.version))
+      .limit(1)
+      .for("update");
+    if (!job || job.version !== appointment.notificationVersion) return false;
+    const now = new Date();
+    await transaction
+      .update(appointmentNotificationJobs)
+      .set({
+        status: "pending",
+        attempts: 0,
+        nextAttemptAt: now,
+        leaseUntil: null,
+        lastErrorCode: null,
+        updatedAt: now,
+      })
+      .where(eq(appointmentNotificationJobs.id, job.id));
+    await transaction
+      .update(appointments)
+      .set({
+        notificationStatus: "queued",
+        lastNotificationError: null,
+        updatedAt: now,
+      })
+      .where(eq(appointments.id, id));
+    return true;
+  });
+}
+
+export async function acceptAppointmentReschedule(
+  reference: string,
+  uid: string,
+) {
+  if (firebaseAdminConfigured) {
+    return firebaseAcceptAppointmentReschedule(reference, uid);
+  }
+  return db.transaction(async (transaction) => {
+    const [current] = await transaction
+      .select()
+      .from(appointments)
+      .where(eq(appointments.reference, reference))
+      .for("update")
+      .limit(1);
+    if (
+      !current ||
+      current.uid !== uid ||
+      current.status !== "rescheduled" ||
+      !current.proposedDate ||
+      !current.proposedTime
+    ) {
+      return null;
+    }
+    const requestedDate = current.proposedDate;
+    const requestedTime = current.proposedTime;
+    const conflicts = await transaction
+      .select({ id: appointments.id })
+      .from(appointments)
+      .where(
+        and(
+          eq(appointments.requestedDate, requestedDate),
+          eq(appointments.requestedTime, requestedTime),
+          inArray(appointments.status, ["pending", "approved", "rescheduled"]),
+        ),
+      )
+      .limit(1);
+    if (conflicts.some(({ id: conflictId }) => conflictId !== current.id)) {
+      const error = new Error("The proposed appointment time is no longer available.");
+      error.name = "AppointmentConflictError";
+      throw error;
+    }
+    const now = new Date();
+    const version = current.notificationVersion + 1;
+    const history = [
+      ...((current.history ?? []) as {
+        at: string;
+        action: string;
+        note?: string;
+      }[]),
+      {
+        at: now.toISOString(),
+        action: "reschedule_accepted",
+        note: "Customer accepted the proposed appointment time.",
+      },
+    ];
+    const [updated] = await transaction
+      .update(appointments)
+      .set({
+        requestedDate,
+        requestedTime,
+        proposedDate: null,
+        proposedTime: null,
+        status: "approved",
+        history,
+        notificationVersion: version,
+        notificationStatus: "queued",
+        lastNotificationType: "rescheduled_confirmed",
+        lastNotificationError: null,
+        meetingStatus: current.googleEventId ? "pending" : "not_required",
+        updatedAt: now,
+      })
+      .where(eq(appointments.id, current.id))
+      .returning();
+    await transaction.insert(appointmentNotificationJobs).values({
+      id: `${current.reference}_${version}`,
+      appointmentId: current.id,
+      appointmentReference: current.reference,
+      eventType: "rescheduled_confirmed",
+      version,
+      previousDate: current.requestedDate,
+      previousTime: current.requestedTime,
+    });
+    return updated;
+  });
 }
 
 // ---------------- Blog ----------------

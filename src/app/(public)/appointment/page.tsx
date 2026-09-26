@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Eyebrow, Reveal } from "@/components/public/reveal";
 import { AppointmentStatusViewer } from "@/components/public/appointment-status-viewer";
+import { AuthRequired } from "@/components/auth/auth-required";
 
 export const dynamic = "force-dynamic";
 
@@ -39,7 +40,9 @@ export default async function AppointmentStatusPage({
       <section className="border-t border-ink-900/5 bg-paper-deep py-14">
         <div className="mx-auto max-w-[1100px] px-5 md:px-10">
           <Reveal>
-            <AppointmentStatusViewer initialReference={sp.ref} />
+            <AuthRequired>
+              <AppointmentStatusViewer initialReference={sp.ref} />
+            </AuthRequired>
           </Reveal>
         </div>
       </section>

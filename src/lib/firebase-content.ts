@@ -104,6 +104,16 @@ type Appointment = {
   adminNote: string | null;
   proposedDate: string | null;
   proposedTime: string | null;
+  durationMinutes: number;
+  googleEventId: string | null;
+  googleMeetLink: string | null;
+  meetingStatus: string;
+  cancellationReason: string | null;
+  internalNote: string | null;
+  notificationVersion: number;
+  notificationStatus: string;
+  lastNotificationType: string | null;
+  lastNotificationError: string | null;
   history: { at: string; action: string; note?: string }[];
   createdAt: Date;
   updatedAt: Date;
@@ -272,6 +282,16 @@ function mapAppointment(id: string, data: FirebaseFirestore.DocumentData): Appoi
     adminNote: data.adminNote ?? null,
     proposedDate: data.proposedDate ?? null,
     proposedTime: data.proposedTime ?? null,
+    durationMinutes: Number(data.durationMinutes ?? 60),
+    googleEventId: data.googleEventId ?? null,
+    googleMeetLink: data.googleMeetLink ?? null,
+    meetingStatus: String(data.meetingStatus ?? "not_required"),
+    cancellationReason: data.cancellationReason ?? null,
+    internalNote: data.internalNote ?? null,
+    notificationVersion: Number(data.notificationVersion ?? 0),
+    notificationStatus: String(data.notificationStatus ?? "none"),
+    lastNotificationType: data.lastNotificationType ?? null,
+    lastNotificationError: data.lastNotificationError ?? null,
     history: Array.isArray(data.history) ? data.history : [],
     createdAt: dateValue(data.createdAt),
     updatedAt: dateValue(data.updatedAt),
@@ -620,6 +640,18 @@ export async function firebaseGetAppointmentByUid(uid: string) {
   return active[0] ?? null;
 }
 
+export async function firebaseGetLatestAppointmentByUid(uid: string) {
+  const collection = await firebaseCollection("appointments");
+  if (!collection) return null;
+  const snapshot = await collection
+    .where("uid", "==", uid)
+    .orderBy("createdAt", "desc")
+    .limit(1)
+    .get();
+  const doc = snapshot.docs[0];
+  return doc ? mapAppointment(doc.id, doc.data()) : null;
+}
+
 export async function firebaseGetBookedTimes(date: string) {
   const rows = await firebaseListAppointments();
   if (!rows) return null;
@@ -651,6 +683,7 @@ export async function firebaseCreateAppointment(input: Record<string, unknown>) 
   const record = Object.fromEntries(
     Object.entries(input).filter(([, value]) => value !== undefined),
   );
+  const reference = String(input.reference ?? "");
   const result = await adminFirestore.runTransaction(async (transaction) => {
     const [slotSnapshot, uidSnapshot, userAppointments, slotAppointments, allAppointments] =
       await Promise.all([
@@ -682,10 +715,23 @@ export async function firebaseCreateAppointment(input: Record<string, unknown>) 
       ...record,
       id,
       status: "pending",
+      durationMinutes: Number(input.durationMinutes ?? 60),
+      googleEventId: null,
+      googleMeetLink: null,
+      meetingStatus: "not_required",
+      cancellationReason: null,
+      internalNote: null,
+      notificationVersion: 1,
+      notificationStatus: "queued",
+      lastNotificationType: "booking_received",
+      lastNotificationError: null,
       createdAt: now,
       updatedAt: now,
     };
     const appointmentRef = collection.doc(String(id));
+    const outboxRef = adminFirestore
+      .collection("appointmentNotificationJobs")
+      .doc(`${reference}_1`);
     transaction.create(slotClaim, {
       appointmentId: id,
       uid,
@@ -701,6 +747,23 @@ export async function firebaseCreateAppointment(input: Record<string, unknown>) 
       createdAt: now,
     });
     transaction.create(appointmentRef, saved);
+    transaction.create(outboxRef, {
+      id: `${reference}_1`,
+      appointmentId: id,
+      appointmentReference: reference,
+      eventType: "booking_received",
+      version: 1,
+      previousDate: null,
+      previousTime: null,
+      status: "pending",
+      attempts: 0,
+      nextAttemptAt: now,
+      leaseUntil: null,
+      lastErrorCode: null,
+      providerMessageId: null,
+      createdAt: now,
+      updatedAt: now,
+    });
     return { id, saved };
   });
   return mapAppointment(String(result.id), result.saved);
@@ -715,28 +778,498 @@ export async function firebaseUpdateAppointment(
   const doc = await collection.doc(String(id)).get();
   if (!doc.exists) return;
   const current = mapAppointment(doc.id, doc.data()!);
-  const history = next.historyEntry ? [...current.history, next.historyEntry] : current.history;
   const { firestore: adminFirestore } = requireFirebaseAdmin();
   const appointmentRef = collection.doc(String(id));
+  const notificationType =
+    typeof next.notificationType === "string" ? next.notificationType : null;
+  const update = { ...next };
+  delete update.notificationType;
+  delete update.previousDate;
+  delete update.previousTime;
+  const historyEntry = update.historyEntry as
+    | { at: string; action: string; note?: string }
+    | undefined;
+  delete update.historyEntry;
+  const requestedDate = String(update.requestedDate ?? current.requestedDate);
+  const requestedTime = String(update.requestedTime ?? current.requestedTime);
   const slotClaim = adminFirestore
     .collection("appointmentSlotClaims")
     .doc(`${current.requestedDate}_${current.requestedTime}`);
+  const nextSlotClaim = adminFirestore
+    .collection("appointmentSlotClaims")
+    .doc(`${requestedDate}_${requestedTime}`);
   const uidClaim = adminFirestore
     .collection("appointmentUserClaims")
     .doc(encodeURIComponent(String(doc.data()!.uid ?? "")));
-  await adminFirestore.runTransaction(async (transaction) => {
+  const outboxCollection = adminFirestore.collection("appointmentNotificationJobs");
+  return adminFirestore.runTransaction(async (transaction) => {
+    const [freshSnapshot, uidSnapshot, nextSlotSnapshot, sameSlotAppointments] =
+      await Promise.all([
+        transaction.get(appointmentRef),
+        transaction.get(uidClaim),
+        transaction.get(nextSlotClaim),
+        requestedDate !== current.requestedDate || requestedTime !== current.requestedTime
+          ? transaction.get(
+              collection
+                .where("requestedDate", "==", requestedDate)
+                .where("requestedTime", "==", requestedTime)
+                .limit(20),
+            )
+          : Promise.resolve(null),
+      ]);
+    if (!freshSnapshot.exists) throw new Error("Appointment not found.");
+    const fresh = mapAppointment(freshSnapshot.id, freshSnapshot.data()!);
+    const proposedState = { ...update };
+    const noEffectiveChange =
+      fresh.status === proposedState.status &&
+      Object.entries(proposedState).every(([key, value]) => {
+        if (key === "status") return true;
+        const oldValue = (fresh as unknown as Record<string, unknown>)[key];
+        return JSON.stringify(oldValue ?? null) === JSON.stringify(value ?? null);
+      });
+    if (notificationType && noEffectiveChange) return fresh;
+
+    if (
+      sameSlotAppointments &&
+      (nextSlotSnapshot.exists ||
+        sameSlotAppointments.docs.some(
+          (candidate) =>
+            candidate.id !== appointmentRef.id &&
+            !["cancelled", "completed", "rejected"].includes(
+              String(candidate.data().status),
+            ),
+        ))
+    ) {
+      throw new AppointmentConflictError();
+    }
+
+    const history = historyEntry
+      ? [...fresh.history, historyEntry]
+      : fresh.history;
+    const version = notificationType ? fresh.notificationVersion + 1 : fresh.notificationVersion;
+    const now = new Date();
+    const saved = {
+      ...update,
+      history,
+      notificationVersion: version,
+      notificationStatus: notificationType ? "queued" : fresh.notificationStatus,
+      lastNotificationType: notificationType ?? fresh.lastNotificationType,
+      lastNotificationError: notificationType ? null : fresh.lastNotificationError,
+      updatedAt: now,
+    };
+    const outboxRef = outboxCollection.doc(`${fresh.reference}_${version}`);
+    const outboxSnapshot = notificationType
+      ? await transaction.get(outboxRef)
+      : null;
+    if (notificationType && outboxSnapshot?.exists) {
+      throw new Error("Appointment notification idempotency conflict.");
+    }
+
     transaction.set(
       appointmentRef,
-      { ...next, history, updatedAt: new Date() },
+      saved,
       { merge: true },
     );
-    if (["cancelled", "completed", "rejected"].includes(String(next.status))) {
+    if (["cancelled", "completed", "rejected"].includes(String(update.status))) {
       transaction.delete(slotClaim);
       transaction.delete(uidClaim);
     } else {
-      transaction.set(slotClaim, { appointmentId: id, status: next.status }, { merge: true });
-      transaction.set(uidClaim, { appointmentId: id, status: next.status }, { merge: true });
+      if (slotClaim.path !== nextSlotClaim.path) transaction.delete(slotClaim);
+      transaction.set(
+        nextSlotClaim,
+        {
+          appointmentId: id,
+          uid: fresh.uid,
+          requestedDate,
+          requestedTime,
+          status: update.status,
+          createdAt: now,
+        },
+        { merge: true },
+      );
+      transaction.set(uidClaim, { appointmentId: id, status: update.status }, { merge: true });
     }
+    if (notificationType) {
+      transaction.create(outboxRef, {
+        id: `${fresh.reference}_${version}`,
+        appointmentId: id,
+        appointmentReference: fresh.reference,
+        eventType: notificationType,
+        version,
+        previousDate:
+          typeof next.previousDate === "string"
+            ? next.previousDate
+            : fresh.requestedDate,
+        previousTime:
+          typeof next.previousTime === "string"
+            ? next.previousTime
+            : fresh.requestedTime,
+        status: "pending",
+        attempts: 0,
+        nextAttemptAt: now,
+        leaseUntil: null,
+        lastErrorCode: null,
+        providerMessageId: null,
+        createdAt: now,
+        updatedAt: now,
+      });
+    }
+    return mapAppointment(appointmentRef.id, { ...fresh, ...saved });
+  });
+}
+
+export async function firebaseClaimNextAppointmentNotification() {
+  const { firestore: store } = requireFirebaseAdmin();
+  const jobs = store.collection("appointmentNotificationJobs");
+  const now = new Date();
+  const [pending, expired] = await Promise.all([
+    jobs
+      .where("status", "==", "pending")
+      .where("nextAttemptAt", "<=", now)
+      .orderBy("nextAttemptAt", "asc")
+      .limit(25)
+      .get(),
+    jobs
+      .where("status", "==", "processing")
+      .where("leaseUntil", "<=", now)
+      .orderBy("leaseUntil", "asc")
+      .limit(25)
+      .get(),
+  ]);
+  const candidates = [
+    ...pending.docs.map((doc) => ({ ref: doc.ref, data: doc.data() })),
+    ...expired.docs.map((doc) => ({ ref: doc.ref, data: doc.data() })),
+  ].sort((a, b) => {
+    const dueTime = (data: FirebaseFirestore.DocumentData) =>
+      dateValue(
+        data.status === "pending" ? data.nextAttemptAt : data.leaseUntil,
+      ).getTime();
+    return dueTime(a.data) - dueTime(b.data);
+  });
+
+  for (const candidate of candidates) {
+    const claimed = await store.runTransaction(async (transaction) => {
+      const current = await transaction.get(candidate.ref);
+      if (!current.exists) return null;
+      const data = current.data()!;
+      const due =
+        data.status === "pending" &&
+        dateValue(data.nextAttemptAt).getTime() <= now.getTime();
+      const leaseExpired =
+        data.status === "processing" &&
+        data.leaseUntil &&
+        dateValue(data.leaseUntil).getTime() <= now.getTime();
+      if (!due && !leaseExpired) return null;
+      const attempts = Number(data.attempts ?? 0) + 1;
+      const leaseUntil = new Date(now.getTime() + 60_000);
+      transaction.set(
+        candidate.ref,
+        {
+          status: "processing",
+          attempts,
+          leaseUntil,
+          updatedAt: now,
+        },
+        { merge: true },
+      );
+      return {
+        id: candidate.ref.id,
+        appointmentId: Number(data.appointmentId),
+        appointmentReference: String(data.appointmentReference),
+        eventType: String(data.eventType),
+        version: Number(data.version),
+        previousDate:
+          typeof data.previousDate === "string" ? data.previousDate : null,
+        previousTime:
+          typeof data.previousTime === "string" ? data.previousTime : null,
+        attempts,
+        status: "processing",
+        leaseUntil,
+        updatedAt: now,
+      };
+    });
+    if (claimed) return claimed;
+  }
+  return null;
+}
+
+export async function firebasePersistAppointmentMeeting(input: {
+  appointmentId: number;
+  version: number;
+  googleEventId: string;
+  googleMeetLink: string;
+}) {
+  const { firestore: store } = requireFirebaseAdmin();
+  const ref = store.collection("appointments").doc(String(input.appointmentId));
+  return store.runTransaction(async (transaction) => {
+    const snapshot = await transaction.get(ref);
+    if (!snapshot.exists) throw new Error("Appointment not found.");
+    const appointment = mapAppointment(snapshot.id, snapshot.data()!);
+    if (
+      appointment.notificationVersion !== input.version ||
+      !["approved", "rescheduled"].includes(appointment.status)
+    ) {
+      return false;
+    }
+    transaction.set(
+      ref,
+      {
+        googleEventId: input.googleEventId,
+        googleMeetLink: input.googleMeetLink,
+        meetingStatus: "ready",
+        lastNotificationError: null,
+        updatedAt: new Date(),
+      },
+      { merge: true },
+    );
+    return true;
+  });
+}
+
+export async function firebaseFinishAppointmentNotification(input: {
+  jobId: string;
+  appointmentId: number;
+  version: number;
+  status: "sent" | "failed" | "pending" | "superseded";
+  errorCode?: string | null;
+  providerMessageId?: string | null;
+  meetingStatus?: string;
+  nextAttemptAt?: Date;
+}) {
+  const { firestore: store } = requireFirebaseAdmin();
+  const jobRef = store.collection("appointmentNotificationJobs").doc(input.jobId);
+  const appointmentRef = store
+    .collection("appointments")
+    .doc(String(input.appointmentId));
+  await store.runTransaction(async (transaction) => {
+    const [jobSnapshot, appointmentSnapshot] = await Promise.all([
+      transaction.get(jobRef),
+      transaction.get(appointmentRef),
+    ]);
+    if (!jobSnapshot.exists || !appointmentSnapshot.exists) return;
+    const job = jobSnapshot.data()!;
+    if (job.status !== "processing") return;
+    const appointment = mapAppointment(
+      appointmentSnapshot.id,
+      appointmentSnapshot.data()!,
+    );
+    const now = new Date();
+    transaction.set(
+      jobRef,
+      {
+        status: input.status,
+        lastErrorCode: input.errorCode ?? null,
+        providerMessageId: input.providerMessageId ?? null,
+        nextAttemptAt: input.nextAttemptAt ?? now,
+        leaseUntil: null,
+        updatedAt: now,
+      },
+      { merge: true },
+    );
+    if (appointment.notificationVersion !== input.version) return;
+    transaction.set(
+      appointmentRef,
+      {
+        notificationStatus: input.status === "superseded" ? "queued" : input.status,
+        lastNotificationError: input.errorCode ?? null,
+        ...(input.meetingStatus ? { meetingStatus: input.meetingStatus } : {}),
+        updatedAt: now,
+      },
+      { merge: true },
+    );
+  });
+}
+
+export async function firebaseRetryLatestAppointmentNotification(
+  appointmentId: number,
+) {
+  const { firestore: store } = requireFirebaseAdmin();
+  const appointmentRef = store
+    .collection("appointments")
+    .doc(String(appointmentId));
+  const appointmentSnapshot = await appointmentRef.get();
+  if (!appointmentSnapshot.exists) throw new Error("Appointment not found.");
+  const appointment = mapAppointment(
+    appointmentSnapshot.id,
+    appointmentSnapshot.data()!,
+  );
+  const jobs = await store
+    .collection("appointmentNotificationJobs")
+    .where("appointmentId", "==", appointmentId)
+    .get();
+  const latest = jobs.docs
+    .map((doc) => ({ ref: doc.ref, data: doc.data() }))
+    .filter(({ data }) => data.status === "failed")
+    .sort((a, b) => Number(b.data.version) - Number(a.data.version))[0];
+  if (!latest || Number(latest.data.version) !== appointment.notificationVersion) {
+    return false;
+  }
+  return store.runTransaction(async (transaction) => {
+    const [currentJob, currentAppointment] = await Promise.all([
+      transaction.get(latest.ref),
+      transaction.get(appointmentRef),
+    ]);
+    if (!currentJob.exists || !currentAppointment.exists) return false;
+    const current = mapAppointment(
+      currentAppointment.id,
+      currentAppointment.data()!,
+    );
+    if (
+      current.notificationVersion !== appointment.notificationVersion ||
+      currentJob.data()?.status !== "failed"
+    ) {
+      return false;
+    }
+    const now = new Date();
+    transaction.set(
+      latest.ref,
+      {
+        status: "pending",
+        attempts: 0,
+        nextAttemptAt: now,
+        leaseUntil: null,
+        lastErrorCode: null,
+        updatedAt: now,
+      },
+      { merge: true },
+    );
+    transaction.set(
+      appointmentRef,
+      {
+        notificationStatus: "queued",
+        lastNotificationError: null,
+        ...(latest.data.eventType === "approved" ||
+        latest.data.eventType === "rescheduled_confirmed"
+          ? { meetingStatus: current.googleMeetLink ? "ready" : "pending" }
+          : {}),
+        updatedAt: now,
+      },
+      { merge: true },
+    );
+    return true;
+  });
+}
+
+export async function firebaseAcceptAppointmentReschedule(
+  reference: string,
+  uid: string,
+) {
+  const { firestore: store } = requireFirebaseAdmin();
+  const collection = store.collection("appointments");
+  const matches = await collection.where("reference", "==", reference).limit(1).get();
+  const appointmentRef = matches.docs[0]?.ref;
+  if (!appointmentRef) return null;
+  return store.runTransaction(async (transaction) => {
+    const snapshot = await transaction.get(appointmentRef);
+    if (!snapshot.exists) return null;
+    const current = mapAppointment(snapshot.id, snapshot.data()!);
+    if (current.uid !== uid) return null;
+    if (
+      current.status !== "rescheduled" ||
+      !current.proposedDate ||
+      !current.proposedTime
+    ) {
+      return null;
+    }
+    const requestedDate = current.proposedDate;
+    const requestedTime = current.proposedTime;
+    const oldSlotRef = store
+      .collection("appointmentSlotClaims")
+      .doc(`${current.requestedDate}_${current.requestedTime}`);
+    const nextSlotRef = store
+      .collection("appointmentSlotClaims")
+      .doc(`${requestedDate}_${requestedTime}`);
+    const uidRef = store
+      .collection("appointmentUserClaims")
+      .doc(encodeURIComponent(uid));
+    const query = collection
+      .where("requestedDate", "==", requestedDate)
+      .where("requestedTime", "==", requestedTime)
+      .limit(20);
+    const [slotClaim, uidClaim, matchingAppointments] = await Promise.all([
+      transaction.get(nextSlotRef),
+      transaction.get(uidRef),
+      transaction.get(query),
+    ]);
+    if (
+      (uidClaim.exists && Number(uidClaim.data()?.appointmentId) !== current.id) ||
+      (slotClaim.exists && Number(slotClaim.data()?.appointmentId) !== current.id) ||
+      matchingAppointments.docs.some(
+        (candidate) =>
+          candidate.id !== appointmentRef.id &&
+          !["cancelled", "completed", "rejected"].includes(
+            String(candidate.data().status),
+          ),
+      )
+    ) {
+      throw new AppointmentConflictError();
+    }
+    const now = new Date();
+    const version = current.notificationVersion + 1;
+    const historyEntry = {
+      at: now.toISOString(),
+      action: "reschedule_accepted",
+      note: "Customer accepted the proposed appointment time.",
+    };
+    const history = [...current.history, historyEntry];
+    const outboxRef = store
+      .collection("appointmentNotificationJobs")
+      .doc(`${current.reference}_${version}`);
+    const outboxSnapshot = await transaction.get(outboxRef);
+    if (outboxSnapshot.exists) {
+      throw new Error("Appointment notification idempotency conflict.");
+    }
+    const updated = {
+      requestedDate,
+      requestedTime,
+      proposedDate: null,
+      proposedTime: null,
+      status: "approved",
+      history,
+      notificationVersion: version,
+      notificationStatus: "queued",
+      lastNotificationType: "rescheduled_confirmed",
+      lastNotificationError: null,
+      meetingStatus: current.googleEventId ? "pending" : "not_required",
+      updatedAt: now,
+    };
+    transaction.set(appointmentRef, updated, { merge: true });
+    if (oldSlotRef.path !== nextSlotRef.path) transaction.delete(oldSlotRef);
+    transaction.set(
+      nextSlotRef,
+      {
+        appointmentId: current.id,
+        uid,
+        requestedDate,
+        requestedTime,
+        status: "approved",
+        createdAt: now,
+      },
+      { merge: true },
+    );
+    transaction.set(
+      uidRef,
+      { appointmentId: current.id, uid, status: "approved" },
+      { merge: true },
+    );
+    transaction.create(outboxRef, {
+      id: `${current.reference}_${version}`,
+      appointmentId: current.id,
+      appointmentReference: current.reference,
+      eventType: "rescheduled_confirmed",
+      version,
+      previousDate: current.requestedDate,
+      previousTime: current.requestedTime,
+      status: "pending",
+      attempts: 0,
+      nextAttemptAt: now,
+      leaseUntil: null,
+      lastErrorCode: null,
+      providerMessageId: null,
+      createdAt: now,
+      updatedAt: now,
+    });
+    return mapAppointment(appointmentRef.id, { ...current, ...updated });
   });
 }
 

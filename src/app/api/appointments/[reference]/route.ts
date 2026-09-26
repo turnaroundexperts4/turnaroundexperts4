@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getAppointmentByRef } from "@/lib/data";
 import { checkRequestRateLimit } from "@/lib/request-rate-limit";
+import { verifyFirebaseIdToken } from "@/lib/firebase-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -8,6 +9,22 @@ export async function GET(
   req: Request,
   { params }: { params: Promise<{ reference: string }> },
 ) {
+  const token = req.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
+  if (!token) {
+    return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+  }
+  const user = await verifyFirebaseIdToken(token);
+  if (user.status !== "authenticated") {
+    return NextResponse.json(
+      {
+        error:
+          user.status === "service_unavailable"
+            ? "Authentication service is unavailable."
+            : "Invalid authentication.",
+      },
+      { status: user.status === "service_unavailable" ? 503 : 401 },
+    );
+  }
   const { reference } = await params;
   const normalizedReference = reference.trim().toUpperCase();
   const clientKey =
@@ -33,7 +50,9 @@ export async function GET(
   }
 
   const apt = await getAppointmentByRef(normalizedReference);
-  if (!apt) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  if (!apt || apt.uid !== user.uid) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
   return NextResponse.json({
     reference: apt.reference,
     customerName: apt.customerName,
@@ -42,8 +61,11 @@ export async function GET(
     serviceTitle: apt.serviceTitle,
     serviceId: apt.serviceId,
     status: apt.status,
+    googleMeetLink: apt.googleMeetLink,
+    meetingStatus: apt.meetingStatus,
     proposedDate: apt.proposedDate,
     proposedTime: apt.proposedTime,
-    adminNote: apt.adminNote,
+    adminNote: apt.status === "rescheduled" ? apt.adminNote : null,
+    cancellationReason: apt.cancellationReason,
   });
 }

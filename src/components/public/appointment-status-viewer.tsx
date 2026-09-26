@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { ArrowUpRight, Search } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { useUserAuth } from "@/components/auth/user-auth-provider";
 
 type Status = {
   reference: string;
@@ -15,6 +16,9 @@ type Status = {
   proposedDate: string | null;
   proposedTime: string | null;
   adminNote: string | null;
+  googleMeetLink: string | null;
+  meetingStatus: string;
+  cancellationReason: string | null;
 };
 
 const HOURS_12 = (hhmm: string) => {
@@ -42,14 +46,23 @@ export function AppointmentStatusViewer({
   const [data, setData] = useState<Status | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { user } = useUserAuth();
 
   async function lookup(ref: string) {
     if (!ref) return;
+    if (!user) {
+      setError("Sign in to view your appointment.");
+      return;
+    }
     setLoading(true);
     setError(null);
     setData(null);
     try {
-      const res = await fetch(`/api/appointments/${encodeURIComponent(ref)}`);
+      const token = await user.getIdToken();
+      const res = await fetch(`/api/appointments/${encodeURIComponent(ref)}`, {
+        headers: { Authorization: `Bearer ${token}` },
+        cache: "no-store",
+      });
       if (!res.ok) {
         const j = await res.json().catch(() => ({}));
         throw new Error(j.error ?? "Not found");
@@ -69,11 +82,11 @@ export function AppointmentStatusViewer({
 
   /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
-    if (initialReference) {
-      lookup(initialReference);
+    if (initialReference && user) {
+      void lookup(initialReference);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [initialReference, user]);
   /* eslint-enable react-hooks/set-state-in-effect */
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -156,16 +169,17 @@ export function AppointmentStatusViewer({
                 Requested date
               </dt>
               <dd className="mt-1 text-navy-900">
-                {new Date(data.requestedDate + "T00:00:00").toLocaleDateString(
+                {new Date(`${data.requestedDate}T00:00:00Z`).toLocaleDateString(
                   "en-IN",
                   {
+                    timeZone: "UTC",
                     weekday: "short",
                     day: "numeric",
                     month: "short",
                     year: "numeric",
                   },
                 )}{" "}
-                · {HOURS_12(data.requestedTime)}
+                · {HOURS_12(data.requestedTime)} IST (Asia/Kolkata)
               </dd>
             </div>
             {data.proposedDate && data.proposedTime ? (
@@ -174,16 +188,17 @@ export function AppointmentStatusViewer({
                   Proposed by TAE
                 </dt>
                 <dd className="mt-1 text-navy-900">
-                  {new Date(data.proposedDate + "T00:00:00").toLocaleDateString(
+                  {new Date(`${data.proposedDate}T00:00:00Z`).toLocaleDateString(
                     "en-IN",
                     {
+                      timeZone: "UTC",
                       weekday: "short",
                       day: "numeric",
                       month: "short",
                       year: "numeric",
                     },
                   )}{" "}
-                  · {HOURS_12(data.proposedTime)}
+                  · {HOURS_12(data.proposedTime)} IST (Asia/Kolkata)
                 </dd>
               </div>
             ) : null}
@@ -198,6 +213,26 @@ export function AppointmentStatusViewer({
                 {data.adminNote}
               </p>
             </div>
+          ) : null}
+
+          {data.googleMeetLink ? (
+            <a
+              href={data.googleMeetLink}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="mt-7 inline-flex rounded-full bg-navy-900 px-5 py-2.5 text-[13px] font-medium text-paper"
+            >
+              Join on Google Meet
+            </a>
+          ) : data.meetingStatus === "failed" ? (
+            <p className="mt-5 text-[13px] text-amber-800">
+              The team is resolving a meeting setup issue.
+            </p>
+          ) : null}
+          {data.cancellationReason ? (
+            <p className="mt-4 text-[13px] text-red-800">
+              Cancellation reason: {data.cancellationReason}
+            </p>
           ) : null}
 
           <div className="mt-7 rounded-xl border border-ink-900/5 bg-paper-deep p-5 text-[13.5px] leading-relaxed text-ink-700">
@@ -224,7 +259,7 @@ function StatusExplainer({ status }: { status: string }) {
     case "approved":
       return "Your appointment is confirmed. Please add it to your calendar.";
     case "rescheduled":
-      return "The team has proposed a different date/time. Please review the proposed slot and reply by email to confirm.";
+      return "The team has proposed a different date/time. Please review the proposal in your account and accept it if it works for you.";
     case "rejected":
       return "We're unable to honour this request as submitted. If a new slot has been proposed, please review above.";
     case "completed":

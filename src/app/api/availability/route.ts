@@ -4,6 +4,7 @@ import {
   listAvailabilityRules,
   listBlockedDates,
 } from "@/lib/data";
+import { businessTimeMinutes, todayISODate } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -53,9 +54,17 @@ export async function GET(req: Request) {
     });
   }
 
-  // Determine day-of-week in local time (server TZ)
-  const dt = new Date(date + "T00:00:00");
-  const dayOfWeek = dt.getDay();
+  // Treat the requested business date as a calendar date, independent of server TZ.
+  const [year, month, day] = date.split("-").map(Number);
+  const parsedDate = new Date(Date.UTC(year, month - 1, day));
+  if (
+    parsedDate.getUTCFullYear() !== year ||
+    parsedDate.getUTCMonth() !== month - 1 ||
+    parsedDate.getUTCDate() !== day
+  ) {
+    return NextResponse.json({ error: "Invalid date" }, { status: 400 });
+  }
+  const dayOfWeek = parsedDate.getUTCDay();
   const rule = rules.find((r) => r.dayOfWeek === dayOfWeek);
 
   if (!rule || !rule.enabled) {
@@ -69,9 +78,8 @@ export async function GET(req: Request) {
 
   const slots = generateSlots(rule.startTime, rule.endTime, rule.slotMinutes);
   // Past times today are also blocked
-  const today = new Date();
-  const isToday = date === today.toISOString().slice(0, 10);
-  const nowMinutes = today.getHours() * 60 + today.getMinutes();
+  const isToday = date === todayISODate();
+  const nowMinutes = businessTimeMinutes();
   const available = slots.filter((slot) => {
     if (booked.includes(slot)) return false;
     if (isToday) {

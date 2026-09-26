@@ -8,6 +8,7 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
   signInWithRedirect,
+  sendEmailVerification,
   signOut,
   type User,
 } from "firebase/auth";
@@ -23,11 +24,13 @@ import { clientAuth } from "@/lib/firebase-client";
 
 type UserAuthContextValue = {
   user: User | null;
+  emailVerified: boolean;
   loading: boolean;
   authError: string;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
+  sendVerificationEmail: () => Promise<void>;
   signOutUser: () => Promise<void>;
 };
 
@@ -35,12 +38,14 @@ const UserAuthContext = createContext<UserAuthContextValue | null>(null);
 
 export function UserAuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [emailVerified, setEmailVerified] = useState(false);
   const [loading, setLoading] = useState(true);
   const [authError, setAuthError] = useState("");
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(clientAuth, (nextUser) => {
       setUser(nextUser);
+      setEmailVerified(nextUser?.emailVerified === true);
       setLoading(false);
     });
     const timeout = window.setTimeout(() => setLoading(false), 5000);
@@ -51,6 +56,7 @@ export function UserAuthProvider({ children }: { children: ReactNode }) {
       .then((result) => {
         if (result?.user) {
           setUser(result.user);
+          setEmailVerified(result.user.emailVerified);
           setLoading(false);
         }
       })
@@ -70,6 +76,7 @@ export function UserAuthProvider({ children }: { children: ReactNode }) {
   const value = useMemo<UserAuthContextValue>(
     () => ({
       user,
+      emailVerified,
       loading,
       authError,
       signIn: async (email, password) => {
@@ -97,11 +104,20 @@ export function UserAuthProvider({ children }: { children: ReactNode }) {
           throw error;
         }
       },
+      sendVerificationEmail: async () => {
+        if (!clientAuth.currentUser) {
+          throw new Error("Sign in before requesting email verification.");
+        }
+        await sendEmailVerification(clientAuth.currentUser);
+        await clientAuth.currentUser.reload();
+        setUser(clientAuth.currentUser);
+        setEmailVerified(clientAuth.currentUser.emailVerified);
+      },
       signOutUser: async () => {
         await signOut(clientAuth);
       },
     }),
-    [authError, loading, user],
+    [authError, emailVerified, loading, user],
   );
 
   return <UserAuthContext.Provider value={value}>{children}</UserAuthContext.Provider>;

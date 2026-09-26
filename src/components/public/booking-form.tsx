@@ -30,11 +30,14 @@ const HOURS_12 = (hhmm: string) => {
 };
 
 const TODAY = () => {
-  const d = new Date();
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${y}-${m}-${day}`;
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Kolkata",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date());
+  const values = Object.fromEntries(parts.map(({ type, value }) => [type, value]));
+  return `${values.year}-${values.month}-${values.day}`;
 };
 
 const ISODate = (d: Date) => {
@@ -55,14 +58,15 @@ export function BookingForm({ services }: { services: Service[] }) {
   // Date / slots state
   const todayStr = TODAY();
   const [month, setMonth] = useState(() => {
-    const t = new Date();
-    return new Date(t.getFullYear(), t.getMonth(), 1);
+    const [year, currentMonth] = todayStr.split("-").map(Number);
+    return new Date(year, currentMonth - 1, 1);
   });
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [slotData, setSlotData] = useState<SlotResp | null>(null);
   const [loadingSlots, setLoadingSlots] = useState(false);
-  const { user } = useUserAuth();
+  const [verificationError, setVerificationError] = useState("");
+  const { user, emailVerified, sendVerificationEmail } = useUserAuth();
 
   // Fetch slots when date selected.
   /* eslint-disable react-hooks/set-state-in-effect */
@@ -279,14 +283,22 @@ export function BookingForm({ services }: { services: Service[] }) {
                       placeholder="e.g. Ramesh Patel"
                       error={state.fieldErrors?.customerName}
                     />
-                    <Field
-                      label="Email"
-                      type="email"
-                      name="email"
-                      required
-                      placeholder="you@business.com"
-                      error={state.fieldErrors?.email}
-                    />
+                    <div>
+                      <label className="block text-[13px] font-medium text-navy-900">
+                        Verified account email
+                      </label>
+                      <input
+                        type="email"
+                        name="email"
+                        required
+                        readOnly
+                        value={user?.email ?? ""}
+                        className="mt-2 w-full rounded-xl border border-ink-900/10 bg-paper px-4 py-3 text-[15px] outline-none"
+                      />
+                      <p className="mt-1 text-[12.5px] text-ink-500">
+                        Appointment updates will be sent to this account address.
+                      </p>
+                    </div>
                     <Field
                       label="Phone"
                       type="tel"
@@ -328,6 +340,30 @@ export function BookingForm({ services }: { services: Service[] }) {
                         className="mt-2 w-full rounded-xl border border-ink-900/10 bg-paper px-4 py-3 text-[15px] outline-none transition focus:border-navy-900/40"
                       />
                     </div>
+                    {!emailVerified ? (
+                      <div className="md:col-span-2 rounded-xl border border-amber-200 bg-amber-50 p-4 text-[14px] text-amber-900">
+                        Verify your account email before requesting an appointment.{" "}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setVerificationError("");
+                            void sendVerificationEmail().catch(() =>
+                              setVerificationError(
+                                "We could not send the verification email. Please try again.",
+                              ),
+                            );
+                          }}
+                          className="underline"
+                        >
+                          Send verification email
+                        </button>
+                        {verificationError ? (
+                          <span className="mt-2 block text-red-700">
+                            {verificationError}
+                          </span>
+                        ) : null}
+                      </div>
+                    ) : null}
                     {state.error ? (
                       <div className="md:col-span-2 rounded-xl border border-red-200 bg-red-50 p-4 text-[14px] text-red-800">
                         {state.error}
@@ -338,7 +374,7 @@ export function BookingForm({ services }: { services: Service[] }) {
                         Submissions are reviewed by the TAE team. You&apos;ll receive
                         a confirmation by email once approved.
                       </p>
-                      <SubmitButton />
+                      <SubmitButton disabled={!emailVerified} />
                     </div>
                   </form>
                   </AuthRequired>
@@ -428,12 +464,12 @@ function Field({
   );
 }
 
-function SubmitButton() {
+function SubmitButton({ disabled = false }: { disabled?: boolean }) {
   const { pending } = useFormStatus();
   return (
     <button
       type="submit"
-      disabled={pending}
+      disabled={pending || disabled}
       className="inline-flex items-center gap-2 rounded-full bg-navy-900 px-7 py-3.5 text-[15px] font-medium text-paper transition hover:bg-navy-800 disabled:cursor-not-allowed disabled:bg-ink-300"
     >
       {pending ? "Submitting…" : "Submit appointment request"}
