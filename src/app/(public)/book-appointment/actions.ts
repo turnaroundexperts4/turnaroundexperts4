@@ -2,6 +2,7 @@
 
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
 import {
   createAppointment,
   getBookedTimesForDate,
@@ -11,6 +12,7 @@ import {
 } from "@/lib/data";
 import { generateReference, todayISODate } from "@/lib/utils";
 import { verifyFirebaseIdToken } from "@/lib/firebase-auth";
+import { checkRequestRateLimit } from "@/lib/request-rate-limit";
 
 const TimeRegex = /^([01]\d|2[0-3]):[0-5]\d$/;
 const DateRegex = /^\d{4}-\d{2}-\d{2}$/;
@@ -63,9 +65,26 @@ export async function submitAppointment(
     return { ok: false, error: "Please fix the highlighted fields.", fieldErrors: errors };
   }
   const data = parsed.data;
+  const requestHeaders = await headers();
+  const clientKey =
+    requestHeaders.get("cf-connecting-ip") ??
+    requestHeaders.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+    "unknown";
+  const rateLimit = checkRequestRateLimit(`booking:${clientKey}`, {
+    limit: 5,
+    windowMs: 10 * 60_000,
+  });
+  if (!rateLimit.allowed) {
+    return {
+      ok: false,
+      error: "Too many booking requests. Please try again later.",
+    };
+  }
   const idToken = String(formData.get("idToken") ?? "");
   const user = await verifyFirebaseIdToken(idToken);
-  if (!user) return { ok: false, error: "Please sign in before requesting an appointment." };
+  if (!user || user.status !== "authenticated") {
+    return { ok: false, error: "Please sign in before requesting an appointment." };
+  }
 
   // Server-side validation: date is not in past + within allowed lead window
   const today = todayISODate();

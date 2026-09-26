@@ -9,6 +9,7 @@ import {
   jsonb,
   pgEnum,
   index,
+  uniqueIndex,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 
@@ -193,6 +194,7 @@ export const appointments = pgTable(
   {
     id: serial("id").primaryKey(),
     reference: varchar("reference", { length: 32 }).notNull().unique(),
+    uid: varchar("uid", { length: 200 }),
     customerName: varchar("customer_name", { length: 200 }).notNull(),
     email: varchar("email", { length: 200 }).notNull(),
     phone: varchar("phone", { length: 40 }).notNull(),
@@ -221,6 +223,12 @@ export const appointments = pgTable(
   (t) => ({
     statusIdx: index("appointments_status_idx").on(t.status, t.createdAt),
     dateIdx: index("appointments_date_idx").on(t.requestedDate),
+    activeUidUnique: uniqueIndex("appointments_active_uid_unique")
+      .on(t.uid)
+      .where(sql`"status" in ('pending', 'approved', 'rescheduled') and "uid" is not null`),
+    activeSlotUnique: uniqueIndex("appointments_active_slot_unique")
+      .on(t.requestedDate, t.requestedTime)
+      .where(sql`"status" in ('pending', 'approved', 'rescheduled')`),
   }),
 );
 

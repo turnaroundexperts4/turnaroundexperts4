@@ -6,6 +6,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
+    "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "seed:firebase": "tsx scripts/seed-firebase.ts",
     "preview:cloudflare": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
@@ -47,6 +48,7 @@
     "tailwindcss": "4.1.17",
     "tsx": "^4.23.13",
     "typescript": "5.9.3",
+    "vitest": "^5.0.1",
     "wrangler": "^4.135.0"
   }
 }

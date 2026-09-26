@@ -628,23 +628,82 @@ export async function firebaseGetBookedTimes(date: string) {
     .map((row) => row.requestedTime);
 }
 
+export class AppointmentConflictError extends Error {
+  constructor() {
+    super("An active appointment already exists for this user or time slot.");
+    this.name = "AppointmentConflictError";
+  }
+}
+
 export async function firebaseCreateAppointment(input: Record<string, unknown>) {
   const collection = await firebaseCollection("appointments");
   if (!collection) return null;
-  const id = nextId((await collection.get()).docs);
+  const { firestore: adminFirestore } = requireFirebaseAdmin();
+  const uid = String(input.uid ?? "");
+  const requestedDate = String(input.requestedDate ?? "");
+  const requestedTime = String(input.requestedTime ?? "");
+  const slotKey = `${requestedDate}_${requestedTime}`;
+  const slotClaim = adminFirestore.collection("appointmentSlotClaims").doc(slotKey);
+  const uidClaim = adminFirestore
+    .collection("appointmentUserClaims")
+    .doc(encodeURIComponent(uid));
   const now = new Date();
   const record = Object.fromEntries(
     Object.entries(input).filter(([, value]) => value !== undefined),
   );
-  const saved = {
-    ...record,
-    id,
-    status: "pending",
-    createdAt: now,
-    updatedAt: now,
-  };
-  await collection.doc(String(id)).set(saved);
-  return mapAppointment(String(id), saved);
+  const result = await adminFirestore.runTransaction(async (transaction) => {
+    const [slotSnapshot, uidSnapshot, userAppointments, slotAppointments, allAppointments] =
+      await Promise.all([
+        transaction.get(slotClaim),
+        transaction.get(uidClaim),
+        transaction.get(collection.where("uid", "==", uid).limit(20)),
+        transaction.get(
+          collection
+            .where("requestedDate", "==", requestedDate)
+            .where("requestedTime", "==", requestedTime)
+            .limit(20),
+        ),
+        transaction.get(collection),
+      ]);
+    const active = (snapshot: FirebaseFirestore.QuerySnapshot) =>
+      snapshot.docs.some((doc) =>
+        ["cancelled", "completed", "rejected"].indexOf(String(doc.data().status)) === -1,
+      );
+    if (
+      slotSnapshot.exists ||
+      uidSnapshot.exists ||
+      active(userAppointments) ||
+      active(slotAppointments)
+    ) {
+      throw new AppointmentConflictError();
+    }
+    const id = nextId(allAppointments.docs);
+    const saved = {
+      ...record,
+      id,
+      status: "pending",
+      createdAt: now,
+      updatedAt: now,
+    };
+    const appointmentRef = collection.doc(String(id));
+    transaction.create(slotClaim, {
+      appointmentId: id,
+      uid,
+      requestedDate,
+      requestedTime,
+      status: "pending",
+      createdAt: now,
+    });
+    transaction.create(uidClaim, {
+      appointmentId: id,
+      uid,
+      status: "pending",
+      createdAt: now,
+    });
+    transaction.create(appointmentRef, saved);
+    return { id, saved };
+  });
+  return mapAppointment(String(result.id), result.saved);
 }
 
 export async function firebaseUpdateAppointment(
@@ -657,7 +716,28 @@ export async function firebaseUpdateAppointment(
   if (!doc.exists) return;
   const current = mapAppointment(doc.id, doc.data()!);
   const history = next.historyEntry ? [...current.history, next.historyEntry] : current.history;
-  await collection.doc(String(id)).set({ ...next, history, updatedAt: new Date() }, { merge: true });
+  const { firestore: adminFirestore } = requireFirebaseAdmin();
+  const appointmentRef = collection.doc(String(id));
+  const slotClaim = adminFirestore
+    .collection("appointmentSlotClaims")
+    .doc(`${current.requestedDate}_${current.requestedTime}`);
+  const uidClaim = adminFirestore
+    .collection("appointmentUserClaims")
+    .doc(encodeURIComponent(String(doc.data()!.uid ?? "")));
+  await adminFirestore.runTransaction(async (transaction) => {
+    transaction.set(
+      appointmentRef,
+      { ...next, history, updatedAt: new Date() },
+      { merge: true },
+    );
+    if (["cancelled", "completed", "rejected"].includes(String(next.status))) {
+      transaction.delete(slotClaim);
+      transaction.delete(uidClaim);
+    } else {
+      transaction.set(slotClaim, { appointmentId: id, status: next.status }, { merge: true });
+      transaction.set(uidClaim, { appointmentId: id, status: next.status }, { merge: true });
+    }
+  });
 }
 
 export async function firebaseListEnquiries() {

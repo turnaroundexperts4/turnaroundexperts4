@@ -80,6 +80,8 @@ export function UserAuthCard() {
             setError(
               code === "auth/invalid-credential"
                 ? "Google sign-in is not configured correctly in Firebase. Enable the Google provider and save its support email."
+                : code === "auth/unauthorized-domain"
+                  ? "This website domain is not authorized in Firebase Authentication."
                 : code === "auth/popup-blocked"
                   ? "Google sign-in was blocked by the browser. Allow popups for this site and try again."
                   : code

@@ -14,7 +14,7 @@ import {
   siteSettings,
   teamMembers,
 } from "@/db/schema";
-import { and, asc, desc, eq } from "drizzle-orm";
+import { and, asc, desc, eq, inArray } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import {
   firebaseDeleteCategory,
@@ -870,7 +870,20 @@ export async function getAppointmentByRef(reference: string) {
 export async function getAppointmentByUid(uid: string) {
   const firebaseAppointment = await firebaseGetAppointmentByUid(uid);
   if (firebaseAppointment) return firebaseAppointment;
-  return null;
+  return withDbFallback(null, async () => {
+    const rows = await db
+      .select()
+      .from(appointments)
+      .where(
+        and(
+          eq(appointments.uid, uid),
+          inArray(appointments.status, ["pending", "approved", "rescheduled"]),
+        ),
+      )
+      .orderBy(desc(appointments.createdAt))
+      .limit(1);
+    return rows[0] ?? null;
+  });
 }
 
 export async function getBookedTimesForDate(date: string) {
@@ -915,6 +928,7 @@ export async function createAppointment(input: {
       .insert(appointments)
       .values({
         reference: input.reference,
+        uid: input.uid,
         customerName: input.customerName,
         email: input.email,
         phone: input.phone,
