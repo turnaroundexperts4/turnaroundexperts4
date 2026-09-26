@@ -1,4 +1,6 @@
-import "dotenv/config";
+import { config as loadEnv } from "dotenv";
+
+loadEnv({ path: [".env.local", ".env"] });
 
 import { FieldValue, getFirestore } from "firebase-admin/firestore";
 import { cert, getApps, initializeApp } from "firebase-admin/app";
@@ -12,7 +14,7 @@ import {
 import { PORTFOLIO_SAMPLES } from "../src/lib/seed-portfolio";
 import { slugify } from "../src/lib/utils";
 
-const projectId = process.env.FIREBASE_PROJECT_ID ?? "tae-bef9c";
+const projectId = process.env.FIREBASE_PROJECT_ID ?? "tae-lucky-509808";
 const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
 const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n");
 
