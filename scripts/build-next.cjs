@@ -18,8 +18,6 @@ const wranglerConfig = JSON.parse(readFileSync(wranglerPath, "utf8"));
 const buildEnvironment = { ...process.env };
 
 for (const name of firebaseVariables) {
-  if (buildEnvironment[name]) continue;
-
   const value = wranglerConfig.vars?.[name];
   if (typeof value === "string" && value) {
     buildEnvironment[name] = value;
