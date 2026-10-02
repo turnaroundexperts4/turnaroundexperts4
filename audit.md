@@ -251,7 +251,7 @@ The catalog below covers the tracked application files and explains each file's 
 | File | Responsibility | Needs / dependencies |
 |---|---|---|
 | [`package.json`](./package.json) | Scripts and dependency manifest. | Node/npm, Next.js, Firebase, Drizzle, Cloudflare tooling. |
-| [`scripts/build-next.cjs`](./scripts/build-next.cjs) | Loads public Firebase variables from Wrangler before the Next.js production build so its Firebase project configuration is authoritative. | `wrangler.jsonc`, Node.js, Next.js. |
+| [`scripts/build-next.cjs`](./scripts/build-next.cjs) | Loads public Firebase variables from Wrangler and runs the OpenNext Cloudflare build; when OpenNext invokes the configured build command, runs Next.js directly to avoid recursion. | `wrangler.jsonc`, Node.js, Next.js, `@opennextjs/cloudflare`. |
 | [`package-lock.json`](./package-lock.json) | Locked dependency graph. | Must remain synchronized with `package.json`. |
 | [`tsconfig.json`](./tsconfig.json) | TypeScript compiler settings and path aliases. | `tsc`, Next.js type generation. |
 | [`next.config.ts`](./next.config.ts) | Next.js configuration. | Next.js build/runtime. |
@@ -402,7 +402,7 @@ These must remain secret:
 - `SEED_ADMIN_EMAIL`
 - `SEED_ADMIN_PASSWORD`
 
-The deployment must provide the server variables at runtime. The `npm run build` script loads public Firebase client variables from `wrangler.jsonc` before Next.js builds the browser bundle, overriding stale build-environment values to keep the browser bundle aligned with the Worker configuration.
+The deployment must provide the server variables at runtime. The `npm run build` script loads public Firebase client variables from `wrangler.jsonc` before building Next.js, overriding stale build-environment values to keep the browser bundle aligned with the Worker configuration. It runs the OpenNext Cloudflare build to create `.open-next`; when OpenNext invokes the configured build command, the script runs Next.js directly to avoid recursion. The `wrangler deploy` command requires this output.
 
 ### Configuration inconsistencies
 

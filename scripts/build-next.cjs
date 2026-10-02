@@ -1,5 +1,5 @@
 const { readFileSync } = require("node:fs");
-const { resolve } = require("node:path");
+const { dirname, resolve } = require("node:path");
 const { spawnSync } = require("node:child_process");
 
 const firebaseVariables = [
@@ -34,16 +34,29 @@ if (missingVariables.length > 0) {
   process.exit(1);
 }
 
-const nextCliPath = require.resolve("next/dist/bin/next");
-const result = spawnSync(
-  process.execPath,
-  [nextCliPath, "build"],
-  { env: buildEnvironment, stdio: "inherit" },
-);
+function runBuild(label, cliPath, args) {
+  const result = spawnSync(process.execPath, [cliPath, ...args], {
+    env: buildEnvironment,
+    stdio: "inherit",
+  });
 
-if (result.error) {
-  console.error("Failed to start the Next.js production build:", result.error);
-  process.exit(1);
+  if (result.error) {
+    console.error(`Failed to start ${label}:`, result.error);
+    process.exit(1);
+  }
+
+  if (result.status !== 0) {
+    process.exit(result.status ?? 1);
+  }
 }
 
-process.exit(result.status ?? 1);
+if (process.env.NEXT_PRIVATE_STANDALONE === "true") {
+  const nextCliPath = require.resolve("next/dist/bin/next");
+  runBuild("the Next.js production build", nextCliPath, ["build"]);
+} else {
+  const openNextCliPath = resolve(
+    dirname(require.resolve("@opennextjs/cloudflare")),
+    "../cli/index.js",
+  );
+  runBuild("the OpenNext Cloudflare build", openNextCliPath, ["build"]);
+}
