@@ -2,11 +2,14 @@ import { cert, getApps, initializeApp } from "firebase-admin/app";
 import { getDatabase } from "firebase-admin/database";
 import { getAuth } from "firebase-admin/auth";
 import { FirestoreRestClient } from "@/lib/firebase-firestore-rest";
-import { normalizeFirebasePrivateKey } from "@/lib/firebase-service-account";
 
 const projectId = process.env.FIREBASE_PROJECT_ID || "tae-lucky-509808";
 const clientEmail = process.env.FIREBASE_CLIENT_EMAIL?.trim();
-const privateKey = normalizeFirebasePrivateKey(process.env.FIREBASE_PRIVATE_KEY);
+const privateKey = process.env.FIREBASE_PRIVATE_KEY
+  ?.trim()
+  .replace(/^(['"])([\s\S]*)\1$/, "$2")
+  .replace(/\\+r/g, "\r")
+  .replace(/\\+n/g, "\n");
 const isBuildPhase = process.env.NEXT_PHASE === "phase-production-build";
 
 export const firebaseAdminConfigured = Boolean(
@@ -66,7 +69,7 @@ async function getFirestoreAccessToken() {
   )?.[1];
   if (!pem) {
     throw new Error(
-      "FIREBASE_PRIVATE_KEY must be the private_key value from your Firebase service-account JSON, the complete service-account JSON, or a PKCS#8 PEM private key.",
+      "FIREBASE_PRIVATE_KEY must be a PKCS#8 PEM private key for Firestore REST access.",
     );
   }
   const keyBytes = Uint8Array.from(
