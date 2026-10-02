@@ -251,6 +251,7 @@ The catalog below covers the tracked application files and explains each file's 
 | File | Responsibility | Needs / dependencies |
 |---|---|---|
 | [`package.json`](./package.json) | Scripts and dependency manifest. | Node/npm, Next.js, Firebase, Drizzle, Cloudflare tooling. |
+| [`scripts/build-next.cjs`](./scripts/build-next.cjs) | Loads public Firebase variables from Wrangler before the Next.js production build, unless already set in the build environment. | `wrangler.jsonc`, Node.js, Next.js. |
 | [`package-lock.json`](./package-lock.json) | Locked dependency graph. | Must remain synchronized with `package.json`. |
 | [`tsconfig.json`](./tsconfig.json) | TypeScript compiler settings and path aliases. | `tsc`, Next.js type generation. |
 | [`next.config.ts`](./next.config.ts) | Next.js configuration. | Next.js build/runtime. |
@@ -401,13 +402,13 @@ These must remain secret:
 - `SEED_ADMIN_EMAIL`
 - `SEED_ADMIN_PASSWORD`
 
-The deployment must provide the server variables at runtime. Client variables must be present when the Next.js browser bundle is built; adding them only after deployment does not change an already-built client bundle.
+The deployment must provide the server variables at runtime. The `npm run build` script loads any missing public Firebase client variables from `wrangler.jsonc` before Next.js builds the browser bundle. Build-environment values take precedence; adding client variables only after deployment does not change an already-built bundle.
 
 ### Configuration inconsistencies
 
 - `.env.local` contains the expected local Firebase client and Admin variables.
 - `.dev.vars` does not contain the `NEXT_PUBLIC_FIREBASE_*` client variables.
-- `wrangler.jsonc` contains public Firebase variables, but server secrets must be added through Cloudflare secret configuration.
+- `wrangler.jsonc` contains public Firebase variables that the production build loads as fallbacks; build-environment values take precedence. Server secrets must be added through Cloudflare secret configuration.
 - The production metadata references `turnaroundexperts.info`, while the domain is currently unpaid/unavailable. Local testing should use `localhost`.
 - `firebase-service-account..json` has a service-account-looking name and must be verified as untracked/non-secret. If it ever contained a real private key and was committed, rotate it.
 
