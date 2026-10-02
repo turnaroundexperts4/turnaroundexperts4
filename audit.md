@@ -361,10 +361,11 @@ Every admin server action must continue to call `requireAdmin()` before reading 
 | File | Responsibility | Needs / risks |
 |---|---|---|
 | [`src/lib/auth.ts`](./src/lib/auth.ts) | Iron Session options, cookie, admin session helpers. | `SESSION_SECRET` of at least 32 characters. |
-| [`src/lib/firebase-client.ts`](./src/lib/firebase-client.ts) | Browser Firebase app/Auth/Firestore/Realtime Database initialization. | `NEXT_PUBLIC_FIREBASE_*` values are embedded at build time. |
-| [`src/lib/firebase-admin.ts`](./src/lib/firebase-admin.ts) | Firebase Admin initialization and service exports. | `FIREBASE_PROJECT_ID`, `FIREBASE_CLIENT_EMAIL`, `FIREBASE_PRIVATE_KEY`, database URL. |
+| [`src/lib/firebase-client.ts`](./src/lib/firebase-client.ts) | Browser Firebase app and Auth initialization. | `NEXT_PUBLIC_FIREBASE_*` values are embedded at build time. |
+| [`src/lib/firebase-admin.ts`](./src/lib/firebase-admin.ts) | Firebase Admin initialization and service exports; creates short-lived Firestore REST access tokens from the service-account key. | `FIREBASE_PROJECT_ID`, `FIREBASE_CLIENT_EMAIL`, `FIREBASE_PRIVATE_KEY`, database URL. |
 | [`src/lib/firebase-auth.ts`](./src/lib/firebase-auth.ts) | Firebase ID-token verification and password REST auth. | Firebase Admin runtime plus client API key for password auth. |
-| [`src/lib/firebase-content.ts`](./src/lib/firebase-content.ts) | Firestore content CRUD and record mapping. | Firebase Admin Firestore. |
+| [`src/lib/firebase-firestore-rest.ts`](./src/lib/firebase-firestore-rest.ts) | Firestore REST reads, queries, writes, and transactions without the protobuf/gRPC client that requires dynamic code generation. | Firestore REST API and service-account access token. |
+| [`src/lib/firebase-content.ts`](./src/lib/firebase-content.ts) | Firestore content CRUD and record mapping. | Firestore REST client. |
 | [`src/lib/data.ts`](./src/lib/data.ts) | Main Firebase/PostgreSQL data abstraction and fallback behavior. | Both data sources and consistent record mapping. |
 | [`src/lib/utils.ts`](./src/lib/utils.ts) | Shared formatting/utility functions. | Imported by pages/components as needed. |
 | [`src/lib/seed.ts`](./src/lib/seed.ts) | Seed users/content/database records. | Seed environment variables and database access. |

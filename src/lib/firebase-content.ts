@@ -319,7 +319,7 @@ function enabled() {
 }
 
 function nextId(
-  docs: FirebaseFirestore.QueryDocumentSnapshot<FirebaseFirestore.DocumentData>[],
+  docs: Array<{ data: () => FirebaseFirestore.DocumentData }>,
 ) {
   return (
     docs.reduce((max, doc) => Math.max(max, Number(doc.data().id ?? 0)), 0) + 1
@@ -700,7 +700,7 @@ export async function firebaseCreateAppointment(input: Record<string, unknown>) 
         ),
         transaction.get(collection),
       ]);
-    const active = (snapshot: FirebaseFirestore.QuerySnapshot) =>
+    const active = (snapshot: { docs: Array<{ data: () => FirebaseFirestore.DocumentData }> }) =>
       snapshot.docs.some((doc) =>
         ["cancelled", "completed", "rejected"].indexOf(String(doc.data().status)) === -1,
       );

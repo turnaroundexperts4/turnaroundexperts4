@@ -1,7 +1,7 @@
 import { cert, getApps, initializeApp } from "firebase-admin/app";
-import { getFirestore } from "firebase-admin/firestore";
 import { getDatabase } from "firebase-admin/database";
 import { getAuth } from "firebase-admin/auth";
+import { FirestoreRestClient } from "@/lib/firebase-firestore-rest";
 
 const projectId = process.env.FIREBASE_PROJECT_ID || "tae-lucky-509808";
 const clientEmail = process.env.FIREBASE_CLIENT_EMAIL?.trim();
@@ -42,9 +42,97 @@ if (!app && firebaseAdminConfigured && !isBuildPhase) {
 
 export { initializationError as firebaseAdminInitializationError };
 
-export const firestore = app ? getFirestore(app) : null;
+export const firestore =
+  app && app.options.credential
+    ? new FirestoreRestClient(projectId, async () => {
+        return getFirestoreAccessToken();
+      })
+    : null;
 export const realtimeDatabase = app ? getDatabase(app) : null;
 export const firebaseAuth = app ? getAuth(app) : null;
+
+let cachedFirestoreAccessToken: string | null = null;
+let firestoreAccessTokenExpiresAt = 0;
+
+async function getFirestoreAccessToken() {
+  if (!clientEmail || !privateKey) {
+    throw new Error(
+      "Firebase Firestore REST access requires Firebase service-account credentials.",
+    );
+  }
+
+  const now = Math.floor(Date.now() / 1000);
+  if (cachedFirestoreAccessToken && firestoreAccessTokenExpiresAt > now + 60) {
+    return cachedFirestoreAccessToken;
+  }
+
+  const pem = privateKey.match(
+    /^-----BEGIN PRIVATE KEY-----([\s\S]+)-----END PRIVATE KEY-----$/,
+  )?.[1];
+  if (!pem) {
+    throw new Error(
+      "FIREBASE_PRIVATE_KEY must be a PKCS#8 PEM private key for Firestore REST access.",
+    );
+  }
+  const keyBytes = Uint8Array.from(
+    atob(pem.replace(/\s/g, "")),
+    (character) => character.charCodeAt(0),
+  );
+  const signingKey = await crypto.subtle.importKey(
+    "pkcs8",
+    keyBytes,
+    { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" },
+    false,
+    ["sign"],
+  );
+  const encodeSegment = (value: string | Uint8Array) => {
+    const bytes =
+      typeof value === "string" ? new TextEncoder().encode(value) : value;
+    let binary = "";
+    for (const byte of bytes) binary += String.fromCharCode(byte);
+    return btoa(binary).replace(/=/g, "").replace(/\+/g, "-").replace(/\//g, "_");
+  };
+  const unsignedToken = [
+    encodeSegment(JSON.stringify({ alg: "RS256", typ: "JWT" })),
+    encodeSegment(
+      JSON.stringify({
+        iss: clientEmail,
+        scope: "https://www.googleapis.com/auth/datastore",
+        aud: "https://oauth2.googleapis.com/token",
+        iat: now,
+        exp: now + 3600,
+      }),
+    ),
+  ].join(".");
+  const signature = await crypto.subtle.sign(
+    "RSASSA-PKCS1-v1_5",
+    signingKey,
+    new TextEncoder().encode(unsignedToken),
+  );
+  const assertion = `${unsignedToken}.${encodeSegment(new Uint8Array(signature))}`;
+  const response = await fetch("https://oauth2.googleapis.com/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
+      assertion,
+    }),
+  });
+  const result = (await response.json()) as {
+    access_token?: string;
+    expires_in?: number;
+    error?: string;
+    error_description?: string;
+  };
+  if (!response.ok || !result.access_token) {
+    throw new Error(
+      `Firebase Firestore access-token request failed: ${result.error_description ?? result.error ?? `HTTP ${response.status}`}`,
+    );
+  }
+  cachedFirestoreAccessToken = result.access_token;
+  firestoreAccessTokenExpiresAt = now + (result.expires_in ?? 3600);
+  return cachedFirestoreAccessToken;
+}
 
 export function requireFirebaseAdmin() {
   if (!firestore || !firebaseAuth || !realtimeDatabase) {

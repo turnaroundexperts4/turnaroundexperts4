@@ -2,8 +2,6 @@
 
 import { getApp, getApps, initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { getDatabase } from "firebase/database";
-import { getFirestore } from "firebase/firestore";
 
 const app = getApps().length
   ? getApp()
@@ -19,5 +17,3 @@ const app = getApps().length
     });
 
 export const clientAuth = getAuth(app);
-export const clientFirestore = getFirestore(app);
-export const clientRealtimeDatabase = getDatabase(app);
