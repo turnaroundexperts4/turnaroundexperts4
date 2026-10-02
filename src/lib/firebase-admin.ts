@@ -43,10 +43,8 @@ if (!app && firebaseAdminConfigured && !isBuildPhase) {
 export { initializationError as firebaseAdminInitializationError };
 
 export const firestore =
-  app && app.options.credential
-    ? new FirestoreRestClient(projectId, async () => {
-        return getFirestoreAccessToken();
-      })
+  firebaseAdminConfigured && !isBuildPhase
+    ? new FirestoreRestClient(projectId, getFirestoreAccessToken)
     : null;
 export const realtimeDatabase = app ? getDatabase(app) : null;
 export const firebaseAuth = app ? getAuth(app) : null;
@@ -135,11 +133,20 @@ async function getFirestoreAccessToken() {
 }
 
 export function requireFirebaseAdmin() {
-  if (!firestore || !firebaseAuth || !realtimeDatabase) {
+  if (!firebaseAuth || !realtimeDatabase) {
     throw new Error(
       initializationError?.message ??
         "Firebase Admin is not configured. Set FIREBASE_CLIENT_EMAIL and FIREBASE_PRIVATE_KEY.",
     );
   }
-  return { firestore, firebaseAuth, realtimeDatabase };
+  return { firebaseAuth, realtimeDatabase };
+}
+
+export function requireFirebaseFirestore() {
+  if (!firestore) {
+    throw new Error(
+      "Firebase Firestore is not configured. Set FIREBASE_CLIENT_EMAIL and FIREBASE_PRIVATE_KEY.",
+    );
+  }
+  return firestore;
 }

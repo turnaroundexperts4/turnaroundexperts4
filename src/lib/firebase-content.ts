@@ -1,7 +1,7 @@
 import {
   firebaseAdminConfigured,
   firestore,
-  requireFirebaseAdmin,
+  requireFirebaseFirestore,
 } from "@/lib/firebase-admin";
 
 type Service = {
@@ -351,7 +351,7 @@ export async function firebaseSaveService(
   input: Record<string, unknown>,
 ) {
   if (!enabled()) return 0;
-  const { firestore: store } = requireFirebaseAdmin();
+  const store = requireFirebaseFirestore();
   const collection = store.collection("services");
   const target = id
     ? collection.doc(String(id))
@@ -366,7 +366,7 @@ export async function firebaseSaveService(
 
 export async function firebaseDeleteService(id: number) {
   if (!enabled()) return;
-  const { firestore: store } = requireFirebaseAdmin();
+  const store = requireFirebaseFirestore();
   await store.collection("services").doc(String(id)).delete();
 }
 
@@ -395,7 +395,7 @@ export async function firebaseSaveCategory(
   input: Record<string, unknown>,
 ) {
   if (!enabled()) return 0;
-  const { firestore: store } = requireFirebaseAdmin();
+  const store = requireFirebaseFirestore();
   const collection = store.collection("portfolioCategories");
   const target = id
     ? collection.doc(String(id))
@@ -406,7 +406,7 @@ export async function firebaseSaveCategory(
 
 export async function firebaseDeleteCategory(id: number) {
   if (!enabled()) return;
-  const { firestore: store } = requireFirebaseAdmin();
+  const store = requireFirebaseFirestore();
   await store.collection("portfolioCategories").doc(String(id)).delete();
 }
 
@@ -459,7 +459,7 @@ export async function firebaseSaveProject(
   input: Record<string, unknown>,
 ) {
   if (!enabled()) return 0;
-  const { firestore: store } = requireFirebaseAdmin();
+  const store = requireFirebaseFirestore();
   const collection = store.collection("portfolioProjects");
   const target = id
     ? collection.doc(String(id))
@@ -474,7 +474,7 @@ export async function firebaseSaveProject(
 
 export async function firebaseDeleteProject(id: number) {
   if (!enabled()) return;
-  const { firestore: store } = requireFirebaseAdmin();
+  const store = requireFirebaseFirestore();
   await store.collection("portfolioProjects").doc(String(id)).delete();
 }
 
@@ -491,7 +491,7 @@ export async function firebaseSaveBlogCategory(
   input: Record<string, unknown>,
 ) {
   if (!enabled()) return 0;
-  const { firestore: store } = requireFirebaseAdmin();
+  const store = requireFirebaseFirestore();
   const collection = store.collection("blogCategories");
   const target = id
     ? collection.doc(String(id))
@@ -552,7 +552,7 @@ export async function firebaseSaveBlogPost(
   input: Record<string, unknown>,
 ) {
   if (!enabled()) return 0;
-  const { firestore: store } = requireFirebaseAdmin();
+  const store = requireFirebaseFirestore();
   const collection = store.collection("blogPosts");
   const target = id
     ? collection.doc(String(id))
@@ -567,7 +567,7 @@ export async function firebaseSaveBlogPost(
 
 export async function firebaseDeleteBlogPost(id: number) {
   if (!enabled()) return;
-  const { firestore: store } = requireFirebaseAdmin();
+  const store = requireFirebaseFirestore();
   await store.collection("blogPosts").doc(String(id)).delete();
 }
 
@@ -672,7 +672,7 @@ export class AppointmentConflictError extends Error {
 export async function firebaseCreateAppointment(input: Record<string, unknown>) {
   const collection = await firebaseCollection("appointments");
   if (!collection) return null;
-  const { firestore: adminFirestore } = requireFirebaseAdmin();
+  const adminFirestore = requireFirebaseFirestore();
   const uid = String(input.uid ?? "");
   const requestedDate = String(input.requestedDate ?? "");
   const requestedTime = String(input.requestedTime ?? "");
@@ -780,7 +780,7 @@ export async function firebaseUpdateAppointment(
   const doc = await collection.doc(String(id)).get();
   if (!doc.exists) return;
   const current = mapAppointment(doc.id, doc.data()!);
-  const { firestore: adminFirestore } = requireFirebaseAdmin();
+  const adminFirestore = requireFirebaseFirestore();
   const appointmentRef = collection.doc(String(id));
   const notificationType =
     typeof next.notificationType === "string" ? next.notificationType : null;
@@ -921,7 +921,7 @@ export async function firebaseUpdateAppointment(
 }
 
 export async function firebaseClaimNextAppointmentNotification() {
-  const { firestore: store } = requireFirebaseAdmin();
+  const store = requireFirebaseFirestore();
   const jobs = store.collection("appointmentNotificationJobs");
   const now = new Date();
   const [pending, expired] = await Promise.all([
@@ -1001,7 +1001,7 @@ export async function firebasePersistAppointmentMeeting(input: {
   googleEventId: string;
   googleMeetLink: string;
 }) {
-  const { firestore: store } = requireFirebaseAdmin();
+  const store = requireFirebaseFirestore();
   const ref = store.collection("appointments").doc(String(input.appointmentId));
   return store.runTransaction(async (transaction) => {
     const snapshot = await transaction.get(ref);
@@ -1038,7 +1038,7 @@ export async function firebaseFinishAppointmentNotification(input: {
   meetingStatus?: string;
   nextAttemptAt?: Date;
 }) {
-  const { firestore: store } = requireFirebaseAdmin();
+  const store = requireFirebaseFirestore();
   const jobRef = store.collection("appointmentNotificationJobs").doc(input.jobId);
   const appointmentRef = store
     .collection("appointments")
@@ -1085,7 +1085,7 @@ export async function firebaseFinishAppointmentNotification(input: {
 export async function firebaseRetryLatestAppointmentNotification(
   appointmentId: number,
 ) {
-  const { firestore: store } = requireFirebaseAdmin();
+  const store = requireFirebaseFirestore();
   const appointmentRef = store
     .collection("appointments")
     .doc(String(appointmentId));
@@ -1156,7 +1156,7 @@ export async function firebaseAcceptAppointmentReschedule(
   reference: string,
   uid: string,
 ) {
-  const { firestore: store } = requireFirebaseAdmin();
+  const store = requireFirebaseFirestore();
   const collection = store.collection("appointments");
   const matches = await collection.where("reference", "==", reference).limit(1).get();
   const appointmentRef = matches.docs[0]?.ref;
