@@ -34,7 +34,7 @@ export function BrandLogo({
         style={{ width: size, height: size }}
       >
         <Image
-          src="/images/tae-logo.svg"
+          src="/images/tae-logo.png"
           alt="TurnAround Experts"
           width={size * 2}
           height={size * 2}
@@ -77,7 +77,7 @@ export function BrandMarkSvg({
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
-      src="/images/tae-logo.svg"
+      src="/images/tae-logo.png"
       alt="TurnAround Experts"
       width={size}
       height={size}
