@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createEnquiry } from "@/lib/data";
 import { verifyFirebaseIdToken } from "@/lib/firebase-auth";
+import { FirestoreRestError } from "@/lib/firebase-firestore-rest";
 import { checkRequestRateLimit } from "@/lib/request-rate-limit";
 
 export const dynamic = "force-dynamic";
@@ -51,7 +52,24 @@ export async function POST(req: Request) {
       { status: 400 },
     );
   }
-  const id = await createEnquiry({ ...parsed.data, uid: user.uid });
+  let id: number;
+  try {
+    id = await createEnquiry({ ...parsed.data, uid: user.uid });
+  } catch (error) {
+    console.error("Enquiry submission failed", {
+      errorCode:
+        error instanceof Error && /^[A-Za-z0-9_-]{1,80}$/.test(error.name)
+          ? error.name
+          : "unknown",
+      ...(error instanceof FirestoreRestError
+        ? { firestoreCode: error.code, firestoreStatus: error.status }
+        : {}),
+    });
+    return NextResponse.json(
+      { error: "Unable to save enquiry right now. Please try again." },
+      { status: 503 },
+    );
+  }
   if (!id) {
     return NextResponse.json(
       { error: "Unable to save enquiry right now." },

@@ -14,6 +14,7 @@ import {
 } from "@/lib/data";
 import { generateReference, todayISODate } from "@/lib/utils";
 import { verifyFirebaseIdToken } from "@/lib/firebase-auth";
+import { FirestoreRestError } from "@/lib/firebase-firestore-rest";
 import { checkRequestRateLimit } from "@/lib/request-rate-limit";
 
 const TimeRegex = /^([01]\d|2[0-3]):[0-5]\d$/;
@@ -219,6 +220,9 @@ export async function submitAppointment(
         error instanceof Error && /^[A-Za-z0-9_-]{1,80}$/.test(error.name)
           ? error.name
           : "unknown",
+      ...(error instanceof FirestoreRestError
+        ? { firestoreCode: error.code, firestoreStatus: error.status }
+        : {}),
     });
     return {
       ok: false,

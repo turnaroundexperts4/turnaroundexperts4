@@ -106,7 +106,7 @@ describe("FirestoreRestClient", () => {
       writes: [
         {
           update: {
-            name: "https://firestore.googleapis.com/v1/projects/test-project/databases/(default)/documents/appointments/7",
+            name: "projects/test-project/databases/(default)/documents/appointments/7",
             fields: {
               reference: { stringValue: "TAE-TEST" },
               createdAt: {
@@ -118,6 +118,48 @@ describe("FirestoreRestClient", () => {
         },
       ],
     });
+  });
+
+  it("uses Firestore resource names for document writes and deletes", async () => {
+    const fetchMock = vi.fn(async () => Response.json({}));
+    vi.stubGlobal("fetch", fetchMock);
+
+    const client = new FirestoreRestClient("test-project", async () => "token");
+    const reference = client.collection("enquiries").doc("7");
+    await reference.set({ message: "Test enquiry" });
+    await reference.delete();
+
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      1,
+      "https://firestore.googleapis.com/v1/projects/test-project/databases/(default)/documents:commit",
+      expect.objectContaining({
+        method: "POST",
+        body: JSON.stringify({
+          writes: [
+            {
+              update: {
+                name: "projects/test-project/databases/(default)/documents/enquiries/7",
+                fields: { message: { stringValue: "Test enquiry" } },
+              },
+            },
+          ],
+        }),
+      }),
+    );
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      2,
+      "https://firestore.googleapis.com/v1/projects/test-project/databases/(default)/documents:commit",
+      expect.objectContaining({
+        method: "POST",
+        body: JSON.stringify({
+          writes: [
+            {
+              delete: "projects/test-project/databases/(default)/documents/enquiries/7",
+            },
+          ],
+        }),
+      }),
+    );
   });
 
   it("surfaces Firestore REST errors with status and service code", async () => {

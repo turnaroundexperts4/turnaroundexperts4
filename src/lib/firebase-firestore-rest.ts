@@ -204,7 +204,7 @@ export class FirestoreRestClient {
   }
 
   documentName(path: string) {
-    return `${this.documentsUrl}/${path}`;
+    return `${this.documentResourcePath}/${path}`;
   }
 
   encodeDocument(data: FirestoreData): FirestoreDocument {
