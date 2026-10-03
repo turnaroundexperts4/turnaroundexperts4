@@ -1,15 +1,12 @@
 import { cert, getApps, initializeApp } from "firebase-admin/app";
 import { getDatabase } from "firebase-admin/database";
 import { getAuth } from "firebase-admin/auth";
+import { normalizeFirebasePrivateKey } from "@/lib/firebase-credentials";
 import { FirestoreRestClient } from "@/lib/firebase-firestore-rest";
 
 const projectId = process.env.FIREBASE_PROJECT_ID || "tae-lucky-509808";
 const clientEmail = process.env.FIREBASE_CLIENT_EMAIL?.trim();
-const privateKey = process.env.FIREBASE_PRIVATE_KEY
-  ?.trim()
-  .replace(/^(['"])([\s\S]*)\1$/, "$2")
-  .replace(/\\+r/g, "\r")
-  .replace(/\\+n/g, "\n");
+const privateKey = normalizeFirebasePrivateKey(process.env.FIREBASE_PRIVATE_KEY);
 const isBuildPhase = process.env.NEXT_PHASE === "phase-production-build";
 
 export const firebaseAdminConfigured = Boolean(
