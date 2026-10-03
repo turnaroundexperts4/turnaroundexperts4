@@ -115,10 +115,8 @@ export async function verifyFirebasePassword(email: string, password: string) {
   }
 
   const result = (await response.json()) as FirebaseSignIn;
-  let user;
   let adminDoc;
   try {
-    user = await firebaseAuth.getUser(result.localId);
     adminDoc = await firestore
       ?.collection("adminUsers")
       .doc(result.localId)
@@ -132,9 +130,30 @@ export async function verifyFirebasePassword(email: string, password: string) {
     }
     return { status: "invalid_credentials" } satisfies FirebaseAuthResult;
   }
-  const isAdmin = user.customClaims?.admin === true || adminDoc?.exists === true;
-  if (!isAdmin) return { status: "invalid_credentials" };
+  if (adminDoc?.exists) {
+    return {
+      status: "authenticated",
+      uid: result.localId,
+      email: result.email ?? email,
+      name: result.displayName ?? result.email ?? email,
+    } satisfies FirebaseAuthResult;
+  }
 
+  let user;
+  try {
+    user = await firebaseAuth.getUser(result.localId);
+  } catch (error) {
+    if (isUnavailableError(error)) {
+      return {
+        status: "service_unavailable",
+        reason: error instanceof Error ? error.message : "Firebase lookup failed.",
+      } satisfies FirebaseAuthResult;
+    }
+    return { status: "invalid_credentials" } satisfies FirebaseAuthResult;
+  }
+  if (user.customClaims?.admin !== true) {
+    return { status: "invalid_credentials" };
+  }
   return {
     status: "authenticated",
     uid: result.localId,
