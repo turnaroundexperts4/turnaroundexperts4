@@ -20,6 +20,18 @@ describe("normalizeFirebasePrivateKey", () => {
     ).toBe(pem);
   });
 
+  it("extracts a key from a JSON-encoded service-account string", () => {
+    expect(
+      normalizeFirebasePrivateKey(
+        JSON.stringify(JSON.stringify({ private_key: `${pem}\n` })),
+      ),
+    ).toBe(pem);
+  });
+
+  it("extracts a PEM block when the environment value has surrounding text", () => {
+    expect(normalizeFirebasePrivateKey(`prefix ${pem} suffix`)).toBe(pem);
+  });
+
   it("converts escaped newlines in raw environment values", () => {
     expect(normalizeFirebasePrivateKey(pem.replace(/\n/g, "\\n"))).toBe(pem);
   });
