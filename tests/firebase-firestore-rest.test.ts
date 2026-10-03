@@ -92,6 +92,15 @@ describe("FirestoreRestClient", () => {
     const commitCall = fetchMock.mock.calls.find(([url]) =>
       String(url).endsWith(":commit"),
     );
+    const batchGetCall = fetchMock.mock.calls.find(([url]) =>
+      String(url).endsWith(":batchGet"),
+    );
+    expect(JSON.parse(String(batchGetCall?.[1]?.body))).toEqual({
+      documents: [
+        "projects/test-project/databases/(default)/documents/appointments/7",
+      ],
+      transaction: "transaction-token",
+    });
     expect(JSON.parse(String(commitCall?.[1]?.body))).toEqual({
       transaction: "transaction-token",
       writes: [

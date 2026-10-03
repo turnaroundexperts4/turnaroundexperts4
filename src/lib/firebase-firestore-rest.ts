@@ -115,7 +115,7 @@ export class FirestoreRestClient {
       {
         method: "POST",
         body: JSON.stringify({
-          documents: [`${this.documentsUrl}/${path}`],
+          documents: [`${this.documentResourcePath}/${path}`],
           transaction: transactionId,
         }),
       },
