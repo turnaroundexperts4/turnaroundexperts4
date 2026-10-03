@@ -1,0 +1,19 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "turnaroundexperts-appointment-notifier",
+  "main": "scripts/appointment-notifier-worker.ts",
+  "compatibility_date": "2026-09-19",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": false,
+  "triggers": {
+    "crons": ["* * * * *"]
+  },
+  "vars": {
+    "FIREBASE_PROJECT_ID": "tae-lucky-509808",
+    "FIREBASE_DATABASE_URL": "https://tae-lucky-509808-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "APP_BASE_URL": "https://turnaroundexperts.in"
+  },
+  "observability": {
+    "enabled": true
+  }
+}

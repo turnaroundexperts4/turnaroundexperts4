@@ -10,9 +10,10 @@
     "typecheck": "tsc --noEmit",
     "seed:firebase": "tsx scripts/seed-firebase.ts",
     "appointments:process-outbox": "tsx scripts/process-appointment-outbox.ts",
+    "appointments:deploy": "wrangler deploy --config wrangler.appointments.jsonc",
     "preview:cloudflare": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
-    "deploy:cloudflare": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
-    "deploy:cloudflare-built": "opennextjs-cloudflare deploy"
+    "deploy:cloudflare": "opennextjs-cloudflare build && opennextjs-cloudflare deploy && wrangler deploy --config wrangler.appointments.jsonc",
+    "deploy:cloudflare-built": "opennextjs-cloudflare deploy && wrangler deploy --config wrangler.appointments.jsonc"
   },
   "dependencies": {
     "@opennextjs/cloudflare": "^1.20.5",
