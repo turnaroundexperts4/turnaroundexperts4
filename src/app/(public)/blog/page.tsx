@@ -10,6 +10,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Blog",
   description: "Insights and field notes from TurnAround Experts.",
+  alternates: { canonical: "/blog" },
 };
 
 export default async function BlogIndexPage({

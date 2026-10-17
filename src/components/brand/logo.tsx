@@ -34,12 +34,12 @@ export function BrandLogo({
         style={{ width: size, height: size }}
       >
         <Image
-          src="/images/tae-logo.png"
+          src="/images/tae-logo.webp"
           alt="TurnAround Experts"
           width={size * 2}
           height={size * 2}
           className="h-full w-full object-contain"
-          priority
+          loading="lazy"
         />
       </span>
       {!markOnly && withWordmark ? (

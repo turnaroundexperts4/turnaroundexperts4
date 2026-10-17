@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { ArrowUpRight } from "lucide-react";
 import { AnimatedBackdrop } from "@/components/public/animated-backdrop";
 import { Eyebrow, Reveal } from "@/components/public/reveal";
@@ -15,6 +16,13 @@ import { formatDate } from "@/lib/utils";
 import { ServiceIcon } from "@/components/public/service-icon";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Business Consulting & Digital Solutions in Gujarat",
+  description:
+    "TurnAround Experts helps business owners across India improve operations, build custom software, and grow through practical consulting and digital services.",
+  alternates: { canonical: "/" },
+};
 
 type Company = {
   name: string;
@@ -132,13 +140,9 @@ export default async function HomePage() {
               </div>
             </Reveal>
 
-            <Reveal delay={0.08}>
-              <h1
-                className="display-font mt-8 max-w-4xl text-balance text-[clamp(2.6rem,5.6vw,5rem)] font-medium leading-[1.02] tracking-[-0.03em] text-paper"
-              >
-                We diagnose where the business loses money — and we build the fix.
-              </h1>
-            </Reveal>
+            <h1 className="display-font mt-8 max-w-4xl text-balance text-[clamp(2.6rem,5.6vw,5rem)] font-medium leading-[1.02] tracking-[-0.03em] text-paper">
+              We diagnose where the business loses money — and we build the fix.
+            </h1>
 
             <Reveal delay={0.18}>
               <p className="mt-7 max-w-2xl text-[17px] leading-relaxed text-ink-300/90">
@@ -506,6 +510,8 @@ export default async function HomePage() {
                           <img
                             src={f!.photoUrl}
                             alt={f!.name}
+                            loading="lazy"
+                            decoding="async"
                             className="h-full w-full object-cover"
                           />
                         ) : (

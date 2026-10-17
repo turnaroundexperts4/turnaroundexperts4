@@ -9,6 +9,7 @@ export const metadata: Metadata = {
   title: "Engagement Models",
   description:
     "How TAE engagements are priced — consultation, project-based, custom and retainer.",
+  alternates: { canonical: "/pricing" },
 };
 
 const MODELS = [

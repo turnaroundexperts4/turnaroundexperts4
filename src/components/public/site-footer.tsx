@@ -177,9 +177,9 @@ export function SiteFooter({
 
 function FooterTitle({ children }: { children: React.ReactNode }) {
   return (
-    <h4 className="text-[11px] uppercase tracking-[0.22em] text-ink-300/60">
+    <h3 className="text-[11px] uppercase tracking-[0.22em] text-ink-300/60">
       {children}
-    </h4>
+    </h3>
   );
 }
 

@@ -10,6 +10,7 @@ export const metadata: Metadata = {
   title: "Founders & Team",
   description:
     "Meet the founders and team of TurnAround Experts — leadership behind TAE's consulting, technology and digital practice.",
+  alternates: { canonical: "/founders" },
 };
 
 export default async function FoundersPage() {

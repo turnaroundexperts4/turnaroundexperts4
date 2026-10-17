@@ -17,10 +17,11 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const service = await getServiceBySlug(slug);
-  if (!service) return { title: "Service" };
+  if (!service) return { title: "Service", robots: { index: false } };
   return {
     title: service.title,
     description: service.tagline ?? service.description.slice(0, 160),
+    alternates: { canonical: `/services/${encodeURIComponent(slug)}` },
   };
 }
 

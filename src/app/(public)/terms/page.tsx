@@ -3,7 +3,11 @@ import { LegalPage } from "@/components/public/legal-pages";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = { title: "Terms of Use" };
+export const metadata: Metadata = {
+  title: "Terms of Use",
+  description: "Terms for using the TurnAround Experts public website.",
+  alternates: { canonical: "/terms" },
+};
 
 export default function TermsPage() {
   return (

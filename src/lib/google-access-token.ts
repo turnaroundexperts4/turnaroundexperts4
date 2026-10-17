@@ -10,6 +10,7 @@ type CachedToken = {
 };
 
 const cachedTokens = new Map<string, CachedToken>();
+const pendingTokenRequests = new Map<string, Promise<string>>();
 
 export async function getGoogleAccessToken(scope: string): Promise<string> {
   if (!clientEmail || !privateKey) {
@@ -22,7 +23,26 @@ export async function getGoogleAccessToken(scope: string): Promise<string> {
   const cached = cachedTokens.get(scope);
   if (cached && cached.expiresAt > now + 60) return cached.accessToken;
 
-  const pem = privateKey.match(
+  const pending = pendingTokenRequests.get(scope);
+  if (pending) return pending;
+
+  const request = requestAccessToken(scope, now, privateKey);
+  pendingTokenRequests.set(scope, request);
+  try {
+    return await request;
+  } finally {
+    if (pendingTokenRequests.get(scope) === request) {
+      pendingTokenRequests.delete(scope);
+    }
+  }
+}
+
+async function requestAccessToken(
+  scope: string,
+  now: number,
+  key: string,
+): Promise<string> {
+  const pem = key.match(
     /^-----BEGIN PRIVATE KEY-----([\s\S]+)-----END PRIVATE KEY-----$/,
   )?.[1];
   if (!pem) {

@@ -17,11 +17,14 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const row = await getPostBySlug(slug);
-  if (!row || !row.post.published) return { title: "Article" };
+  if (!row || !row.post.published) {
+    return { title: "Article", robots: { index: false } };
+  }
   return {
     title: row.post.title,
     description:
       row.post.excerpt ?? row.post.content.replace(/<[^>]+>/g, "").slice(0, 160),
+    alternates: { canonical: `/blog/${encodeURIComponent(slug)}` },
   };
 }
 

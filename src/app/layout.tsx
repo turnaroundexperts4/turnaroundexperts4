@@ -22,8 +22,8 @@ export const metadata: Metadata = {
     template: "%s · TurnAround Experts",
   },
   description:
-    "TurnAround Experts (TAE) is a technology, digital services and consulting company helping businesses solve operational and growth problems across Gujarat and India.",
-  metadataBase: new URL("https://turnaroundexperts.info"),
+    "TurnAround Experts helps businesses across Gujarat and India solve operational and growth problems through technology, digital services and consulting.",
+  metadataBase: new URL("https://turnaroundexperts.in"),
   icons: {
     icon: [{ url: "/favicon.png", type: "image/png", sizes: "48x48" }],
     apple: [
@@ -42,9 +42,21 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
+  const organizationSchema = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "TurnAround Experts",
+    url: "https://turnaroundexperts.in",
+    logo: "https://turnaroundexperts.in/images/tae-logo.webp",
+  };
+
   return (
     <html lang="en" className={`${fraunces.variable} ${inter.variable}`}>
       <body className="bg-paper text-ink-900 antialiased">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+        />
         <UserAuthProvider>{children}</UserAuthProvider>
       </body>
     </html>
