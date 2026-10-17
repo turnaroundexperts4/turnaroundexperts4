@@ -40,7 +40,7 @@ export async function POST(req: Request) {
   }
   if (file.size > MAX_BYTES) {
     return NextResponse.json(
-      { error: "File too large (max 6MB)." },
+      { error: "File too large (max 5 MB)." },
       { status: 400 },
     );
   }
@@ -49,14 +49,23 @@ export async function POST(req: Request) {
   const buffer = Buffer.from(await file.arrayBuffer());
   const dataUrl = `data:${file.type};base64,${buffer.toString("base64")}`;
   const path = `uploads/${folder}/${name}`;
-  const { realtimeDatabase } = requireFirebaseAdmin();
-  await realtimeDatabase.ref(path).set({
-    name,
-    contentType: file.type,
-    size: file.size,
-    dataUrl,
-    createdAt: Date.now(),
-  });
+  try {
+    const { realtimeDatabase } = requireFirebaseAdmin();
+    await realtimeDatabase.ref(path).set({
+      name,
+      contentType: file.type,
+      size: file.size,
+      dataUrl,
+      createdAt: Date.now(),
+    });
+  } catch (error) {
+    console.error("Admin photo upload failed:", error);
+    return NextResponse.json(
+      { error: "Photo upload failed. Please try again." },
+      { status: 500 },
+    );
+  }
+
   return NextResponse.json({
     url: `/api/media?path=${encodeURIComponent(path)}`,
     name,
