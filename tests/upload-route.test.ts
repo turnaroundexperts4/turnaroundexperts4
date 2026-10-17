@@ -1,13 +1,14 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-const { getSession, requireFirebaseAdmin, set } = vi.hoisted(() => ({
+const { getSession, setRealtimeDatabaseValue } = vi.hoisted(() => ({
   getSession: vi.fn(),
-  requireFirebaseAdmin: vi.fn(),
-  set: vi.fn(),
+  setRealtimeDatabaseValue: vi.fn(),
 }));
 
 vi.mock("@/lib/auth", () => ({ getSession }));
-vi.mock("@/lib/firebase-admin", () => ({ requireFirebaseAdmin }));
+vi.mock("@/lib/firebase-realtime-database-rest", () => ({
+  setRealtimeDatabaseValue,
+}));
 vi.mock("nanoid", () => ({ nanoid: () => "test-id" }));
 
 import { POST } from "@/app/api/upload/route";
@@ -28,12 +29,7 @@ function imageFile(size = 1, type = "image/jpeg") {
 
 beforeEach(() => {
   getSession.mockResolvedValue({ adminUid: "admin-uid" });
-  set.mockResolvedValue(undefined);
-  requireFirebaseAdmin.mockReturnValue({
-    realtimeDatabase: {
-      ref: vi.fn(() => ({ set })),
-    },
-  });
+  setRealtimeDatabaseValue.mockResolvedValue(undefined);
 });
 
 afterEach(() => {
@@ -51,7 +47,7 @@ describe("POST /api/upload", () => {
 
     expect(response.status).toBe(401);
     expect(await response.json()).toEqual({ error: "Unauthorized" });
-    expect(requireFirebaseAdmin).not.toHaveBeenCalled();
+    expect(setRealtimeDatabaseValue).not.toHaveBeenCalled();
   });
 
   it("rejects unsupported file types without writing to Firebase", async () => {
@@ -63,7 +59,7 @@ describe("POST /api/upload", () => {
     expect(await response.json()).toEqual({
       error: "Unsupported file type. Use JPG, PNG, WEBP, GIF or SVG.",
     });
-    expect(set).not.toHaveBeenCalled();
+    expect(setRealtimeDatabaseValue).not.toHaveBeenCalled();
   });
 
   it("accepts an image at the 5 MiB limit and stores it in the requested folder", async () => {
@@ -78,7 +74,8 @@ describe("POST /api/upload", () => {
       name: expect.stringMatching(/^\d+-test-id$/),
       path: expect.stringMatching(/^uploads\/teamphotos\/\d+-test-id$/),
     });
-    expect(set).toHaveBeenCalledWith(
+    expect(setRealtimeDatabaseValue).toHaveBeenCalledWith(
+      expect.stringMatching(/^uploads\/teamphotos\/\d+-test-id$/),
       expect.objectContaining({
         contentType: "image/jpeg",
         size: 5 * 1024 * 1024,
@@ -96,12 +93,12 @@ describe("POST /api/upload", () => {
     expect(await response.json()).toEqual({
       error: "File too large (max 5 MB).",
     });
-    expect(set).not.toHaveBeenCalled();
+    expect(setRealtimeDatabaseValue).not.toHaveBeenCalled();
   });
 
   it("returns a logged server error when Firebase storage fails", async () => {
     const storageError = new Error("Firebase unavailable");
-    set.mockRejectedValue(storageError);
+    setRealtimeDatabaseValue.mockRejectedValue(storageError);
     const errorLog = vi.spyOn(console, "error").mockImplementation(() => {});
 
     const response = await POST(

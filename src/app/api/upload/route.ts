@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
-import { requireFirebaseAdmin } from "@/lib/firebase-admin";
+import { setRealtimeDatabaseValue } from "@/lib/firebase-realtime-database-rest";
 import { nanoid } from "nanoid";
 
 export const dynamic = "force-dynamic";
@@ -24,10 +24,9 @@ export async function POST(req: Request) {
 
   const form = await req.formData();
   const file = form.get("file");
-  const folder = String(form.get("folder") ?? "general").replace(
-    /[^a-z0-9_-]/gi,
-    "",
-  );
+  const folder =
+    String(form.get("folder") ?? "general").replace(/[^a-z0-9_-]/gi, "") ||
+    "general";
 
   if (!(file instanceof File)) {
     return NextResponse.json({ error: "No file provided" }, { status: 400 });
@@ -50,8 +49,7 @@ export async function POST(req: Request) {
   const dataUrl = `data:${file.type};base64,${buffer.toString("base64")}`;
   const path = `uploads/${folder}/${name}`;
   try {
-    const { realtimeDatabase } = requireFirebaseAdmin();
-    await realtimeDatabase.ref(path).set({
+    await setRealtimeDatabaseValue(path, {
       name,
       contentType: file.type,
       size: file.size,

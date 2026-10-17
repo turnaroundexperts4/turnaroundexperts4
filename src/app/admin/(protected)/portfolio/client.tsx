@@ -27,6 +27,7 @@ import {
   saveProject,
 } from "@/app/admin/(protected)/portfolio/actions";
 import { cn } from "@/lib/utils";
+import { uploadAdminImage } from "@/lib/admin-image-upload";
 
 type Category = {
   id: number;
@@ -411,14 +412,9 @@ function ProjectForm({
   async function uploadFile(file: File) {
     setUploading(true);
     try {
-      const fd = new FormData();
-      fd.append("file", file);
-      fd.append("folder", "portfolio");
-      const res = await fetch("/api/upload", { method: "POST", body: fd });
-      const j = await res.json();
-      if (!res.ok) throw new Error(j.error ?? "Upload failed");
-      setImages((arr) => [...arr, j.url]);
-      if (!thumb) setThumb(j.url);
+      const url = await uploadAdminImage(file, "portfolio");
+      setImages((arr) => [...arr, url]);
+      if (!thumb) setThumb(url);
     } catch (e) {
       alert(e instanceof Error ? e.message : "Upload failed");
     } finally {

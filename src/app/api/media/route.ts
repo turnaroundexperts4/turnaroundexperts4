@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requireFirebaseAdmin } from "@/lib/firebase-admin";
+import { getRealtimeDatabaseValue } from "@/lib/firebase-realtime-database-rest";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -10,16 +10,18 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Invalid media path" }, { status: 400 });
   }
 
-  const { realtimeDatabase } = requireFirebaseAdmin();
-  const snapshot = await realtimeDatabase.ref(path).get();
-  if (!snapshot.exists()) {
+  const value = await getRealtimeDatabaseValue(path);
+  if (value === null) {
     return NextResponse.json({ error: "Media not found" }, { status: 404 });
   }
-  const media = snapshot.val() as {
-    dataUrl?: string;
-    contentType?: string;
-  };
-  if (!media.dataUrl || !media.contentType) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return NextResponse.json({ error: "Invalid media record" }, { status: 500 });
+  }
+  const media = value as Record<string, unknown>;
+  if (
+    typeof media.dataUrl !== "string" ||
+    typeof media.contentType !== "string"
+  ) {
     return NextResponse.json({ error: "Invalid media record" }, { status: 500 });
   }
 

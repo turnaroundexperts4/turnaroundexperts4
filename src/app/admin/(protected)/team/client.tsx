@@ -11,6 +11,7 @@ import {
   Textarea,
 } from "@/app/admin/_components/admin-fields";
 import { removeTeamMember, saveTeamMember } from "@/app/admin/(protected)/team/actions";
+import { uploadAdminImage } from "@/lib/admin-image-upload";
 
 type Member = {
   id: number;
@@ -177,13 +178,7 @@ function MemberForm({
   async function upload(file: File) {
     setUploading(true);
     try {
-      const fd = new FormData();
-      fd.append("file", file);
-      fd.append("folder", "team");
-      const res = await fetch("/api/upload", { method: "POST", body: fd });
-      const j = await res.json();
-      if (!res.ok) throw new Error(j.error ?? "Upload failed");
-      setPhoto(j.url);
+      setPhoto(await uploadAdminImage(file, "team"));
     } catch (e) {
       alert(e instanceof Error ? e.message : "Upload failed");
     } finally {

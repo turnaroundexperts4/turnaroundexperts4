@@ -12,6 +12,7 @@ import {
   Textarea,
 } from "@/app/admin/_components/admin-fields";
 import { removePost, savePost } from "@/app/admin/(protected)/blog/actions";
+import { uploadAdminImage } from "@/lib/admin-image-upload";
 
 type Cat = { id: number; name: string };
 type Post = {
@@ -178,13 +179,7 @@ function PostForm({
   async function upload(file: File) {
     setUploading(true);
     try {
-      const fd = new FormData();
-      fd.append("file", file);
-      fd.append("folder", "blog");
-      const res = await fetch("/api/upload", { method: "POST", body: fd });
-      const j = await res.json();
-      if (!res.ok) throw new Error(j.error ?? "Upload failed");
-      setCover(j.url);
+      setCover(await uploadAdminImage(file, "blog"));
     } catch (e) {
       alert(e instanceof Error ? e.message : "Upload failed");
     } finally {
