@@ -9,6 +9,7 @@ export const metadata: Metadata = {
   title: "Book an Appointment",
   description:
     "Book a consultation directly with the TAE team. Choose a date, time and service — natively on the TAE website.",
+  alternates: { canonical: "/book-appointment" },
 };
 
 export default async function BookAppointmentPage() {

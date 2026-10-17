@@ -10,6 +10,7 @@ export const metadata: Metadata = {
   title: "Services",
   description:
     "TAE services across consulting, technology, ERP, e-commerce, SEO and accounting.",
+  alternates: { canonical: "/services" },
 };
 
 export default async function ServicesPage() {

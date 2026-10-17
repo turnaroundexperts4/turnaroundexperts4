@@ -17,11 +17,14 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const row = await getProjectBySlug(slug);
-  if (!row) return { title: "Project" };
+  if (!row || !row.project.visible) {
+    return { title: "Project", robots: { index: false } };
+  }
   return {
     title: row.project.title,
     description:
       row.project.shortDescription ?? row.project.description.slice(0, 160),
+    alternates: { canonical: `/portfolio/${encodeURIComponent(slug)}` },
   };
 }
 

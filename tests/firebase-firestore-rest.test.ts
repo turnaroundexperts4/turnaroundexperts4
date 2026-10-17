@@ -3,6 +3,7 @@ import { FirestoreRestClient } from "../src/lib/firebase-firestore-rest";
 
 afterEach(() => {
   vi.unstubAllGlobals();
+  vi.useRealTimers();
 });
 
 describe("FirestoreRestClient", () => {
@@ -60,6 +61,51 @@ describe("FirestoreRestClient", () => {
         }),
       }),
     );
+  });
+
+  it("reuses short-lived reads of public content and clears them after writes", async () => {
+    const fetchMock = vi.fn(async () => Response.json([]));
+    vi.stubGlobal("fetch", fetchMock);
+    const client = new FirestoreRestClient("test-project", async () => "token");
+    const services = client.collection("services");
+
+    await services.get();
+    await services.get();
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    await services.doc("7").set({ title: "Updated service" });
+    await services.get();
+    expect(fetchMock).toHaveBeenCalledTimes(3);
+  });
+
+  it("refreshes cached public content after its time-to-live", async () => {
+    vi.useFakeTimers();
+    const fetchMock = vi.fn(async () => Response.json([]));
+    vi.stubGlobal("fetch", fetchMock);
+    const services = new FirestoreRestClient(
+      "test-project",
+      async () => "token",
+    ).collection("services");
+
+    await services.get();
+    await vi.advanceTimersByTimeAsync(30_001);
+    await services.get();
+
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
+  it("does not cache appointment reads", async () => {
+    const fetchMock = vi.fn(async () => Response.json([]));
+    vi.stubGlobal("fetch", fetchMock);
+    const appointments = new FirestoreRestClient(
+      "test-project",
+      async () => "token",
+    ).collection("appointments");
+
+    await appointments.get();
+    await appointments.get();
+
+    expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 
   it("commits transaction writes with create preconditions", async () => {

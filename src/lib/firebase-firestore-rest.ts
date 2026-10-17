@@ -37,6 +37,18 @@ type FirestoreWrite =
 
 type AccessTokenProvider = () => Promise<string>;
 
+const PUBLIC_READ_CACHE_TTL_MS = 30_000;
+const PUBLIC_READ_CACHE_MAX_ENTRIES = 128;
+const PUBLIC_COLLECTIONS = new Set([
+  "services",
+  "portfolioProjects",
+  "portfolioCategories",
+  "blogPosts",
+  "blogCategories",
+  "founders",
+  "teamMembers",
+]);
+
 export class FirestoreRestError extends Error {
   constructor(
     message: string,
@@ -51,6 +63,12 @@ export class FirestoreRestError extends Error {
 export class FirestoreRestClient {
   private readonly documentsUrl: string;
   private readonly documentResourcePath: string;
+  private readonly readCache = new Map<
+    string,
+    { body: string; expiresAt: number }
+  >();
+  private readonly pendingReads = new Map<string, Promise<string>>();
+  private readCacheGeneration = 0;
 
   constructor(
     projectId: string,
@@ -176,6 +194,7 @@ export class FirestoreRestClient {
       method: "POST",
       body: JSON.stringify({ writes: [write] }),
     });
+    this.clearReadCache();
   }
 
   async beginTransaction() {
@@ -194,6 +213,7 @@ export class FirestoreRestClient {
       method: "POST",
       body: JSON.stringify({ transaction, writes }),
     });
+    if (writes.length > 0) this.clearReadCache();
   }
 
   async rollback(transaction: string) {
@@ -287,6 +307,82 @@ export class FirestoreRestClient {
   }
 
   private async request<T = void>(
+    url: string,
+    init: RequestInit = {},
+  ): Promise<T> {
+    const cacheKey = this.getPublicReadCacheKey(url, init);
+    if (!cacheKey) return this.requestUncached<T>(url, init);
+
+    const cached = this.readCache.get(cacheKey);
+    if (cached && cached.expiresAt > Date.now()) {
+      return JSON.parse(cached.body) as T;
+    }
+    this.readCache.delete(cacheKey);
+
+    const pending = this.pendingReads.get(cacheKey);
+    if (pending) return JSON.parse(await pending) as T;
+
+    const generation = this.readCacheGeneration;
+    const request = this.requestUncached<T>(url, init).then((value) => {
+      const body = JSON.stringify(value);
+      if (body !== undefined && generation === this.readCacheGeneration) {
+        if (this.readCache.size >= PUBLIC_READ_CACHE_MAX_ENTRIES) {
+          const oldestKey = this.readCache.keys().next().value;
+          if (oldestKey !== undefined) this.readCache.delete(oldestKey);
+        }
+        this.readCache.set(cacheKey, {
+          body,
+          expiresAt: Date.now() + PUBLIC_READ_CACHE_TTL_MS,
+        });
+      }
+      return body ?? "null";
+    });
+    this.pendingReads.set(cacheKey, request);
+    try {
+      return JSON.parse(await request) as T;
+    } finally {
+      if (this.pendingReads.get(cacheKey) === request) {
+        this.pendingReads.delete(cacheKey);
+      }
+    }
+  }
+
+  private getPublicReadCacheKey(url: string, init: RequestInit) {
+    const method = (init.method ?? "GET").toUpperCase();
+    const pathname = new URL(url).pathname;
+    if (method === "GET") {
+      const settingMatch = pathname.match(
+        /\/documents\/siteSettings\/(company|social)$/,
+      );
+      return settingMatch ? `${method}:${pathname}` : null;
+    }
+    if (method !== "POST" || !pathname.endsWith(":runQuery") || !init.body) {
+      return null;
+    }
+
+    try {
+      const body = JSON.parse(String(init.body)) as {
+        structuredQuery?: { from?: Array<{ collectionId?: string }> };
+        transaction?: string;
+      };
+      const collectionId = body.structuredQuery?.from?.[0]?.collectionId;
+      return !body.transaction &&
+        collectionId &&
+        PUBLIC_COLLECTIONS.has(collectionId)
+        ? `${method}:${pathname}:${String(init.body)}`
+        : null;
+    } catch {
+      return null;
+    }
+  }
+
+  private clearReadCache() {
+    this.readCacheGeneration += 1;
+    this.readCache.clear();
+    this.pendingReads.clear();
+  }
+
+  private async requestUncached<T = void>(
     url: string,
     init: RequestInit = {},
   ): Promise<T> {

@@ -12,6 +12,7 @@ export const metadata: Metadata = {
   title: "Portfolio",
   description:
     "Selected projects by TurnAround Experts — websites, webapps, ERP, e-commerce, management software and logo design.",
+  alternates: { canonical: "/portfolio" },
 };
 
 export default async function PortfolioPage() {

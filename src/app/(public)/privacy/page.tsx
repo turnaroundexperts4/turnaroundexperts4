@@ -3,7 +3,12 @@ import { LegalPage } from "@/components/public/legal-pages";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = { title: "Privacy Policy" };
+export const metadata: Metadata = {
+  title: "Privacy Policy",
+  description:
+    "How TurnAround Experts collects, uses and protects information shared through this website.",
+  alternates: { canonical: "/privacy" },
+};
 
 export default function PrivacyPage() {
   return (

@@ -9,6 +9,7 @@ export const metadata: Metadata = {
   title: "Check appointment status",
   description:
     "Look up the status of an existing TAE appointment using your reference id.",
+  robots: { index: false, follow: false },
 };
 
 export default async function AppointmentStatusPage({

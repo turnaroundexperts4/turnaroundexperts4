@@ -16,6 +16,7 @@ export const metadata: Metadata = {
   title: "Contact TAE",
   description:
     "Get in touch with TurnAround Experts — phone, email, office and enquiry form.",
+  alternates: { canonical: "/contact" },
 };
 
 export default async function ContactPage() {
